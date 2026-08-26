@@ -224,6 +224,31 @@
                 }
             });
         }
+
+        // Real-Time 3-Second Auto-Polling for Admin Panel
+        function pollLiveData() {
+            fetch('/api/admin_data')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.candidates) return;
+                data.candidates.forEach(cand => {
+                    const rows = document.querySelectorAll('.candidate-row');
+                    rows.forEach(row => {
+                        const nameTd = row.querySelector('td');
+                        if (nameTd && nameTd.textContent.trim() === cand.name) {
+                            const prelimCell = row.querySelector('.prelim-val');
+                            if (prelimCell) {
+                                prelimCell.textContent = cand.prelim_score.toFixed(2);
+                            }
+                        }
+                    });
+                });
+                calculateTabulation();
+            })
+            .catch(err => {});
+        }
+
+        setInterval(pollLiveData, 3000);
     </script>
 
 </body>
