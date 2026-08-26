@@ -42,6 +42,22 @@
 <body>
 
     <div class="admin-container">
+        <!-- Hotspot Network Info & Admin Actions -->
+        <div style="background: #1e293b; color: white; padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">🟢 HOTSPOT MODE ACTIVE</span>
+                <span style="margin-left: 12px; font-size: 14px;">Host Server: <strong>http://{{ host_ip if host_ip else '192.168.x.x' }}:5000</strong></span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="/download_csv" style="background: #0284c7; color: white; padding: 8px 14px; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+                    📥 Backup CSV
+                </a>
+                <button onclick="resetScores()" style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">
+                    🔄 Reset Scores
+                </button>
+            </div>
+        </div>
+
         <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION</div>
         
         <table id="tabulationTable">
@@ -123,7 +139,47 @@
         });
 
         // Run once on page load to instantly calculate the 30% Overall Preliminary column
-        document.addEventListener('DOMContentLoaded', calculateTabulation);
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateTabulation();
+            setInterval(pollAdminData, 3000);
+        });
+
+        async function pollAdminData() {
+            try {
+                const res = await fetch('/api/admin_data');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.candidates) return;
+
+                data.candidates.forEach(cand => {
+                    const rows = document.querySelectorAll('.candidate-row');
+                    rows.forEach(row => {
+                        const nameCell = row.querySelector('td');
+                        if (nameCell && nameCell.textContent.includes(cand.name)) {
+                            const prelimCell = row.querySelector('.prelim-val');
+                            if (prelimCell && parseFloat(prelimCell.textContent) !== cand.prelim_score) {
+                                prelimCell.textContent = cand.prelim_score.toFixed(2);
+                            }
+                        }
+                    });
+                });
+                calculateTabulation();
+            } catch (e) {
+                console.log("Hotspot polling sync error:", e);
+            }
+        }
+
+        async function resetScores() {
+            if (!confirm("Are you sure you want to reset all judge scores for a new round? This cannot be undone!")) return;
+            try {
+                const res = await fetch('/api/reset_scores', { method: 'POST' });
+                const result = await res.json();
+                alert(result.message);
+                window.location.reload();
+            } catch (e) {
+                alert("Error resetting scores.");
+            }
+        }
 
         function calculateTabulation() {
             const rows = document.querySelectorAll('.candidate-row');

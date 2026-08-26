@@ -239,12 +239,30 @@
     </style>
 </head>
 <body>
+    <!-- Hotspot Offline Mode Status Banner -->
+    <div id="hotspot-banner" style="width: 100%; max-width: 1050px; background: #0f766e; color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(15,118,110,0.2); box-sizing: border-box;">
+        <div>🟢 Hotspot Network Mode &nbsp;|&nbsp; Host Server: <strong>http://{{ host_ip if host_ip else '192.168.x.x' }}:5000</strong></div>
+        <div id="offline-badge" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px;">Connected</div>
+    </div>
+
     <div class="tabulation-card">
         <h2>SK Pageant Judging</h2>
         <form id="scoringForm" class="form-layout">
             
-            <!-- LEFT PANEL: 3 Rows x 4 Columns Candidate Grid -->
+            <!-- LEFT PANEL: Candidate Grid & Judge Identifier -->
             <div class="left-panel">
+                <!-- Judge Identifier Selection -->
+                <div style="background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Judge Identifier:</label>
+                    <select name="judge_name" id="judge_select" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 600; font-size: 14px; background: white; color: #0f172a;">
+                        <option value="Judge 1">Judge 1</option>
+                        <option value="Judge 2">Judge 2</option>
+                        <option value="Judge 3">Judge 3</option>
+                        <option value="Judge 4">Judge 4</option>
+                        <option value="Judge 5">Judge 5</option>
+                    </select>
+                </div>
+
                 <label class="section-title">1. Select Candidate</label>
                 <div class="selected-preview">
                     <div id="placeholder-circle" class="placeholder-circle">Select below</div>
@@ -469,20 +487,75 @@
             });
         });
 
-        // --- 4. SUBMIT FORM ---
+        // --- 4. OFFLINE STORAGE & AUTO-SYNC LOGIC ---
+        function getOfflineQueue() {
+            return JSON.parse(localStorage.getItem('pageant_offline_queue') || '[]');
+        }
+
+        function saveOfflineQueue(queue) {
+            localStorage.setItem('pageant_offline_queue', JSON.stringify(queue));
+            updateOfflineBadge();
+        }
+
+        function updateOfflineBadge() {
+            const queue = getOfflineQueue();
+            const badge = document.getElementById('offline-badge');
+            if (!badge) return;
+            if (queue.length > 0) {
+                badge.style.background = '#f59e0b';
+                badge.textContent = `⚠️ ${queue.length} Queued for Sync`;
+            } else {
+                badge.style.background = 'rgba(255,255,255,0.2)';
+                badge.textContent = '🟢 Connected';
+            }
+        }
+
+        async function syncOfflineQueue() {
+            const queue = getOfflineQueue();
+            if (queue.length === 0) return;
+
+            const remaining = [];
+            for (const item of queue) {
+                try {
+                    const res = await fetch('/submit_score', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    if (!res.ok) remaining.push(item);
+                } catch (e) {
+                    remaining.push(item);
+                }
+            }
+            saveOfflineQueue(remaining);
+        }
+
+        // Periodically sync offline queue every 4 seconds
+        setInterval(syncOfflineQueue, 4000);
+        updateOfflineBadge();
+
+        // --- SUBMIT FORM HANDLER ---
         document.getElementById('scoringForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
             const statusMessage = document.getElementById('status-message');
-            statusMessage.textContent = "Sending..."; 
+            statusMessage.textContent = "Submitting..."; 
             statusMessage.className = ""; 
             
-            const submittedCandidate = document.querySelector('input[name="candidate_number"]:checked').value;
+            const formData = new FormData(this);
+            const scorePayload = {};
+            formData.forEach((value, key) => { scorePayload[key] = value; });
+
+            const submittedCandidate = scorePayload['candidate_number'];
 
             fetch('/submit_score', { 
                 method: 'POST', 
-                body: new FormData(this) 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(scorePayload)
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error("Server error");
+                return response.json();
+            })
             .then(data => {
                 statusMessage.textContent = "Scores submitted successfully!"; 
                 statusMessage.className = "success";
@@ -497,13 +570,21 @@
                 previewImg.style.display = 'none'; 
                 previewName.textContent = "No Candidate Selected";
                 
-                setTimeout(() => { 
-                    statusMessage.textContent = ""; 
-                }, 3000);
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
             })
             .catch(error => {
-                statusMessage.textContent = "Error submitting scores. Check connection."; 
+                // Network down or offline: save to local queue
+                const queue = getOfflineQueue();
+                queue.push(scorePayload);
+                saveOfflineQueue(queue);
+
+                statusMessage.textContent = "⚠️ Offline: Score saved locally. Will auto-sync when hotspot reconnects!"; 
                 statusMessage.className = "error";
+
+                delete candidateMemory[submittedCandidate];
+                document.getElementById('scoringForm').reset();
+                currentStep = 1; 
+                showStep(currentStep);
             });
         });
     </script>
