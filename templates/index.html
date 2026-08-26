@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Federation Pageant Tabulation</title>
+    
+    <!-- NEW: Importing the Geist font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* BASE STYLES */
+        body { 
+            /* NEW: Applying the Geist font */
+            font-family: 'Geist', sans-serif; 
+            background-color: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        .tabulation-card { 
+            background-color: white; 
+            padding: 35px 40px; 
+            border-radius: 14px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+            width: 100%; 
+            max-width: 1050px; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-top: 0; 
+            margin-bottom: 25px; 
+            font-size: 26px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            font-weight: 700;
+        }
+        .form-layout { 
+            display: flex; 
+            gap: 35px; 
+        }
+        
+        /* LEFT PANEL (Candidates) */
+        .left-panel { 
+            flex: 1.1; 
+            border-right: 2px dashed #eee; 
+            padding-right: 35px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        label.section-title { 
+            font-weight: 600; 
+            color: #555; 
+            display: block; 
+            margin-bottom: 15px; 
+            font-size: 16px; 
+            text-align: left; 
+            border-bottom: 2px solid #007bff; 
+            padding-bottom: 6px; 
+            display: inline-block; 
+        }
+        
+        /* Top Preview */
+        .selected-preview { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            min-height: 140px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .selected-preview img { 
+            width: 100px; 
+            height: 100px; 
+            object-fit: cover; 
+            border-radius: 50%; 
+            border: 3px solid #007bff; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12); 
+            display: none; 
+        }
+        .placeholder-circle { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            background-color: #f0f0f0; 
+            border: 2px dashed #ccc; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #999; 
+            font-size: 13px; 
+            text-align: center; 
+            padding: 8px; 
+            box-sizing: border-box; 
+        }
+        .selected-preview h3 { 
+            margin: 10px 0 0 0; 
+            color: #333; 
+            font-size: 18px; 
+            font-weight: 600;
+        }
+        
+        /* NO SCROLL: 3 Rows x 4 Columns Grid */
+        .candidate-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; 
+        }
+        input[type="radio"] { 
+            display: none; 
+        }
+        .list-item { 
+            cursor: pointer; 
+        }
+        .list-content { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 8px 4px; 
+            background-color: #fdfdfd; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            transition: all 0.2s ease-in-out; 
+            text-align: center;
+        }
+        .list-content img { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin-bottom: 5px; 
+        }
+        .list-content span { 
+            font-weight: 600; 
+            color: #555; 
+            font-size: 11px; 
+            white-space: nowrap;
+        }
+        input[type="radio"]:checked + .list-content { 
+            border-color: #007bff; 
+            background-color: #e9f2ff; 
+            transform: translateY(-2px); 
+            box-shadow: 0 3px 6px rgba(0, 123, 255, 0.15);
+        }
+
+        /* RIGHT PANEL (Wizard) */
+        .right-panel { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            position: relative; 
+        }
+        .step { 
+            display: none; 
+        } 
+        .step.active { 
+            display: block; 
+        } 
+        .step-indicator { 
+            text-align: right; 
+            color: #888; 
+            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+        }
+        
+        .criteria-item { 
+            margin-bottom: 10px; 
+        }
+        .criteria-item label { 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: #444; 
+            display: block; 
+            margin-bottom: 4px; 
+        }
+        .criteria-item input[type="number"] { 
+            width: 100%; 
+            padding: 9px 12px; 
+            border: 2px solid #ccc; 
+            border-radius: 6px; 
+            font-size: 15px; 
+            box-sizing: border-box; 
+            background-color: #fcfcfc; 
+            font-family: 'Geist', sans-serif;
+        }
+        
+        /* Buttons */
+        .button-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        button { 
+            flex: 1; 
+            padding: 13px; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 15px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+            font-family: 'Geist', sans-serif;
+        }
+        .btn-next { background-color: #007bff; }
+        .btn-next:hover { background-color: #0056b3; }
+        .btn-prev { background-color: #6c757d; }
+        .btn-prev:hover { background-color: #5a6268; }
+        .btn-submit { background-color: #28a745; }
+        .btn-submit:hover { background-color: #218838; }
+
+        #status-message { 
+            text-align: center; 
+            margin-top: 12px; 
+            font-weight: 600; 
+            height: 18px; 
+            font-size: 14px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .form-layout { flex-direction: column; gap: 20px; }
+            .left-panel { border-right: none; border-bottom: 2px dashed #eee; padding-right: 0; padding-bottom: 25px; }
+            .candidate-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tabulation-card">
+        <h2>SK Pageant Judging</h2>
+        <form id="scoringForm" class="form-layout">
+            
+            <!-- LEFT PANEL: 3 Rows x 4 Columns Candidate Grid -->
+            <div class="left-panel">
+                <label class="section-title">1. Select Candidate</label>
+                <div class="selected-preview">
+                    <div id="placeholder-circle" class="placeholder-circle">Select below</div>
+                    <img id="preview-img" src="" alt="Selected Candidate">
+                    <h3 id="preview-name">No Candidate Selected</h3>
+                </div>
+                
+                <div class="candidate-grid">
+                    <!-- Row 1 -->
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="1" data-img="/static/candidate1.jpg" data-name="Candidate 1" required>
+                        <div class="list-content"><img src="/static/candidate1.jpg" alt="Candidate 1"><span>Cand. 1</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="2" data-img="/static/candidate2.jpg" data-name="Candidate 2" required>
+                        <div class="list-content"><img src="/static/candidate2.jpg" alt="Candidate 2"><span>Cand. 2</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="3" data-img="/static/candidate3.jpg" data-name="Candidate 3" required>
+                        <div class="list-content"><img src="/static/candidate3.jpg" alt="Candidate 3"><span>Cand. 3</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="4" data-img="/static/candidate4.jpg" data-name="Candidate 4" required>
+                        <div class="list-content"><img src="/static/candidate4.jpg" alt="Candidate 4"><span>Cand. 4</span></div>
+                    </label>
+
+                    <!-- Row 2 -->
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="5" data-img="/static/candidate5.jpg" data-name="Candidate 5" required>
+                        <div class="list-content"><img src="/static/candidate5.jpg" alt="Candidate 5"><span>Cand. 5</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="6" data-img="/static/candidate6.jpg" data-name="Candidate 6" required>
+                        <div class="list-content"><img src="/static/candidate6.jpg" alt="Candidate 6"><span>Cand. 6</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="7" data-img="/static/candidate7.jpg" data-name="Candidate 7" required>
+                        <div class="list-content"><img src="/static/candidate7.jpg" alt="Candidate 7"><span>Cand. 7</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="8" data-img="/static/candidate8.jpg" data-name="Candidate 8" required>
+                        <div class="list-content"><img src="/static/candidate8.jpg" alt="Candidate 8"><span>Cand. 8</span></div>
+                    </label>
+
+                    <!-- Row 3 -->
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="9" data-img="/static/candidate9.jpg" data-name="Candidate 9" required>
+                        <div class="list-content"><img src="/static/candidate9.jpg" alt="Candidate 9"><span>Cand. 9</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="10" data-img="/static/candidate10.jpg" data-name="Candidate 10" required>
+                        <div class="list-content"><img src="/static/candidate10.jpg" alt="Candidate 10"><span>Cand. 10</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="11" data-img="/static/candidate11.jpg" data-name="Candidate 11" required>
+                        <div class="list-content"><img src="/static/candidate11.jpg" alt="Candidate 11"><span>Cand. 11</span></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="candidate_number" value="12" data-img="/static/candidate12.jpg" data-name="Candidate 12" required>
+                        <div class="list-content"><img src="/static/candidate12.jpg" alt="Candidate 12"><span>Cand. 12</span></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL WIZARD (6 Steps) -->
+            <div class="right-panel">
+                
+                <!-- Step 1: PRODUCTION -->
+                <div class="step active" id="step-1">
+                    <label class="section-title">Production Number (15% Weight)</label>
+                    <div class="step-indicator">Step 1 of 6</div>
+                    <div class="criteria-item"><label>Stage Presence & Confidence (1-30)</label><input type="number" name="p_presence" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Execution & Coordination (1-25)</label><input type="number" name="p_execution" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Energy & Projection (1-25)</label><input type="number" name="p_energy" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Personality & Overall Impact (1-20)</label><input type="number" name="p_personality" min="1" max="20" required></div>
+                    <div class="button-group"><button type="button" class="btn-next">Next &#8594;</button></div>
+                </div>
+
+                <!-- Step 2: CASUAL WEAR -->
+                <div class="step" id="step-2">
+                    <label class="section-title">Casual Wear (15% Weight)</label>
+                    <div class="step-indicator">Step 2 of 6</div>
+                    <div class="criteria-item"><label>Poise & Confidence (1-30)</label><input type="number" name="c_poise" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Carriage & Ramp Skills (1-30)</label><input type="number" name="c_carriage" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Stage Presence & Personality (1-25)</label><input type="number" name="c_presence" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Overall Impact (1-15)</label><input type="number" name="c_impact" min="1" max="15" required></div>
+                    <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next &#8594;</button></div>
+                </div>
+
+                <!-- Step 3: SWIMWEAR -->
+                <div class="step" id="step-3">
+                    <label class="section-title">Swimwear (15% Weight)</label>
+                    <div class="step-indicator">Step 3 of 6</div>
+                    <div class="criteria-item"><label>Confidence & Poise (1-30)</label><input type="number" name="s_confidence" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Carriage & Ramp Skills (1-30)</label><input type="number" name="s_carriage" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Stage Presence & Projection (1-25)</label><input type="number" name="s_presence" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Overall Impact (1-15)</label><input type="number" name="s_impact" min="1" max="15" required></div>
+                    <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next &#8594;</button></div>
+                </div>
+
+                <!-- Step 4: ADVOCACY -->
+                <div class="step" id="step-4">
+                    <label class="section-title">Advocacy (20% Weight)</label>
+                    <div class="step-indicator">Step 4 of 6</div>
+                    <div class="criteria-item"><label>Relevance & Significance (1-25)</label><input type="number" name="a_relevance" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Content & Substance (1-25)</label><input type="number" name="a_content" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Feasibility & Potential Impact (1-20)</label><input type="number" name="a_feasibility" min="1" max="20" required></div>
+                    <div class="criteria-item"><label>Communication & Delivery (1-15)</label><input type="number" name="a_communication" min="1" max="15" required></div>
+                    <div class="criteria-item"><label>Sincerity & Conviction (1-15)</label><input type="number" name="a_sincerity" min="1" max="15" required></div>
+                    <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next &#8594;</button></div>
+                </div>
+
+                <!-- Step 5: EVENING GOWN -->
+                <div class="step" id="step-5">
+                    <label class="section-title">Evening Gown (15% Weight)</label>
+                    <div class="step-indicator">Step 5 of 6</div>
+                    <div class="criteria-item"><label>Elegance & Poise (1-25)</label><input type="number" name="e_elegance" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Carriage & Stage Presence (1-25)</label><input type="number" name="e_carriage" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Grace & Ramp Skills (1-20)</label><input type="number" name="e_grace" min="1" max="20" required></div>
+                    <div class="criteria-item"><label>Gown & Overall Styling (1-15)</label><input type="number" name="e_styling" min="1" max="15" required></div>
+                    <div class="criteria-item"><label>Overall Impact (1-15)</label><input type="number" name="e_impact" min="1" max="15" required></div>
+                    <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next &#8594;</button></div>
+                </div>
+
+                <!-- Step 6: QUESTION & ANSWER -->
+                <div class="step" id="step-6">
+                    <label class="section-title">Question & Answer (20% Weight)</label>
+                    <div class="step-indicator">Step 6 of 6</div>
+                    <div class="criteria-item"><label>Relevance & Substance (1-30)</label><input type="number" name="q_relevance" min="1" max="30" required></div>
+                    <div class="criteria-item"><label>Clarity & Organization of Thoughts (1-25)</label><input type="number" name="q_clarity" min="1" max="25" required></div>
+                    <div class="criteria-item"><label>Critical Thinking & Insight (1-20)</label><input type="number" name="q_insight" min="1" max="20" required></div>
+                    <div class="criteria-item"><label>Communication Skills (1-15)</label><input type="number" name="q_communication" min="1" max="15" required></div>
+                    <div class="criteria-item"><label>Confidence & Composure (1-10)</label><input type="number" name="q_composure" min="1" max="10" required></div>
+                    <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="submit" class="btn-submit">Submit Scores</button></div>
+                </div>
+                
+                <div id="status-message"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // --- 1. CANDIDATE MEMORY SYSTEM ---
+        let candidateMemory = {};
+        const numberInputs = document.querySelectorAll('.right-panel input[type="number"]');
+
+        numberInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const selectedCandidate = document.querySelector('input[name="candidate_number"]:checked');
+                if (selectedCandidate) {
+                    const candidateId = selectedCandidate.value;
+                    if (!candidateMemory[candidateId]) { candidateMemory[candidateId] = {}; }
+                    candidateMemory[candidateId][this.name] = this.value;
+                }
+            });
+        });
+
+        // --- 2. LIVE PREVIEW & RESTORE ---
+        const radioButtons = document.querySelectorAll('input[name="candidate_number"]');
+        const previewImg = document.getElementById('preview-img');
+        const placeholderCircle = document.getElementById('placeholder-circle');
+        const previewName = document.getElementById('preview-name');
+
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                placeholderCircle.style.display = 'none';
+                previewImg.style.display = 'block';
+                previewImg.src = this.getAttribute('data-img');
+                previewName.textContent = this.getAttribute('data-name');
+                
+                const candidateId = this.value;
+
+                numberInputs.forEach(input => {
+                    if (candidateMemory[candidateId] && candidateMemory[candidateId][input.name] !== undefined) {
+                        input.value = candidateMemory[candidateId][input.name];
+                    } else {
+                        input.value = '';
+                    }
+                });
+                
+                currentStep = 1;
+                showStep(currentStep);
+            });
+        });
+
+        // --- 3. WIZARD LOGIC ---
+        let currentStep = 1;
+        
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step-${stepNumber}`).classList.add('active');
+        }
+
+        document.querySelectorAll('.btn-next').forEach(button => {
+            button.addEventListener('click', () => {
+                if (currentStep === 1 && !document.querySelector('input[name="candidate_number"]:checked')) {
+                    alert("Please select a candidate from the left panel first!");
+                    return; 
+                }
+                
+                const inputs = document.getElementById(`step-${currentStep}`).querySelectorAll('input');
+                let allValid = true;
+                
+                inputs.forEach(input => {
+                    if (!input.checkValidity()) { 
+                        input.reportValidity(); 
+                        allValid = false; 
+                    }
+                });
+                
+                if (allValid) { 
+                    currentStep++; 
+                    showStep(currentStep); 
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-prev').forEach(button => {
+            button.addEventListener('click', () => { 
+                currentStep--; 
+                showStep(currentStep); 
+            });
+        });
+
+        // --- 4. SUBMIT FORM ---
+        document.getElementById('scoringForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = "Sending..."; 
+            statusMessage.className = ""; 
+            
+            const submittedCandidate = document.querySelector('input[name="candidate_number"]:checked').value;
+
+            fetch('/submit_score', { 
+                method: 'POST', 
+                body: new FormData(this) 
+            })
+            .then(response => response.text())
+            .then(data => {
+                statusMessage.textContent = "Scores submitted successfully!"; 
+                statusMessage.className = "success";
+                
+                delete candidateMemory[submittedCandidate];
+
+                document.getElementById('scoringForm').reset();
+                currentStep = 1; 
+                showStep(currentStep);
+                
+                placeholderCircle.style.display = 'flex'; 
+                previewImg.style.display = 'none'; 
+                previewName.textContent = "No Candidate Selected";
+                
+                setTimeout(() => { 
+                    statusMessage.textContent = ""; 
+                }, 3000);
+            })
+            .catch(error => {
+                statusMessage.textContent = "Error submitting scores. Check connection."; 
+                statusMessage.className = "error";
+            });
+        });
+    </script>
+</body>
+</html>
