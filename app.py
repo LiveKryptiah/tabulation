@@ -197,7 +197,7 @@ def admin_panel():
 
 # --- HELPER & API FOR REAL-TIME TABULATION ---
 def get_tabulation_data():
-    prelim_results = {}
+    prelim_by_judge = {}  # cand_num -> { judge_slot: score }
     category_results = {}
     judge_progress = {}
     
@@ -213,9 +213,9 @@ def get_tabulation_data():
                     try:
                         cand_num = int(cand_str.replace('Candidate ', ''))
                         score = float(score_str)
-                        if cand_num not in prelim_results:
-                            prelim_results[cand_num] = []
-                        prelim_results[cand_num].append(score)
+                        if cand_num not in prelim_by_judge:
+                            prelim_by_judge[cand_num] = {}
+                        prelim_by_judge[cand_num][j_slot] = score  # Latest score per judge
                         
                         if cand_num not in category_results:
                             category_results[cand_num] = {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []}
@@ -241,9 +241,8 @@ def get_tabulation_data():
                         pass
 
     # Read Top 5 Judge Scores (Per Judge Breakdown)
-    top5_beauty_results = {}
-    top5_brain_results = {}
-    top5_judge_scores = {} # cand_num -> { judge_slot: score }
+    top5_beauty_by_judge = {} # cand_num -> { judge_slot: b_score }
+    top5_brain_by_judge = {}  # cand_num -> { judge_slot: br_score }
 
     if os.path.exists(TOP5_CSV_FILE):
         with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as file:
@@ -261,14 +260,11 @@ def get_tabulation_data():
                         br_val = float(br_tot) if br_tot else 0
 
                         if b_tot:
-                            if cand_num not in top5_beauty_results: top5_beauty_results[cand_num] = []
-                            top5_beauty_results[cand_num].append(b_val)
+                            if cand_num not in top5_beauty_by_judge: top5_beauty_by_judge[cand_num] = {}
+                            top5_beauty_by_judge[cand_num][j_slot] = b_val
                         if br_tot:
-                            if cand_num not in top5_brain_results: top5_brain_results[cand_num] = []
-                            top5_brain_results[cand_num].append(br_val)
-
-                        if cand_num not in top5_judge_scores: top5_judge_scores[cand_num] = {}
-                        top5_judge_scores[cand_num][j_slot] = round(b_val + br_val, 2)
+                            if cand_num not in top5_brain_by_judge: top5_brain_by_judge[cand_num] = {}
+                            top5_brain_by_judge[cand_num][j_slot] = br_val
 
                         if j_slot not in judge_progress:
                             judge_progress[j_slot] = set()
@@ -277,23 +273,40 @@ def get_tabulation_data():
                         pass
 
     candidates_data = []
-    all_cand_nums = set(range(1, 13)).union(prelim_results.keys()).union(top5_beauty_results.keys())
+    all_cand_nums = set(range(1, 13)).union(prelim_by_judge.keys()).union(top5_beauty_by_judge.keys())
 
     for cand_num in sorted(all_cand_nums):
-        p_scores = prelim_results.get(cand_num, [])
-        b_scores = top5_beauty_results.get(cand_num, [])
-        br_scores = top5_brain_results.get(cand_num, [])
+        p_dict = prelim_by_judge.get(cand_num, {})
+        b_dict = top5_beauty_by_judge.get(cand_num, {})
+        br_dict = top5_brain_by_judge.get(cand_num, {})
         cats = category_results.get(cand_num, {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []})
 
+        # 30% Prelim Avg based on judges who scored
+        p_scores = list(p_dict.values())
         prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0
         prelim_30 = prelim_avg * 0.30
 
+        # 30% Beauty Avg based on judges who scored
+        b_scores = list(b_dict.values())
         beauty_30 = sum(b_scores) / len(b_scores) if b_scores else 0
+
+        # 40% Brain Avg based on judges who scored
+        br_scores = list(br_dict.values())
         brain_40  = sum(br_scores) / len(br_scores) if br_scores else 0
 
+        # Final Score (100%) = 30% Prelim + 30% Beauty + 40% Brain
         final_score = prelim_30 + beauty_30 + brain_40
 
-        j_scores = top5_judge_scores.get(cand_num, {})
+        # Build Per-Judge Top 5 Breakdown (Beauty + Brain total out of 70 pts per judge)
+        j_breakdown = {}
+        for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']:
+            has_b = j_id in b_dict
+            has_br = j_id in br_dict
+            if has_b or has_br:
+                tot = b_dict.get(j_id, 0) + br_dict.get(j_id, 0)
+                j_breakdown[j_id] = round(tot, 2)
+            else:
+                j_breakdown[j_id] = '-'
 
         candidates_data.append({
             'number': cand_num,
@@ -303,11 +316,16 @@ def get_tabulation_data():
             'beauty_30': round(beauty_30, 2),
             'brain_40': round(brain_40, 2),
             'final_score': round(final_score, 2),
-            'judge_1': j_scores.get('Judge 1', '-'),
-            'judge_2': j_scores.get('Judge 2', '-'),
-            'judge_3': j_scores.get('Judge 3', '-'),
-            'judge_4': j_scores.get('Judge 4', '-'),
-            'judge_5': j_scores.get('Judge 5', '-'),
+            'judge_1': j_breakdown.get('Judge 1', '-'),
+            'judge_2': j_breakdown.get('Judge 2', '-'),
+            'judge_3': j_breakdown.get('Judge 3', '-'),
+            'judge_4': j_breakdown.get('Judge 4', '-'),
+            'judge_5': j_breakdown.get('Judge 5', '-'),
+            'p_j1': p_dict.get('Judge 1', '-'),
+            'p_j2': p_dict.get('Judge 2', '-'),
+            'p_j3': p_dict.get('Judge 3', '-'),
+            'p_j4': p_dict.get('Judge 4', '-'),
+            'p_j5': p_dict.get('Judge 5', '-'),
             'prod_avg': round(sum(cats['prod']) / len(cats['prod']), 2) if cats['prod'] else 0,
             'casual_avg': round(sum(cats['casual']) / len(cats['casual']), 2) if cats['casual'] else 0,
             'swim_avg': round(sum(cats['swim']) / len(cats['swim']), 2) if cats['swim'] else 0,
