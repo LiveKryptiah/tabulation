@@ -4,6 +4,20 @@ import os
 
 app = Flask(__name__)
 
+# Determine writable CSV location for Vercel serverless environment (/tmp) or local environment
+CSV_FILE = '/tmp/pageant_scores.csv' if os.environ.get('VERCEL') else 'pageant_scores.csv'
+
+def init_csv():
+    if not os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                'Candidate', 
+                'Production (Max 100)', 'Casual Wear (Max 100)', 'Swimwear (Max 100)', 
+                'Advocacy (Max 100)', 'Evening Gown (Max 100)', 'Q&A (Max 100)', 
+                'FINAL SCORE'
+            ])
+
 # --- ROUTE 1: The Judges' Scoring Form ---
 @app.route('/')
 def home():
@@ -12,6 +26,7 @@ def home():
 # --- ROUTE 2: Saving Preliminary Scores ---
 @app.route('/submit_score', methods=['POST'])
 def save_score():
+    init_csv()
     candidate = request.form['candidate_number']
     
     # 1. PRODUCTION (Sum to 100, Weight 15%)
@@ -42,7 +57,7 @@ def save_score():
     grand_total = prod_weighted + cas_weighted + swim_weighted + adv_weighted + gown_weighted + qa_weighted
     
     # Save to CSV
-    with open('pageant_scores.csv', mode='a', newline='') as file:
+    with open(CSV_FILE, mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([
             "Candidate " + candidate, 
@@ -54,8 +69,9 @@ def save_score():
 @app.route('/rankings')
 def rankings():
     results = {}
-    if os.path.exists('pageant_scores.csv'):
-        with open('pageant_scores.csv', mode='r') as file:
+    init_csv()
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='r') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if 'Candidate' in row and row['Candidate']:
@@ -77,10 +93,11 @@ def rankings():
 @app.route('/admin')
 def admin_panel():
     prelim_results = {}
+    init_csv()
     
     # Read the preliminary scores from the CSV
-    if os.path.exists('pageant_scores.csv'):
-        with open('pageant_scores.csv', mode='r') as file:
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='r') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if 'Candidate' in row and row['Candidate']:
@@ -107,18 +124,9 @@ def admin_panel():
     return render_template('admin.html', candidates=candidates_data)
 
 if __name__ == '__main__':
-    if not os.path.exists('pageant_scores.csv'):
-        with open('pageant_scores.csv', mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([
-                'Candidate', 
-                'Production (Max 100)', 'Casual Wear (Max 100)', 'Swimwear (Max 100)', 
-                'Advocacy (Max 100)', 'Evening Gown (Max 100)', 'Q&A (Max 100)', 
-                'FINAL SCORE'
-            ])
-
+    init_csv()
     print("Starting Server...")
     print("-> Judges go to:   http://[Your-IP-Address]")
     print("-> Public Ranking: http://[Your-IP-Address]/rankings")
     print("-> Admin Top 5:    http://[Your-IP-Address]/admin")
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=80)
