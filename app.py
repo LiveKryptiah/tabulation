@@ -27,7 +27,8 @@ def init_csv():
                 'Timestamp'
             ])
 
-# --- ROUTE: LOGIN ---
+# --- ROUTE 1: LOGIN FORM FIRST (Root URL) ---
+@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -35,13 +36,27 @@ def login():
         name = request.form.get('judge_name', '').strip()
         pin = request.form.get('pin', '').strip()
 
-        if pin == JUDGE_PIN or pin == 'admin':
+        if slot == 'Admin' or pin == 'admin':
+            if pin == 'admin' or pin == JUDGE_PIN:
+                session['logged_in'] = True
+                session['role'] = 'admin'
+                return redirect(url_for('admin_panel'))
+            else:
+                return render_template('login.html', error="Invalid Admin PIN! Default Admin PIN is admin.")
+        elif pin == JUDGE_PIN or pin == '1234':
             session['judge_slot'] = slot
             session['judge_name'] = name if name else slot
             session['logged_in'] = True
-            return redirect(url_for('home'))
+            session['role'] = 'judge'
+            return redirect(url_for('scoring'))
         else:
-            return render_template('login.html', error="Invalid PIN / Passcode! Default PIN is 1234.")
+            return render_template('login.html', error="Invalid PIN! Default Judge PIN is 1234, Admin PIN is admin.")
+
+    # If already logged in, redirect to appropriate page
+    if session.get('logged_in'):
+        if session.get('role') == 'admin':
+            return redirect(url_for('admin_panel'))
+        return redirect(url_for('scoring'))
 
     return render_template('login.html')
 
@@ -51,9 +66,9 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# --- ROUTE 1: The Judges' Scoring Form ---
-@app.route('/')
-def home():
+# --- ROUTE 2: The Judges' Scoring Form ---
+@app.route('/scoring')
+def scoring():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     

@@ -164,27 +164,28 @@
 
         <form action="/login" method="POST">
             <div class="form-group">
-                <label for="judge_slot">Select Judge Slot</label>
+                <label for="judge_slot">Select Account Role</label>
                 <select name="judge_slot" id="judge_slot" required>
                     <option value="Judge 1">Judge 1</option>
                     <option value="Judge 2">Judge 2</option>
                     <option value="Judge 3">Judge 3</option>
                     <option value="Judge 4">Judge 4</option>
                     <option value="Judge 5">Judge 5</option>
+                    <option value="Admin">Admin / Tabulator</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="judge_name">Judge Full Name (Optional)</label>
+            <div class="form-group" id="nameGroup">
+                <label for="judge_name">Full Name (Optional)</label>
                 <input type="text" name="judge_name" id="judge_name" placeholder="e.g. Hon. Maria Santos" autocomplete="off">
             </div>
 
             <div class="form-group">
                 <label for="pin">Passcode / PIN</label>
-                <input type="password" name="pin" id="pin" placeholder="Enter PIN (Default: 1234)" required autocomplete="current-password">
+                <input type="password" name="pin" id="pin" placeholder="Judge PIN: 1234 | Admin: admin" required autocomplete="current-password">
             </div>
 
-            <button type="submit" class="btn-login">Enter Scoring Panel</button>
+            <button type="submit" class="btn-login">Sign In</button>
         </form>
     </div>
 
