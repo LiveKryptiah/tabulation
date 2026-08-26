@@ -44,18 +44,18 @@
     <div class="admin-container">
         <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION</div>
         
-        <!-- Offline Hotspot & Multi-Judge Status Banner -->
+        <!-- Multi-Judge Status Banner -->
         <div style="background-color: #2b2d42; color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
-            <div>
-                <strong>📡 Hotspot URL for Judges:</strong> <span style="color: #ffd166; font-weight: bold;">http://{{ host_ip }}:5000/login</span>
-            </div>
             <div>
                 <strong>Live Judge Submissions:</strong>
                 {% for j, count in judge_summary.items() %}
                 <span style="background: #a67c52; padding: 3px 8px; border-radius: 4px; margin-left: 6px; font-size: 12px;">{{ j }}: {{ count }} candidate(s)</span>
                 {% else %}
-                <span style="color: #bbb;">Waiting for judge login...</span>
+                <span style="color: #bbb;">Waiting for judge submissions...</span>
                 {% endfor %}
+            </div>
+            <div>
+                <a href="/login" style="color: #ffd166; text-decoration: none; font-size: 13px;">🔑 Judges Login Portal</a>
             </div>
         </div>
         

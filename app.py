@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import csv
 import os
-import socket
 from datetime import datetime
 
 app = Flask(__name__)
@@ -10,19 +9,8 @@ app.secret_key = os.environ.get('SECRET_KEY', 'sk_tabulation_secret_key_2026')
 # Determine writable CSV location for Vercel serverless environment (/tmp) or local environment
 CSV_FILE = '/tmp/pageant_scores.csv' if os.environ.get('VERCEL') else 'pageant_scores.csv'
 
-# Default PIN for judges (Can be changed here or overridden)
+# Default PIN for judges (Can be changed via environment variable or default)
 JUDGE_PIN = os.environ.get('JUDGE_PIN', '1234')
-
-def get_local_ip():
-    """Returns host local IP for offline hotspot navigation."""
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return '127.0.0.1'
 
 def init_csv():
     """Ensure CSV exists with headers, supporting judge attribution."""
@@ -42,7 +30,6 @@ def init_csv():
 # --- ROUTE: LOGIN ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    host_ip = get_local_ip()
     if request.method == 'POST':
         slot = request.form.get('judge_slot', 'Judge 1')
         name = request.form.get('judge_name', '').strip()
@@ -54,9 +41,9 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('home'))
         else:
-            return render_template('login.html', error="Invalid PIN / Passcode! Default PIN is 1234.", host_ip=host_ip)
+            return render_template('login.html', error="Invalid PIN / Passcode! Default PIN is 1234.")
 
-    return render_template('login.html', host_ip=host_ip)
+    return render_template('login.html')
 
 # --- ROUTE: LOGOUT ---
 @app.route('/logout')
@@ -70,11 +57,9 @@ def home():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     
-    host_ip = get_local_ip()
     return render_template('index.html', 
                            judge_slot=session.get('judge_slot', 'Judge 1'), 
-                           judge_name=session.get('judge_name', 'Judge'),
-                           host_ip=host_ip)
+                           judge_name=session.get('judge_name', 'Judge'))
 
 # --- ROUTE 2: Saving Preliminary Scores ---
 @app.route('/submit_score', methods=['POST'])
@@ -151,9 +136,9 @@ def rankings():
         leaderboard.append({'candidate': candidate, 'score': round(avg_score, 2)})
         
     leaderboard.sort(key=lambda x: x['score'], reverse=True)
-    return render_template('rankings.html', leaderboard=leaderboard, host_ip=get_local_ip())
+    return render_template('rankings.html', leaderboard=leaderboard)
 
-# --- ROUTE 4: NEW ADMIN TABULATION ---
+# --- ROUTE 4: ADMIN TABULATION ---
 @app.route('/admin')
 def admin_panel():
     prelim_results = {}
@@ -194,27 +179,11 @@ def admin_panel():
         })
         
     candidates_data.sort(key=lambda x: x['number'])
-    host_ip = get_local_ip()
-    
-    # Formatted judge counts
     judge_summary = {j: len(cands) for j, cands in judge_progress.items()}
     
-    return render_template('admin.html', candidates=candidates_data, host_ip=host_ip, judge_summary=judge_summary)
+    return render_template('admin.html', candidates=candidates_data, judge_summary=judge_summary)
 
-# --- API ENDPOINTS FOR LIVE POLLING & OFFLINE HOTSPOT INFO ---
-@app.route('/api/network_info')
-def network_info():
-    return jsonify({
-        'status': 'online',
-        'host_ip': get_local_ip(),
-        'port': 5000,
-        'urls': {
-            'judges': f"http://{get_local_ip()}:5000/login",
-            'rankings': f"http://{get_local_ip()}:5000/rankings",
-            'admin': f"http://{get_local_ip()}:5000/admin"
-        }
-    })
-
+# --- API ENDPOINT FOR LIVE POLLING ---
 @app.route('/api/admin_data')
 def admin_data():
     """Real-time JSON endpoint for live polling on Admin dashboard."""
@@ -250,13 +219,7 @@ def admin_data():
 
 if __name__ == '__main__':
     init_csv()
-    host_ip = get_local_ip()
-    print("=" * 60)
-    print(" 👑 SK FEDERATION PAGEANT TABULATION SYSTEM (OFFLINE HOTSPOT MODE)")
-    print("=" * 60)
-    print(f" -> Judges Login URL:   http://{host_ip}:5000/login")
-    print(f" -> Live Rankings URL:  http://{host_ip}:5000/rankings")
-    print(f" -> Admin Panel URL:    http://{host_ip}:5000/admin")
-    print("=" * 60)
+    print("Starting Tabulation Server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
