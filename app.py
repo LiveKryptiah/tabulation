@@ -190,7 +190,10 @@ def rankings():
 def admin_panel():
     init_csv()
     data = get_tabulation_data()
-    return render_template('admin.html', candidates=data['candidates'], judge_summary=data['judge_summary'])
+    return render_template('admin.html', 
+                           candidates=data['candidates'], 
+                           top5_candidates=data['top5_candidates'], 
+                           judge_summary=data['judge_summary'])
 
 # --- HELPER & API FOR REAL-TIME TABULATION ---
 def get_tabulation_data():
@@ -237,9 +240,11 @@ def get_tabulation_data():
                     except ValueError:
                         pass
 
-    # Read Top 5 Judge Scores
+    # Read Top 5 Judge Scores (Per Judge Breakdown)
     top5_beauty_results = {}
     top5_brain_results = {}
+    top5_judge_scores = {} # cand_num -> { judge_slot: score }
+
     if os.path.exists(TOP5_CSV_FILE):
         with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
@@ -252,12 +257,18 @@ def get_tabulation_data():
                 if cand_str:
                     try:
                         cand_num = int(cand_str.replace('Candidate ', ''))
+                        b_val = float(b_tot) if b_tot else 0
+                        br_val = float(br_tot) if br_tot else 0
+
                         if b_tot:
                             if cand_num not in top5_beauty_results: top5_beauty_results[cand_num] = []
-                            top5_beauty_results[cand_num].append(float(b_tot))
+                            top5_beauty_results[cand_num].append(b_val)
                         if br_tot:
                             if cand_num not in top5_brain_results: top5_brain_results[cand_num] = []
-                            top5_brain_results[cand_num].append(float(br_tot))
+                            top5_brain_results[cand_num].append(br_val)
+
+                        if cand_num not in top5_judge_scores: top5_judge_scores[cand_num] = {}
+                        top5_judge_scores[cand_num][j_slot] = round(b_val + br_val, 2)
 
                         if j_slot not in judge_progress:
                             judge_progress[j_slot] = set()
@@ -282,6 +293,8 @@ def get_tabulation_data():
 
         final_score = prelim_30 + beauty_30 + brain_40
 
+        j_scores = top5_judge_scores.get(cand_num, {})
+
         candidates_data.append({
             'number': cand_num,
             'name': f"Candidate {cand_num}",
@@ -290,6 +303,11 @@ def get_tabulation_data():
             'beauty_30': round(beauty_30, 2),
             'brain_40': round(brain_40, 2),
             'final_score': round(final_score, 2),
+            'judge_1': j_scores.get('Judge 1', '-'),
+            'judge_2': j_scores.get('Judge 2', '-'),
+            'judge_3': j_scores.get('Judge 3', '-'),
+            'judge_4': j_scores.get('Judge 4', '-'),
+            'judge_5': j_scores.get('Judge 5', '-'),
             'prod_avg': round(sum(cats['prod']) / len(cats['prod']), 2) if cats['prod'] else 0,
             'casual_avg': round(sum(cats['casual']) / len(cats['casual']), 2) if cats['casual'] else 0,
             'swim_avg': round(sum(cats['swim']) / len(cats['swim']), 2) if cats['swim'] else 0,
@@ -300,8 +318,24 @@ def get_tabulation_data():
             'submission_count': len(p_scores)
         })
 
+    # Compute Top 5 Finalists & Titles
+    prelim_sorted = sorted(candidates_data, key=lambda x: (x['final_score'], x['prelim_score']), reverse=True)
+    top5_candidates = prelim_sorted[:5]
+
+    titles = [
+        "👑 MISS SK YOUTH AMBASSADRESS 2026",
+        "👑 1st Runner-Up",
+        "👑 2nd Runner-Up",
+        "👑 3rd Runner-Up",
+        "👑 4th Runner-Up"
+    ]
+
+    for idx, cand in enumerate(top5_candidates):
+        cand['title'] = titles[idx]
+        cand['top5_rank'] = idx + 1
+
     judge_summary = {j: len(cands) for j, cands in judge_progress.items()}
-    return {'candidates': candidates_data, 'judge_summary': judge_summary}
+    return {'candidates': candidates_data, 'top5_candidates': top5_candidates, 'judge_summary': judge_summary}
 
 @app.route('/api/admin_data')
 def admin_data():

@@ -27,9 +27,9 @@
             align-items: center;
         }
         .pill-btn {
-            padding: 10px 22px;
+            padding: 10px 20px;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #3182ce;
             background: transparent;
@@ -60,6 +60,7 @@
         .col-rank { font-weight: bold; }
 
         .qualified { color: #004d00; font-weight: bold; background-color: #d4edda !important; }
+        .title-winner { color: #a67c52; font-weight: 700; font-size: 14px; background-color: #fdfaf0; }
         
         /* Spotlight Card */
         .spotlight-card {
@@ -129,6 +130,7 @@
         <!-- Category Pill Navigation Bar (Matching Screenshot UI) -->
         <div class="category-pill-nav">
             <button type="button" class="pill-btn active" onclick="switchAdminTab(0)">🏆 Overall & Top 5</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(7)">👑 Top 5 Judge Breakdown</button>
             <button type="button" class="pill-btn" onclick="switchAdminTab(1)">1. Prod</button>
             <button type="button" class="pill-btn" onclick="switchAdminTab(2)">2. Casual</button>
             <button type="button" class="pill-btn" onclick="switchAdminTab(3)">3. Swim</button>
@@ -176,6 +178,51 @@
                     </tr>
                     {% else %}
                     <tr><td colspan="8" style="padding: 30px; color: #888;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 7: TOP 5 JUDGE BREAKDOWN & CORONATION SHEET -->
+        <div class="tab-view" id="tabView-7">
+            <div style="background: #faf5eb; border-bottom: 2px solid #a67c52; padding: 15px 25px; font-weight: bold; color: #a67c52; text-align: center; font-size: 15px;">
+                👑 OFFICIAL TOP 5 FINALISTS JUDGE-BY-JUDGE BREAKDOWN & TITLE ASSIGNMENT
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Final Rank</th>
+                        <th>Candidate Name</th>
+                        <th class="col-prelim">30% Prelim Score</th>
+                        <th>Judge 1 (70 pts)</th>
+                        <th>Judge 2 (70 pts)</th>
+                        <th>Judge 3 (70 pts)</th>
+                        <th>Judge 4 (70 pts)</th>
+                        <th>Judge 5 (70 pts)</th>
+                        <th class="col-beauty">Beauty Avg (30%)</th>
+                        <th class="col-brain">Brain Avg (40%)</th>
+                        <th class="col-final">FINAL SCORE (100%)</th>
+                        <th>OFFICIAL TITLE</th>
+                    </tr>
+                </thead>
+                <tbody id="top5BreakdownBody">
+                    {% for cand in top5_candidates %}
+                    <tr>
+                        <td style="font-weight: bold; font-size: 15px;">Rank #{{ cand.top5_rank }}</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td class="col-prelim" style="font-weight: bold;">{{ cand.prelim_30 }}</td>
+                        <td>{{ cand.judge_1 }}</td>
+                        <td>{{ cand.judge_2 }}</td>
+                        <td>{{ cand.judge_3 }}</td>
+                        <td>{{ cand.judge_4 }}</td>
+                        <td>{{ cand.judge_5 }}</td>
+                        <td class="col-beauty" style="font-weight: bold; color: #a67c52;">{{ cand.beauty_30 }}</td>
+                        <td class="col-brain" style="font-weight: bold; color: #007bff;">{{ cand.brain_40 }}</td>
+                        <td class="col-final">{{ cand.final_score }}</td>
+                        <td class="title-winner">{{ cand.title }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="12" style="padding: 30px; color: #888;">Waiting for judge scores to display Top 5 breakdown...</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -351,16 +398,23 @@
     </div>
 
     <script>
-        function switchAdminTab(index) {
-            document.querySelectorAll('.pill-btn').forEach((btn, i) => {
-                if (i === index) btn.classList.add('active');
-                else btn.classList.remove('active');
+        const tabMapping = { 0: 0, 7: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7 };
+
+        function switchAdminTab(targetIndex) {
+            document.querySelectorAll('.pill-btn').forEach((btn) => {
+                btn.classList.remove('active');
             });
 
-            document.querySelectorAll('.tab-view').forEach((view, i) => {
-                if (i === index) view.classList.add('active');
-                else view.classList.remove('active');
+            document.querySelectorAll('.tab-view').forEach((view) => {
+                view.classList.remove('active');
             });
+
+            const targetView = document.getElementById(`tabView-${targetIndex}`);
+            if (targetView) targetView.classList.add('active');
+
+            const btnIndex = tabMapping[targetIndex];
+            const activeBtn = document.querySelectorAll('.pill-btn')[btnIndex];
+            if (activeBtn) activeBtn.classList.add('active');
         }
 
         document.addEventListener('DOMContentLoaded', calculateTabulation);
@@ -456,6 +510,33 @@
                     });
                 });
                 calculateTabulation();
+
+                // Update Top 5 Breakdown Table
+                if (data.top5_candidates) {
+                    const tbody = document.getElementById('top5BreakdownBody');
+                    if (tbody && data.top5_candidates.length > 0) {
+                        let html = '';
+                        data.top5_candidates.forEach(cand => {
+                            html += `
+                                <tr>
+                                    <td style="font-weight: bold; font-size: 15px;">Rank #${cand.top5_rank}</td>
+                                    <td style="text-align: left; padding-left: 20px; font-weight: bold;">${cand.name}</td>
+                                    <td class="col-prelim" style="font-weight: bold;">${cand.prelim_30.toFixed(2)}</td>
+                                    <td>${cand.judge_1}</td>
+                                    <td>${cand.judge_2}</td>
+                                    <td>${cand.judge_3}</td>
+                                    <td>${cand.judge_4}</td>
+                                    <td>${cand.judge_5}</td>
+                                    <td class="col-beauty" style="font-weight: bold; color: #a67c52;">${cand.beauty_30.toFixed(2)}</td>
+                                    <td class="col-brain" style="font-weight: bold; color: #007bff;">${cand.brain_40.toFixed(2)}</td>
+                                    <td class="col-final">${cand.final_score.toFixed(2)}</td>
+                                    <td class="title-winner">${cand.title}</td>
+                                </tr>
+                            `;
+                        });
+                        tbody.innerHTML = html;
+                    }
+                }
             })
             .catch(err => {});
         }
