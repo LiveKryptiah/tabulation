@@ -280,6 +280,8 @@ def get_tabulation_data():
         beauty_30 = sum(b_scores) / len(b_scores) if b_scores else 0
         brain_40  = sum(br_scores) / len(br_scores) if br_scores else 0
 
+        final_score = prelim_30 + beauty_30 + brain_40
+
         candidates_data.append({
             'number': cand_num,
             'name': f"Candidate {cand_num}",
