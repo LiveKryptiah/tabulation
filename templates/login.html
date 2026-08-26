@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judge Login - SK Pageant Tabulation</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Geist', sans-serif;
+            background: linear-gradient(135deg, #1e1e24 0%, #2b2d42 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px 35px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .logo-badge {
+            width: 70px;
+            height: 70px;
+            background-color: #a67c52;
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.4);
+        }
+
+        h2 {
+            margin: 0 0 8px 0;
+            color: #1e1e24;
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        p.subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: #495057;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+            background-color: #f8f9fa;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #a67c52;
+            background-color: #fff;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background-color: #a67c52;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.3);
+        }
+
+        .btn-login:hover {
+            background-color: #8c653f;
+        }
+
+        .btn-login:active {
+            transform: scale(0.99);
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .hotspot-info {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-badge">⚖️</div>
+        <h2>Judges Portal</h2>
+        <p class="subtitle">SK Federation Pageant Tabulation</p>
+
+        {% if error %}
+        <div class="error-message" style="display: block;">{{ error }}</div>
+        {% else %}
+        <div id="errorAlert" class="error-message"></div>
+        {% endif %}
+
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="judge_slot">Select Judge Slot</label>
+                <select name="judge_slot" id="judge_slot" required>
+                    <option value="Judge 1">Judge 1</option>
+                    <option value="Judge 2">Judge 2</option>
+                    <option value="Judge 3">Judge 3</option>
+                    <option value="Judge 4">Judge 4</option>
+                    <option value="Judge 5">Judge 5</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="judge_name">Judge Full Name (Optional)</label>
+                <input type="text" name="judge_name" id="judge_name" placeholder="e.g. Hon. Maria Santos" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="pin">Passcode / PIN</label>
+                <input type="password" name="pin" id="pin" placeholder="Enter PIN (Default: 1234)" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login">Enter Scoring Panel</button>
+        </form>
+
+        <div class="hotspot-info">
+            <span class="status-dot"></span>
+            <span>Local Hotspot Network: <strong>{{ host_ip if host_ip else '127.0.0.1' }}</strong></span>
+        </div>
+    </div>
+
+    <script>
+        // Auto-fill last used judge name if stored locally
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('tabulation_judge_name');
+            const savedSlot = localStorage.getItem('tabulation_judge_slot');
+            if (savedName) document.getElementById('judge_name').value = savedName;
+            if (savedSlot) document.getElementById('judge_slot').value = savedSlot;
+        });
+
+        document.querySelector('form').addEventListener('submit', function() {
+            const slot = document.getElementById('judge_slot').value;
+            const name = document.getElementById('judge_name').value;
+            localStorage.setItem('tabulation_judge_slot', slot);
+            if (name) localStorage.setItem('tabulation_judge_name', name);
+        });
+    </script>
+</body>
+</html>
