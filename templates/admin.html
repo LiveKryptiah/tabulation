@@ -4,47 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Top 5 Selection Tabulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 30px; }
+        body { font-family: 'Geist', sans-serif; background-color: #f8f9fa; margin: 0; padding: 25px; color: #333; }
         
-        .admin-container { max-width: 1400px; margin: 0 auto; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .admin-container { max-width: 1550px; margin: 0 auto; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; }
         
-        /* Styled to match the brown header from the reference image */
-        .header-title { background-color: #a67c52; color: white; text-align: center; padding: 20px; font-size: 26px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+        .header-title { background-color: #a67c52; color: white; text-align: center; padding: 20px; font-size: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         
-        table { width: 100%; border-collapse: collapse; text-align: center; }
-        th { background-color: #e6d3a3; color: #333; padding: 15px 10px; font-size: 14px; border: 1px solid #ccc; font-weight: bold; }
-        td { padding: 12px 10px; border: 1px solid #ccc; font-size: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+        th { background-color: #e6d3a3; color: #1e1e24; padding: 12px 6px; font-size: 12px; border: 1px solid #dcdcdc; font-weight: 700; vertical-align: middle; }
+        th.sub-hdr { background-color: #f3ebda; font-size: 11px; font-weight: 600; }
+        td { padding: 8px 6px; border: 1px solid #dcdcdc; font-size: 13px; }
         
-        /* Striping for readability */
         tr:nth-child(even) td { background-color: #fcfcfc; }
         
-        /* Highlight specific columns for visual hierarchy */
         .col-prelim { background-color: #fdfaf0; }
-        .col-final { background-color: #fff9e6; font-weight: bold; font-size: 16px; }
+        .col-beauty { background-color: #faf5eb; }
+        .col-brain { background-color: #f5f8fa; }
+        .col-final { background-color: #fff9e6; font-weight: bold; font-size: 15px; }
         .col-rank { font-weight: bold; }
         
-        /* Input fields for Admin */
-        input[type="number"] { width: 80px; padding: 8px; border: 1px solid #999; border-radius: 4px; text-align: center; font-size: 15px; background-color: white; font-weight: bold; }
-        input[type="number"]:focus { outline: 2px solid #a67c52; }
+        input[type="number"] { width: 55px; padding: 6px; border: 1.5px solid #bbb; border-radius: 6px; text-align: center; font-size: 13px; font-weight: 700; background-color: white; font-family: inherit; }
+        input[type="number"]:focus { outline: 2px solid #a67c52; border-color: #a67c52; }
 
-        /* Top 5 Highlight styling */
         .qualified { color: #004d00; font-weight: bold; background-color: #d4edda !important; }
         
-        /* Bottom Reference Legend */
-        .legend-container { display: flex; gap: 20px; padding: 30px; background-color: #fff; border-top: 2px solid #eee; }
-        .legend-box { flex: 1; border: 1px solid #ccc; }
-        .legend-header { background-color: #a67c52; color: white; padding: 8px; font-weight: bold; text-align: center; font-size: 14px; }
-        .legend-table { width: 100%; font-size: 13px; text-align: left; }
-        .legend-table th, .legend-table td { padding: 6px 10px; border: 1px solid #eee; background-color: white; }
+        .legend-container { display: flex; gap: 20px; padding: 25px; background-color: #fff; border-top: 2px solid #eee; flex-wrap: wrap; }
+        .legend-box { flex: 1; min-width: 300px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
+        .legend-header { background-color: #a67c52; color: white; padding: 10px; font-weight: 700; text-align: center; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .legend-table { width: 100%; font-size: 12px; text-align: left; }
+        .legend-table th, .legend-table td { padding: 8px 12px; border: 1px solid #eee; background-color: white; }
+        .legend-table th { background-color: #f8f9fa; font-weight: 700; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
-        <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION</div>
+        <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION TABULATION</div>
         
-        <!-- Multi-Judge Status Banner -->
+        <!-- Multi-Judge Progress Banner -->
         <div style="background-color: #2b2d42; color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
             <div>
                 <strong>Live Judge Submissions:</strong>
@@ -62,126 +63,150 @@
         <table id="tabulationTable">
             <thead>
                 <tr>
-                    <th>Candidate</th>
-                    <th>Overall Preliminary Score</th>
-                    <th>30% Overall</th>
-                    <th>Beauty Score</th>
-                    <th>30% Beauty</th>
-                    <th>Brain Score</th>
-                    <th>40% Brain</th>
-                    <th>FINAL SCORE</th>
-                    <th>RANK</th>
-                    <th>TOP 5</th>
+                    <th rowspan="2">Candidate</th>
+                    <th colspan="2" class="col-prelim">30% PRELIMINARY ROUND</th>
+                    <th colspan="4" class="col-beauty">30% BEAUTY CRITERIA</th>
+                    <th colspan="5" class="col-brain">40% BRAIN CRITERIA</th>
+                    <th rowspan="2" class="col-final">FINAL SCORE<br>(100%)</th>
+                    <th rowspan="2">RANK</th>
+                    <th rowspan="2">TOP 5</th>
+                </tr>
+                <tr>
+                    <th class="sub-hdr col-prelim">Prelim Avg (100)</th>
+                    <th class="sub-hdr col-prelim">30% Prelim</th>
+                    
+                    <th class="sub-hdr col-beauty">Facial Appeal<br>(Max 15%)</th>
+                    <th class="sub-hdr col-beauty">Poise & Stage<br>(Max 10%)</th>
+                    <th class="sub-hdr col-beauty">Confidence<br>(Max 5%)</th>
+                    <th class="sub-hdr col-beauty" style="font-weight: 700; color: #a67c52;">Beauty Total<br>(30%)</th>
+                    
+                    <th class="sub-hdr col-brain">Relevance & Content<br>(Max 15%)</th>
+                    <th class="sub-hdr col-brain">Intelligence<br>(Max 10%)</th>
+                    <th class="sub-hdr col-brain">Clarity & Org<br>(Max 10%)</th>
+                    <th class="sub-hdr col-brain">Delivery<br>(Max 5%)</th>
+                    <th class="sub-hdr col-brain" style="font-weight: 700; color: #007bff;">Brain Total<br>(40%)</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Python injects the candidates dynamically from the CSV -->
                 {% for cand in candidates %}
                 <tr class="candidate-row">
-                    <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                    <td style="text-align: left; padding-left: 15px; font-weight: bold;">{{ cand.name }}</td>
                     <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
-                    <td class="prelim-30 col-prelim">0.00</td>
+                    <td class="prelim-30 col-prelim" style="font-weight: bold;">0.00</td>
                     
-                    <!-- Admin inputs the scores here out of 100 -->
-                    <td><input type="number" class="beauty-input" min="0" max="100" placeholder="0"></td>
-                    <td class="beauty-30">0.00</td>
+                    <!-- Beauty Sub-criteria Inputs -->
+                    <td class="col-beauty"><input type="number" class="beauty-15" min="0" max="15" step="0.5" placeholder="0"></td>
+                    <td class="col-beauty"><input type="number" class="beauty-10" min="0" max="10" step="0.5" placeholder="0"></td>
+                    <td class="col-beauty"><input type="number" class="beauty-5"  min="0" max="5"  step="0.5" placeholder="0"></td>
+                    <td class="beauty-total col-beauty" style="font-weight: bold; color: #a67c52;">0.00</td>
                     
-                    <td><input type="number" class="brain-input" min="0" max="100" placeholder="0"></td>
-                    <td class="brain-40">0.00</td>
+                    <!-- Brain Sub-criteria Inputs -->
+                    <td class="col-brain"><input type="number" class="brain-15" min="0" max="15" step="0.5" placeholder="0"></td>
+                    <td class="col-brain"><input type="number" class="brain-10-1" min="0" max="10" step="0.5" placeholder="0"></td>
+                    <td class="col-brain"><input type="number" class="brain-10-2" min="0" max="10" step="0.5" placeholder="0"></td>
+                    <td class="col-brain"><input type="number" class="brain-5"  min="0" max="5"  step="0.5" placeholder="0"></td>
+                    <td class="brain-total col-brain" style="font-weight: bold; color: #007bff;">0.00</td>
                     
                     <td class="final-score col-final">0.00</td>
                     <td class="rank-cell col-rank">-</td>
                     <td class="top5-cell">-</td>
                 </tr>
                 {% else %}
-                <tr><td colspan="10" style="padding: 30px; color: #888;">No preliminary scores recorded yet. Have the judges submit scores first!</td></tr>
+                <tr><td colspan="15" style="padding: 30px; color: #888;">No preliminary scores recorded yet. Have judges submit scores first!</td></tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- The exact Scoring Distribution Reference from image_57ff86.png -->
+        <!-- Exact Updated Criteria Reference Tables -->
         <div class="legend-container">
             <div class="legend-box">
-                <div class="legend-header">SCORING DISTRIBUTION</div>
+                <div class="legend-header">OVERALL SCORING DISTRIBUTION</div>
                 <table class="legend-table">
-                    <tr><td>Overall Preliminary Performance</td><td>30%</td></tr>
-                    <tr><td>Beauty</td><td>30%</td></tr>
-                    <tr><td>Brain</td><td>40%</td></tr>
+                    <tr><td>Overall Preliminary Performance</td><td style="font-weight: bold; text-align: right;">30%</td></tr>
+                    <tr><td>Beauty Criteria</td><td style="font-weight: bold; text-align: right;">30%</td></tr>
+                    <tr><td>Brain Criteria</td><td style="font-weight: bold; text-align: right;">40%</td></tr>
+                    <tr style="font-weight: 700; background-color: #fdfaf7;"><td>GRAND TOTAL</td><td style="font-weight: bold; text-align: right; color: #a67c52;">100%</td></tr>
                 </table>
             </div>
+
             <div class="legend-box">
-                <div class="legend-header">BEAUTY CRITERIA</div>
+                <div class="legend-header">30% BEAUTY CRITERIA BREAKDOWN</div>
                 <table class="legend-table">
-                    <tr><th>Criterion</th><th>Share of Beauty</th><th>Equivalent Points</th></tr>
-                    <tr><td>Facial Beauty & Appeal</td><td>50%</td><td>15</td></tr>
-                    <tr><td>Poise, Elegance & Carriage</td><td>33%</td><td>10</td></tr>
-                    <tr><td>Confidence & Overall Impact</td><td>17%</td><td>5</td></tr>
+                    <tr><th>Criterion</th><th style="text-align: right;">Weight</th></tr>
+                    <tr><td>Facial beauty and appeal</td><td style="text-align: right; font-weight: bold;">15%</td></tr>
+                    <tr><td>Poise, elegance, and stage presence</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
+                    <tr><td>Confidence and overall impression</td><td style="text-align: right; font-weight: bold;">5%</td></tr>
+                    <tr style="font-weight: 700; background-color: #faf5eb;"><td>BEAUTY TOTAL</td><td style="text-align: right; color: #a67c52;">30%</td></tr>
                 </table>
             </div>
+
             <div class="legend-box">
-                <div class="legend-header">BRAIN CRITERIA</div>
+                <div class="legend-header">40% BRAIN CRITERIA BREAKDOWN</div>
                 <table class="legend-table">
-                    <tr><th>Criterion</th><th>Share of Brain</th><th>Equivalent Points</th></tr>
-                    <tr><td>Relevance & Substance</td><td>38%</td><td>15</td></tr>
-                    <tr><td>Intelligence & Critical Thinking</td><td>25%</td><td>10</td></tr>
-                    <tr><td>Clarity & Organization</td><td>25%</td><td>10</td></tr>
-                    <tr><td>Confidence & Delivery</td><td>13%</td><td>5</td></tr>
+                    <tr><th>Criterion</th><th style="text-align: right;">Weight</th></tr>
+                    <tr><td>Relevance and substance of answer</td><td style="text-align: right; font-weight: bold;">15%</td></tr>
+                    <tr><td>Intelligence and critical thinking</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
+                    <tr><td>Clarity and organization of thoughts</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
+                    <tr><td>Confidence and delivery</td><td style="text-align: right; font-weight: bold;">5%</td></tr>
+                    <tr style="font-weight: 700; background-color: #f5f8fa;"><td>BRAIN TOTAL</td><td style="text-align: right; color: #007bff;">40%</td></tr>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // Trigger calculation whenever the admin types a number in the Beauty or Brain column
-        document.querySelectorAll('.beauty-input, .brain-input').forEach(input => {
+        // Trigger calculation whenever admin inputs sub-scores
+        document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', calculateTabulation);
         });
 
-        // Run once on page load to instantly calculate the 30% Overall Preliminary column
         document.addEventListener('DOMContentLoaded', calculateTabulation);
 
         function calculateTabulation() {
             const rows = document.querySelectorAll('.candidate-row');
             let candidates = [];
 
-            // 1. First Pass: Calculate all the math for each candidate row
-            rows.forEach((row, index) => {
-                // Get the base scores
+            rows.forEach((row) => {
                 const prelimVal = parseFloat(row.querySelector('.prelim-val').textContent) || 0;
-                const beautyVal = parseFloat(row.querySelector('.beauty-input').value) || 0;
-                const brainVal  = parseFloat(row.querySelector('.brain-input').value) || 0;
-
-                // Calculate weights exactly like the reference image
                 const prelim30 = prelimVal * 0.30;
-                const beauty30 = beautyVal * 0.30;
-                const brain40  = brainVal * 0.40;
-                const finalScore = prelim30 + beauty30 + brain40;
 
-                // Update the DOM to show the new calculated numbers
+                // Beauty sub-criteria sum (Max 30%)
+                const b15 = parseFloat(row.querySelector('.beauty-15').value) || 0;
+                const b10 = parseFloat(row.querySelector('.beauty-10').value) || 0;
+                const b5  = parseFloat(row.querySelector('.beauty-5').value) || 0;
+                const beautyTotal = b15 + b10 + b5;
+
+                // Brain sub-criteria sum (Max 40%)
+                const br15   = parseFloat(row.querySelector('.brain-15').value) || 0;
+                const br10_1 = parseFloat(row.querySelector('.brain-10-1').value) || 0;
+                const br10_2 = parseFloat(row.querySelector('.brain-10-2').value) || 0;
+                const br5    = parseFloat(row.querySelector('.brain-5').value) || 0;
+                const brainTotal = br15 + br10_1 + br10_2 + br5;
+
+                // Grand Total Score (100%)
+                const finalScore = prelim30 + beautyTotal + brainTotal;
+
                 row.querySelector('.prelim-30').textContent = prelim30.toFixed(2);
-                row.querySelector('.beauty-30').textContent = beauty30.toFixed(2);
-                row.querySelector('.brain-40').textContent  = brain40.toFixed(2);
+                row.querySelector('.beauty-total').textContent = beautyTotal.toFixed(2);
+                row.querySelector('.brain-total').textContent  = brainTotal.toFixed(2);
                 row.querySelector('.final-score').textContent = finalScore.toFixed(2);
 
-                // Store object for sorting and ranking
                 candidates.push({
                     element: row,
-                    score: finalScore
+                    score: finalScore,
+                    hasEnteredScores: (beautyTotal > 0 || brainTotal > 0)
                 });
             });
 
-            // 2. Sort the candidates by highest Final Score
-            // Note: We use a copy of the array [...candidates] so we don't mess up the original table order
+            // Sort by highest Final Score
             const sortedCandidates = [...candidates].sort((a, b) => b.score - a.score);
 
-            // 3. Assign Ranks and determine the Top 5
             sortedCandidates.forEach((cand, sortedIndex) => {
                 const rank = sortedIndex + 1;
                 const rankCell = cand.element.querySelector('.rank-cell');
                 const top5Cell = cand.element.querySelector('.top5-cell');
 
-                // If they have no Beauty or Brain score yet, don't rank them just yet
-                if (cand.score === parseFloat(cand.element.querySelector('.prelim-30').textContent)) {
+                if (!cand.hasEnteredScores) {
                     rankCell.textContent = "-";
                     top5Cell.textContent = "-";
                     top5Cell.classList.remove('qualified');
@@ -190,7 +215,6 @@
 
                 rankCell.textContent = rank;
 
-                // Highlight Top 5
                 if (rank <= 5) {
                     top5Cell.textContent = "QUALIFIED";
                     top5Cell.classList.add('qualified');
