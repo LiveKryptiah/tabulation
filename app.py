@@ -147,6 +147,26 @@ def rankings():
     leaderboard.sort(key=lambda x: x['score'], reverse=True)
     return render_template('rankings.html', leaderboard=leaderboard)
 
+import json
+
+ADMIN_SCORES_FILE = '/tmp/admin_top5_scores.json' if os.environ.get('VERCEL') else 'admin_top5_scores.json'
+
+def load_admin_scores():
+    if os.path.exists(ADMIN_SCORES_FILE):
+        try:
+            with open(ADMIN_SCORES_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_admin_scores_data(data):
+    try:
+        with open(ADMIN_SCORES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f)
+    except Exception:
+        pass
+
 # --- ROUTE 4: ADMIN TABULATION ---
 @app.route('/admin')
 def admin_panel():
@@ -177,22 +197,43 @@ def admin_panel():
                     except ValueError:
                         pass
     
+    admin_saved_scores = load_admin_scores()
+    
     candidates_data = []
-    for cand_num, scores in prelim_results.items():
+    # Include Candidates 1 to 12 even if scores haven't arrived yet
+    all_cand_nums = set(range(1, 13)).union(prelim_results.keys())
+    for cand_num in sorted(all_cand_nums):
+        scores = prelim_results.get(cand_num, [])
         avg_score = sum(scores) / len(scores) if scores else 0
+        cand_key = str(cand_num)
+        saved = admin_saved_scores.get(cand_key, {})
+        
         candidates_data.append({
             'number': cand_num,
             'name': f"Candidate {cand_num}",
             'prelim_score': round(avg_score, 2),
-            'submission_count': len(scores)
+            'submission_count': len(scores),
+            'beauty_15': saved.get('beauty_15', ''),
+            'beauty_10': saved.get('beauty_10', ''),
+            'beauty_5': saved.get('beauty_5', ''),
+            'brain_15': saved.get('brain_15', ''),
+            'brain_10_1': saved.get('brain_10_1', ''),
+            'brain_10_2': saved.get('brain_10_2', ''),
+            'brain_5': saved.get('brain_5', '')
         })
         
-    candidates_data.sort(key=lambda x: x['number'])
     judge_summary = {j: len(cands) for j, cands in judge_progress.items()}
     
     return render_template('admin.html', candidates=candidates_data, judge_summary=judge_summary)
 
-# --- API ENDPOINT FOR LIVE POLLING ---
+# --- API ENDPOINTS FOR LIVE ADMIN POLLING & PERSISTENCE ---
+@app.route('/api/save_admin_scores', methods=['POST'])
+def save_admin_scores_api():
+    """Save Admin Beauty & Brain judging scores."""
+    req_data = request.get_json(silent=True) or {}
+    save_admin_scores_data(req_data)
+    return jsonify({'status': 'success'})
+
 @app.route('/api/admin_data')
 def admin_data():
     """Real-time JSON endpoint for live polling on Admin dashboard."""
@@ -214,21 +255,34 @@ def admin_data():
                     except ValueError:
                         pass
                         
+    admin_saved_scores = load_admin_scores()
     candidates_data = []
-    for cand_num, scores in prelim_results.items():
+    all_cand_nums = set(range(1, 13)).union(prelim_results.keys())
+    for cand_num in sorted(all_cand_nums):
+        scores = prelim_results.get(cand_num, [])
         avg_score = sum(scores) / len(scores) if scores else 0
+        cand_key = str(cand_num)
+        saved = admin_saved_scores.get(cand_key, {})
+        
         candidates_data.append({
             'number': cand_num,
             'name': f"Candidate {cand_num}",
             'prelim_score': round(avg_score, 2),
-            'count': len(scores)
+            'count': len(scores),
+            'beauty_15': saved.get('beauty_15', ''),
+            'beauty_10': saved.get('beauty_10', ''),
+            'beauty_5': saved.get('beauty_5', ''),
+            'brain_15': saved.get('brain_15', ''),
+            'brain_10_1': saved.get('brain_10_1', ''),
+            'brain_10_2': saved.get('brain_10_2', ''),
+            'brain_5': saved.get('brain_5', '')
         })
-    candidates_data.sort(key=lambda x: x['number'])
-    return jsonify({'candidates': candidates_data})
+    return jsonify({'candidates': candidates_data, 'admin_scores': admin_saved_scores})
 
 if __name__ == '__main__':
     init_csv()
     print("Starting Tabulation Server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
