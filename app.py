@@ -28,7 +28,7 @@ def init_csv():
             ])
 
 # --- ROUTE 1: LOGIN FORM FIRST (Root URL) ---
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -51,12 +51,6 @@ def login():
             return redirect(url_for('scoring'))
         else:
             return render_template('login.html', error="Invalid PIN! Default Judge PIN is 1234, Admin PIN is admin.")
-
-    # If already logged in, redirect to appropriate page
-    if session.get('logged_in'):
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin_panel'))
-        return redirect(url_for('scoring'))
 
     return render_template('login.html')
 
