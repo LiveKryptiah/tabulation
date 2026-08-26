@@ -163,6 +163,19 @@
             gap: 6px;
         }
 
+        .top5-badge-banner {
+            background-color: #fff9e6;
+            border: 1px solid #ffeba8;
+            color: #8a6d3b;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: none;
+            text-align: center;
+        }
+
         /* Selected Preview */
         .selected-preview { 
             background: #faf8f5;
@@ -230,6 +243,7 @@
             border-radius: 10px; 
             transition: all 0.2s ease; 
             text-align: center;
+            position: relative;
         }
         .candidate-box img { 
             width: 42px; 
@@ -243,6 +257,19 @@
             color: #495057; 
             font-size: 12px; 
             white-space: nowrap;
+        }
+        .top5-star-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #a67c52;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         input[type="radio"]:checked + .candidate-box { 
             border-color: #a67c52; 
@@ -468,6 +495,7 @@
             <!-- LEFT PANEL: Candidate Grid -->
             <div class="left-panel">
                 <div class="section-label">📌 1. Select Candidate</div>
+                <div class="top5-badge-banner" id="top5BadgeBanner">👑 TOP 5 QUALIFIED FINALISTS MODE: Scoring Top 5 Only</div>
                 
                 <div class="selected-preview">
                     <div id="placeholder-circle" class="placeholder-circle">Select Candidate Below</div>
@@ -477,53 +505,89 @@
                 
                 <div class="candidate-grid">
                     <!-- Candidates 1 to 12 -->
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="1">
                         <input type="radio" name="candidate_number" value="1" data-img="/static/candidate1.jpg" data-name="Candidate 1" required>
-                        <div class="candidate-box"><img src="/static/candidate1.jpg" alt="Cand 1"><span>Cand. 1</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate1.jpg" alt="Cand 1"><span>Cand. 1</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="2">
                         <input type="radio" name="candidate_number" value="2" data-img="/static/candidate2.jpg" data-name="Candidate 2">
-                        <div class="candidate-box"><img src="/static/candidate2.jpg" alt="Cand 2"><span>Cand. 2</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate2.jpg" alt="Cand 2"><span>Cand. 2</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="3">
                         <input type="radio" name="candidate_number" value="3" data-img="/static/candidate3.jpg" data-name="Candidate 3">
-                        <div class="candidate-box"><img src="/static/candidate3.jpg" alt="Cand 3"><span>Cand. 3</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate3.jpg" alt="Cand 3"><span>Cand. 3</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="4">
                         <input type="radio" name="candidate_number" value="4" data-img="/static/candidate4.jpg" data-name="Candidate 4">
-                        <div class="candidate-box"><img src="/static/candidate4.jpg" alt="Cand 4"><span>Cand. 4</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate4.jpg" alt="Cand 4"><span>Cand. 4</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="5">
                         <input type="radio" name="candidate_number" value="5" data-img="/static/candidate5.jpg" data-name="Candidate 5">
-                        <div class="candidate-box"><img src="/static/candidate5.jpg" alt="Cand 5"><span>Cand. 5</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate5.jpg" alt="Cand 5"><span>Cand. 5</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="6">
                         <input type="radio" name="candidate_number" value="6" data-img="/static/candidate6.jpg" data-name="Candidate 6">
-                        <div class="candidate-box"><img src="/static/candidate6.jpg" alt="Cand 6"><span>Cand. 6</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate6.jpg" alt="Cand 6"><span>Cand. 6</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="7">
                         <input type="radio" name="candidate_number" value="7" data-img="/static/candidate7.jpg" data-name="Candidate 7">
-                        <div class="candidate-box"><img src="/static/candidate7.jpg" alt="Cand 7"><span>Cand. 7</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate7.jpg" alt="Cand 7"><span>Cand. 7</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="8">
                         <input type="radio" name="candidate_number" value="8" data-img="/static/candidate8.jpg" data-name="Candidate 8">
-                        <div class="candidate-box"><img src="/static/candidate8.jpg" alt="Cand 8"><span>Cand. 8</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate8.jpg" alt="Cand 8"><span>Cand. 8</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="9">
                         <input type="radio" name="candidate_number" value="9" data-img="/static/candidate9.jpg" data-name="Candidate 9">
-                        <div class="candidate-box"><img src="/static/candidate9.jpg" alt="Cand 9"><span>Cand. 9</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate9.jpg" alt="Cand 9"><span>Cand. 9</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="10">
                         <input type="radio" name="candidate_number" value="10" data-img="/static/candidate10.jpg" data-name="Candidate 10">
-                        <div class="candidate-box"><img src="/static/candidate10.jpg" alt="Cand 10"><span>Cand. 10</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate10.jpg" alt="Cand 10"><span>Cand. 10</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="11">
                         <input type="radio" name="candidate_number" value="11" data-img="/static/candidate11.jpg" data-name="Candidate 11">
-                        <div class="candidate-box"><img src="/static/candidate11.jpg" alt="Cand 11"><span>Cand. 11</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate11.jpg" alt="Cand 11"><span>Cand. 11</span>
+                        </div>
                     </label>
-                    <label class="candidate-card">
+                    <label class="candidate-card" data-cand-num="12">
                         <input type="radio" name="candidate_number" value="12" data-img="/static/candidate12.jpg" data-name="Candidate 12">
-                        <div class="candidate-box"><img src="/static/candidate12.jpg" alt="Cand 12"><span>Cand. 12</span></div>
+                        <div class="candidate-box">
+                            <span class="top5-star-badge">TOP 5</span>
+                            <img src="/static/candidate12.jpg" alt="Cand 12"><span>Cand. 12</span>
+                        </div>
                     </label>
                 </div>
             </div>
@@ -689,6 +753,7 @@
             const btnP = document.getElementById('btnPrelimRound');
             const btnT = document.getElementById('btnTop5Round');
             const headerT = document.getElementById('formHeaderTitle');
+            const banner = document.getElementById('top5BadgeBanner');
 
             if (mode === 'prelim') {
                 btnP.classList.add('active');
@@ -697,6 +762,14 @@
                 document.getElementById('prelimWizard').style.display = 'block';
                 document.getElementById('top5Wizard').style.display = 'none';
                 document.getElementById('scorePreviewLabel').textContent = "Preliminary Grand Total:";
+                banner.style.display = 'none';
+                
+                // Show all candidates in prelim mode
+                document.querySelectorAll('.candidate-card').forEach(card => {
+                    card.style.display = 'block';
+                    const badge = card.querySelector('.top5-star-badge');
+                    if (badge) badge.style.display = 'none';
+                });
             } else {
                 btnT.classList.add('active');
                 btnP.classList.remove('active');
@@ -704,8 +777,46 @@
                 document.getElementById('prelimWizard').style.display = 'none';
                 document.getElementById('top5Wizard').style.display = 'block';
                 document.getElementById('scorePreviewLabel').textContent = "Top 5 Score Total (Beauty 30% + Brain 40%):";
+                banner.style.display = 'block';
+                
+                filterTop5Candidates();
             }
             updateLiveTotal();
+        }
+
+        function filterTop5Candidates() {
+            fetch('/api/admin_data')
+            .then(res => res.json())
+            .then(data => {
+                if (data.candidates && data.candidates.length > 0) {
+                    // Sort candidates by prelim score descending
+                    const sorted = [...data.candidates].sort((a, b) => b.prelim_score - a.prelim_score);
+                    const top5Nums = new Set(sorted.slice(0, 5).map(c => c.number));
+
+                    document.querySelectorAll('.candidate-card').forEach(card => {
+                        const num = parseInt(card.getAttribute('data-cand-num'));
+                        const badge = card.querySelector('.top5-star-badge');
+                        if (top5Nums.has(num)) {
+                            card.style.display = 'block';
+                            if (badge) badge.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                            const radio = card.querySelector('input[type="radio"]');
+                            if (radio.checked) {
+                                radio.checked = false;
+                                resetCandidatePreview();
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(err => {});
+        }
+
+        function resetCandidatePreview() {
+            document.getElementById('placeholder-circle').style.display = 'flex';
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('preview-name').textContent = "No Candidate Selected";
         }
 
         // --- 1. CANDIDATE SELECTION ---
@@ -821,9 +932,7 @@
                 if (currentMode === 'prelim') jumpToStep(1);
                 else jumpToTop5Step(1);
                 
-                placeholderCircle.style.display = 'flex'; 
-                previewImg.style.display = 'none'; 
-                previewName.textContent = "No Candidate Selected";
+                resetCandidatePreview();
                 updateLiveTotal();
                 
                 setTimeout(() => { 
