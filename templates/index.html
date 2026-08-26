@@ -82,6 +82,38 @@
             color: white;
         }
 
+        /* Round Selector Buttons Banner */
+        .round-selector-banner {
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 12px;
+        }
+        .round-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .round-btn.active {
+            border-color: #a67c52;
+            background: #a67c52;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.3);
+        }
+
         /* Main Container Card */
         .tabulation-card { 
             background-color: #ffffff; 
@@ -198,7 +230,6 @@
             border-radius: 10px; 
             transition: all 0.2s ease; 
             text-align: center;
-            position: relative;
         }
         .candidate-box img { 
             width: 42px; 
@@ -232,7 +263,7 @@
             justify-content: space-between; 
         }
 
-        /* Category Stepper Tabs Header */
+        /* Stepper Tabs Navigation */
         .stepper-nav {
             display: flex;
             gap: 4px;
@@ -259,9 +290,6 @@
             background-color: #a67c52;
             color: white;
             box-shadow: 0 2px 6px rgba(166, 124, 82, 0.3);
-        }
-        .step-tab.completed {
-            color: #28a745;
         }
 
         /* Step Card */
@@ -396,12 +424,11 @@
         .success { color: #28a745; }
         .error { color: #d90429; }
 
-        /* Responsive Mobile Layout */
         @media (max-width: 850px) {
             .form-layout { flex-direction: column; gap: 20px; }
             .left-panel { border-right: none; border-bottom: 2px dashed #eee; padding-right: 0; padding-bottom: 25px; }
             .candidate-grid { grid-template-columns: repeat(4, 1fr); }
-            .stepper-nav { overflow-x: auto; }
+            .round-selector-banner { flex-direction: column; }
         }
     </style>
 </head>
@@ -421,11 +448,22 @@
         </div>
     </div>
 
+    <!-- Round Selector Mode Switcher Button -->
+    <div class="round-selector-banner">
+        <button type="button" class="round-btn active" id="btnPrelimRound" onclick="setRoundMode('prelim')">
+            🔘 Preliminary Round (100% Full Pageant)
+        </button>
+        <button type="button" class="round-btn" id="btnTop5Round" onclick="setRoundMode('top5')">
+            🏆 TOP 5 FINALS ROUND (Beauty 30% + Brain 40%)
+        </button>
+    </div>
+
     <!-- Main Tabulation Card -->
     <div class="tabulation-card">
-        <div class="header-title">SK Pageant Official Judging</div>
+        <div class="header-title" id="formHeaderTitle">SK Pageant Preliminary Judging</div>
         
         <form id="scoringForm" class="form-layout">
+            <input type="hidden" name="round_type" id="round_type_input" value="prelim">
             
             <!-- LEFT PANEL: Candidate Grid -->
             <div class="left-panel">
@@ -490,201 +528,149 @@
                 </div>
             </div>
 
-            <!-- RIGHT PANEL: Category Criteria Wizard -->
+            <!-- RIGHT PANEL: Criteria Wizard -->
             <div class="right-panel">
                 
-                <!-- Category Navigation Stepper Tabs -->
-                <div class="stepper-nav">
-                    <div class="step-tab active" onclick="jumpToStep(1)">1. Prod</div>
-                    <div class="step-tab" onclick="jumpToStep(2)">2. Casual</div>
-                    <div class="step-tab" onclick="jumpToStep(3)">3. Swim</div>
-                    <div class="step-tab" onclick="jumpToStep(4)">4. Adv</div>
-                    <div class="step-tab" onclick="jumpToStep(5)">5. Gown</div>
-                    <div class="step-tab" onclick="jumpToStep(6)">6. Q&A</div>
-                </div>
+                <!-- PRELIMINARY ROUND WIZARD -->
+                <div id="prelimWizard">
+                    <div class="stepper-nav">
+                        <div class="step-tab active" onclick="jumpToStep(1)">1. Prod</div>
+                        <div class="step-tab" onclick="jumpToStep(2)">2. Casual</div>
+                        <div class="step-tab" onclick="jumpToStep(3)">3. Swim</div>
+                        <div class="step-tab" onclick="jumpToStep(4)">4. Adv</div>
+                        <div class="step-tab" onclick="jumpToStep(5)">5. Gown</div>
+                        <div class="step-tab" onclick="jumpToStep(6)">6. Q&A</div>
+                    </div>
 
-                <!-- STEP 1: PRODUCTION -->
-                <div class="step-content active" id="step-1">
-                    <div class="category-header">
-                        <span class="category-title">1. Production & Opening</span>
-                        <span class="category-weight">15% Weight</span>
+                    <!-- STEP 1: PRODUCTION -->
+                    <div class="step-content active" id="step-1">
+                        <div class="category-header">
+                            <span class="category-title">1. Production & Opening</span>
+                            <span class="category-weight">15% Weight</span>
+                        </div>
+                        <div class="criteria-item"><label>Stage Presence & Charisma <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="p_presence" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Execution & Precision <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="p_execution" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Energy & Projection <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="p_energy" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Overall Personality <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="p_personality" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-next">Next Category &#8594;</button></div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Stage Presence & Charisma <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="p_presence" min="1" max="30" placeholder="Enter 1 - 30" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Execution & Precision <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="p_execution" min="1" max="30" placeholder="Enter 1 - 30" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Energy & Projection <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="p_energy" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Overall Personality <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="p_personality" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-next">Next Category &#8594;</button>
-                    </div>
-                </div>
 
-                <!-- STEP 2: CASUAL WEAR -->
-                <div class="step-content" id="step-2">
-                    <div class="category-header">
-                        <span class="category-title">2. Casual Wear</span>
-                        <span class="category-weight">15% Weight</span>
+                    <!-- STEP 2: CASUAL WEAR -->
+                    <div class="step-content" id="step-2">
+                        <div class="category-header"><span class="category-title">2. Casual Wear</span><span class="category-weight">15% Weight</span></div>
+                        <div class="criteria-item"><label>Poise & Grace <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="c_poise" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Carriage & Posture <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="c_carriage" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Stage Presence <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="c_presence" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Overall Impact & Style <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="c_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Poise & Grace <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="c_poise" min="1" max="30" placeholder="Enter 1 - 30" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Carriage & Posture <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="c_carriage" min="1" max="30" placeholder="Enter 1 - 30" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Stage Presence <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="c_presence" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Overall Impact & Style <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="c_impact" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-prev">&#8592; Prev</button>
-                        <button type="button" class="btn-next">Next Category &#8594;</button>
-                    </div>
-                </div>
 
-                <!-- STEP 3: SWIMWEAR -->
-                <div class="step-content" id="step-3">
-                    <div class="category-header">
-                        <span class="category-title">3. Swimwear</span>
-                        <span class="category-weight">15% Weight</span>
+                    <!-- STEP 3: SWIMWEAR -->
+                    <div class="step-content" id="step-3">
+                        <div class="category-header"><span class="category-title">3. Swimwear</span><span class="category-weight">15% Weight</span></div>
+                        <div class="criteria-item"><label>Confidence & Poise <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="s_confidence" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Carriage & Ramp Skills <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="s_carriage" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Stage Projection <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="s_presence" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="s_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Confidence & Poise <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="s_confidence" min="1" max="30" placeholder="Enter 1 - 30" required>
+
+                    <!-- STEP 4: ADVOCACY -->
+                    <div class="step-content" id="step-4">
+                        <div class="category-header"><span class="category-title">4. Advocacy & Youth Speech</span><span class="category-weight">20% Weight</span></div>
+                        <div class="criteria-item"><label>Relevance & Significance <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="a_relevance" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Content & Substance <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="a_content" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Feasibility & Potential <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="a_feasibility" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>Communication & Delivery <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="a_communication" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>Sincerity & Conviction <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="a_sincerity" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Carriage & Ramp Skills <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="s_carriage" min="1" max="30" placeholder="Enter 1 - 30" required>
+
+                    <!-- STEP 5: EVENING GOWN -->
+                    <div class="step-content" id="step-5">
+                        <div class="category-header"><span class="category-title">5. Evening Gown</span><span class="category-weight">15% Weight</span></div>
+                        <div class="criteria-item"><label>Elegance & Poise <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="e_elegance" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Carriage & Stage Presence <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="e_carriage" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Grace & Ramp Skills <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="e_grace" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>Gown Styling & Fit <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="e_styling" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="e_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Stage Projection <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="s_presence" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="s_impact" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-prev">&#8592; Prev</button>
-                        <button type="button" class="btn-next">Next Category &#8594;</button>
+
+                    <!-- STEP 6: QUESTION & ANSWER -->
+                    <div class="step-content" id="step-6">
+                        <div class="category-header"><span class="category-title">6. Question & Answer</span><span class="category-weight">20% Weight</span></div>
+                        <div class="criteria-item"><label>Relevance & Substance <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="q_relevance" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>Clarity & Thought Structure <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="q_clarity" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>Critical Thinking & Insight <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="q_insight" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>Communication Skills <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="q_communication" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>Confidence & Composure <span class="range-hint">(1 - 10 pts)</span></label><input type="number" name="q_composure" min="1" max="10" placeholder="1 - 10"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="submit" class="btn-submit">Submit Preliminary Scores 🚀</button></div>
                     </div>
                 </div>
 
-                <!-- STEP 4: ADVOCACY -->
-                <div class="step-content" id="step-4">
-                    <div class="category-header">
-                        <span class="category-title">4. Advocacy & Youth Speech</span>
-                        <span class="category-weight">20% Weight</span>
+                <!-- TOP 5 FINALS SCORING WIZARD -->
+                <div id="top5Wizard" style="display: none;">
+                    <div class="stepper-nav">
+                        <div class="step-tab active" id="top5Tab1" onclick="jumpToTop5Step(1)">1. Beauty (30%)</div>
+                        <div class="step-tab" id="top5Tab2" onclick="jumpToTop5Step(2)">2. Brain (40%)</div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Relevance & Significance <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="a_relevance" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Content & Substance <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="a_content" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Feasibility & Potential <span class="range-hint">(1 - 20 pts)</span></label>
-                        <input type="number" name="a_feasibility" min="1" max="20" placeholder="Enter 1 - 20" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Communication & Delivery <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="a_communication" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Sincerity & Conviction <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="a_sincerity" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-prev">&#8592; Prev</button>
-                        <button type="button" class="btn-next">Next Category &#8594;</button>
-                    </div>
-                </div>
 
-                <!-- STEP 5: EVENING GOWN -->
-                <div class="step-content" id="step-5">
-                    <div class="category-header">
-                        <span class="category-title">5. Evening Gown</span>
-                        <span class="category-weight">15% Weight</span>
+                    <!-- TOP 5 STEP 1: BEAUTY (30%) -->
+                    <div class="step-content active" id="top5-step-1">
+                        <div class="category-header">
+                            <span class="category-title">1. Beauty Criteria</span>
+                            <span class="category-weight">30% Weight</span>
+                        </div>
+                        <div class="criteria-item">
+                            <label>Facial Beauty & Appeal <span class="range-hint">(1 - 15 pts)</span></label>
+                            <input type="number" name="b_facial" min="0" max="15" step="0.5" placeholder="Enter 1 - 15">
+                        </div>
+                        <div class="criteria-item">
+                            <label>Poise, Elegance & Stage Presence <span class="range-hint">(1 - 10 pts)</span></label>
+                            <input type="number" name="b_poise" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                        </div>
+                        <div class="criteria-item">
+                            <label>Confidence & Overall Impression <span class="range-hint">(1 - 5 pts)</span></label>
+                            <input type="number" name="b_conf" min="0" max="5" step="0.5" placeholder="Enter 1 - 5">
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-next" onclick="jumpToTop5Step(2)">Next: Brain (40%) &#8594;</button>
+                        </div>
                     </div>
-                    <div class="criteria-item">
-                        <label>Elegance & Poise <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="e_elegance" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Carriage & Stage Presence <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="e_carriage" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Grace & Ramp Skills <span class="range-hint">(1 - 20 pts)</span></label>
-                        <input type="number" name="e_grace" min="1" max="20" placeholder="Enter 1 - 20" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Gown Styling & Fit <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="e_styling" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="e_impact" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-prev">&#8592; Prev</button>
-                        <button type="button" class="btn-next">Next Category &#8594;</button>
-                    </div>
-                </div>
 
-                <!-- STEP 6: QUESTION & ANSWER -->
-                <div class="step-content" id="step-6">
-                    <div class="category-header">
-                        <span class="category-title">6. Question & Answer</span>
-                        <span class="category-weight">20% Weight</span>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Relevance & Substance <span class="range-hint">(1 - 30 pts)</span></label>
-                        <input type="number" name="q_relevance" min="1" max="30" placeholder="Enter 1 - 30" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Clarity & Thought Structure <span class="range-hint">(1 - 25 pts)</span></label>
-                        <input type="number" name="q_clarity" min="1" max="25" placeholder="Enter 1 - 25" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Critical Thinking & Insight <span class="range-hint">(1 - 20 pts)</span></label>
-                        <input type="number" name="q_insight" min="1" max="20" placeholder="Enter 1 - 20" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Communication Skills <span class="range-hint">(1 - 15 pts)</span></label>
-                        <input type="number" name="q_communication" min="1" max="15" placeholder="Enter 1 - 15" required>
-                    </div>
-                    <div class="criteria-item">
-                        <label>Confidence & Composure <span class="range-hint">(1 - 10 pts)</span></label>
-                        <input type="number" name="q_composure" min="1" max="10" placeholder="Enter 1 - 10" required>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn-prev">&#8592; Prev</button>
-                        <button type="submit" class="btn-submit">Submit Scores 🚀</button>
+                    <!-- TOP 5 STEP 2: BRAIN (40%) -->
+                    <div class="step-content" id="top5-step-2">
+                        <div class="category-header">
+                            <span class="category-title">2. Brain Criteria</span>
+                            <span class="category-weight">40% Weight</span>
+                        </div>
+                        <div class="criteria-item">
+                            <label>Relevance & Substance of Answer <span class="range-hint">(1 - 15 pts)</span></label>
+                            <input type="number" name="br_substance" min="0" max="15" step="0.5" placeholder="Enter 1 - 15">
+                        </div>
+                        <div class="criteria-item">
+                            <label>Intelligence & Critical Thinking <span class="range-hint">(1 - 10 pts)</span></label>
+                            <input type="number" name="br_intelligence" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                        </div>
+                        <div class="criteria-item">
+                            <label>Clarity & Organization of Thoughts <span class="range-hint">(1 - 10 pts)</span></label>
+                            <input type="number" name="br_clarity" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                        </div>
+                        <div class="criteria-item">
+                            <label>Confidence & Delivery <span class="range-hint">(1 - 5 pts)</span></label>
+                            <input type="number" name="br_delivery" min="0" max="5" step="0.5" placeholder="Enter 1 - 5">
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-prev" onclick="jumpToTop5Step(1)">&#8592; Prev</button>
+                            <button type="submit" class="btn-submit">Submit Top 5 Finals Score 🏆</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Live Score Preview Box -->
                 <div class="live-score-box">
-                    <span class="live-score-label">Grand Total Score Preview:</span>
+                    <span class="live-score-label" id="scorePreviewLabel">Preliminary Grand Total:</span>
                     <span class="live-score-value" id="grandTotalPreview">0.00 / 100</span>
                 </div>
 
@@ -694,55 +680,35 @@
     </div>
 
     <script>
-        // --- 1. CANDIDATE MEMORY & PREVIEW ---
-        let candidateMemory = {};
-        const numberInputs = document.querySelectorAll('.right-panel input[type="number"]');
+        let currentMode = 'prelim';
 
-        numberInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const selectedCandidate = document.querySelector('input[name="candidate_number"]:checked');
-                if (selectedCandidate) {
-                    const candidateId = selectedCandidate.value;
-                    if (!candidateMemory[candidateId]) { candidateMemory[candidateId] = {}; }
-                    candidateMemory[candidateId][this.name] = this.value;
-                }
-                updateLiveTotal();
-            });
-        });
+        function setRoundMode(mode) {
+            currentMode = mode;
+            document.getElementById('round_type_input').value = mode;
+            
+            const btnP = document.getElementById('btnPrelimRound');
+            const btnT = document.getElementById('btnTop5Round');
+            const headerT = document.getElementById('formHeaderTitle');
 
-        // --- 2. LIVE GRAND TOTAL CALCULATOR ---
-        function updateLiveTotal() {
-            const getVal = name => parseFloat(document.querySelector(`input[name="${name}"]`)?.value || 0);
-
-            // Production (15%)
-            const pSum = getVal('p_presence') + getVal('p_execution') + getVal('p_energy') + getVal('p_personality');
-            const pW = pSum * 0.15;
-
-            // Casual (15%)
-            const cSum = getVal('c_poise') + getVal('c_carriage') + getVal('c_presence') + getVal('c_impact');
-            const cW = cSum * 0.15;
-
-            // Swimwear (15%)
-            const sSum = getVal('s_confidence') + getVal('s_carriage') + getVal('s_presence') + getVal('s_impact');
-            const sW = sSum * 0.15;
-
-            // Advocacy (20%)
-            const aSum = getVal('a_relevance') + getVal('a_content') + getVal('a_feasibility') + getVal('a_communication') + getVal('a_sincerity');
-            const aW = aSum * 0.20;
-
-            // Evening Gown (15%)
-            const eSum = getVal('e_elegance') + getVal('e_carriage') + getVal('e_grace') + getVal('e_styling') + getVal('e_impact');
-            const eW = eSum * 0.15;
-
-            // Q&A (20%)
-            const qSum = getVal('q_relevance') + getVal('q_clarity') + getVal('q_insight') + getVal('q_communication') + getVal('q_composure');
-            const qW = qSum * 0.20;
-
-            const total = pW + cW + sW + aW + eW + qW;
-            document.getElementById('grandTotalPreview').textContent = total.toFixed(2) + ' / 100';
+            if (mode === 'prelim') {
+                btnP.classList.add('active');
+                btnT.classList.remove('active');
+                headerT.textContent = "SK Pageant Preliminary Judging";
+                document.getElementById('prelimWizard').style.display = 'block';
+                document.getElementById('top5Wizard').style.display = 'none';
+                document.getElementById('scorePreviewLabel').textContent = "Preliminary Grand Total:";
+            } else {
+                btnT.classList.add('active');
+                btnP.classList.remove('active');
+                headerT.textContent = "MISS SK YOUTH AMBASSADRESS – TOP 5 FINALS JUDGING";
+                document.getElementById('prelimWizard').style.display = 'none';
+                document.getElementById('top5Wizard').style.display = 'block';
+                document.getElementById('scorePreviewLabel').textContent = "Top 5 Score Total (Beauty 30% + Brain 40%):";
+            }
+            updateLiveTotal();
         }
 
-        // --- 3. CANDIDATE SELECTION ---
+        // --- 1. CANDIDATE SELECTION ---
         const radioButtons = document.querySelectorAll('input[name="candidate_number"]');
         const previewImg = document.getElementById('preview-img');
         const placeholderCircle = document.getElementById('placeholder-circle');
@@ -754,69 +720,82 @@
                 previewImg.style.display = 'block';
                 previewImg.src = this.getAttribute('data-img');
                 previewName.textContent = this.getAttribute('data-name');
-                
-                const candidateId = this.value;
-
-                numberInputs.forEach(input => {
-                    if (candidateMemory[candidateId] && candidateMemory[candidateId][input.name] !== undefined) {
-                        input.value = candidateMemory[candidateId][input.name];
-                    } else {
-                        input.value = '';
-                    }
-                });
-                
                 updateLiveTotal();
-                jumpToStep(1);
             });
         });
 
-        // --- 4. STEPPER NAVIGATION & WIZARD ---
+        // --- 2. LIVE GRAND TOTAL CALCULATOR ---
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', updateLiveTotal);
+        });
+
+        function updateLiveTotal() {
+            const getVal = name => parseFloat(document.querySelector(`input[name="${name}"]`)?.value || 0);
+
+            if (currentMode === 'prelim') {
+                // Production (15%)
+                const pSum = getVal('p_presence') + getVal('p_execution') + getVal('p_energy') + getVal('p_personality');
+                const pW = pSum * 0.15;
+                const cSum = getVal('c_poise') + getVal('c_carriage') + getVal('c_presence') + getVal('c_impact');
+                const cW = cSum * 0.15;
+                const sSum = getVal('s_confidence') + getVal('s_carriage') + getVal('s_presence') + getVal('s_impact');
+                const sW = sSum * 0.15;
+                const aSum = getVal('a_relevance') + getVal('a_content') + getVal('a_feasibility') + getVal('a_communication') + getVal('a_sincerity');
+                const aW = aSum * 0.20;
+                const eSum = getVal('e_elegance') + getVal('e_carriage') + getVal('e_grace') + getVal('e_styling') + getVal('e_impact');
+                const eW = eSum * 0.15;
+                const qSum = getVal('q_relevance') + getVal('q_clarity') + getVal('q_insight') + getVal('q_communication') + getVal('q_composure');
+                const qW = qSum * 0.20;
+
+                const total = pW + cW + sW + aW + eW + qW;
+                document.getElementById('grandTotalPreview').textContent = total.toFixed(2) + ' / 100';
+            } else {
+                // Top 5 Round (Beauty 30% + Brain 40% = 70%)
+                const beauty = getVal('b_facial') + getVal('b_poise') + getVal('b_conf');
+                const brain  = getVal('br_substance') + getVal('br_intelligence') + getVal('br_clarity') + getVal('br_delivery');
+                const total = beauty + brain;
+                document.getElementById('grandTotalPreview').textContent = total.toFixed(2) + ' / 70 pts';
+            }
+        }
+
+        // --- 3. STEPPER NAVIGATION & WIZARD ---
         let currentStep = 1;
-        
         function jumpToStep(stepNumber) {
             currentStep = stepNumber;
-            document.querySelectorAll('.step-content').forEach(step => step.classList.remove('active'));
+            document.querySelectorAll('#prelimWizard .step-content').forEach(step => step.classList.remove('active'));
             document.getElementById(`step-${stepNumber}`).classList.add('active');
 
-            document.querySelectorAll('.step-tab').forEach((tab, index) => {
-                if (index + 1 === stepNumber) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
+            document.querySelectorAll('#prelimWizard .step-tab').forEach((tab, index) => {
+                if (index + 1 === stepNumber) tab.classList.add('active');
+                else tab.classList.remove('active');
             });
         }
 
-        document.querySelectorAll('.btn-next').forEach(button => {
+        function jumpToTop5Step(stepNumber) {
+            document.querySelectorAll('#top5Wizard .step-content').forEach(step => step.classList.remove('active'));
+            document.getElementById(`top5-step-${stepNumber}`).classList.add('active');
+
+            document.getElementById('top5Tab1').classList.toggle('active', stepNumber === 1);
+            document.getElementById('top5Tab2').classList.toggle('active', stepNumber === 2);
+        }
+
+        document.querySelectorAll('#prelimWizard .btn-next').forEach(button => {
             button.addEventListener('click', () => {
                 if (currentStep === 1 && !document.querySelector('input[name="candidate_number"]:checked')) {
-                    alert("Please select a candidate from the left panel first!");
+                    alert("Please select a candidate first!");
                     return; 
                 }
-                
-                const inputs = document.getElementById(`step-${currentStep}`).querySelectorAll('input');
-                let allValid = true;
-                
-                inputs.forEach(input => {
-                    if (!input.checkValidity()) { 
-                        input.reportValidity(); 
-                        allValid = false; 
-                    }
-                });
-                
-                if (allValid) { 
-                    jumpToStep(currentStep + 1); 
-                }
+                jumpToStep(currentStep + 1); 
             });
         });
 
-        document.querySelectorAll('.btn-prev').forEach(button => {
+        document.querySelectorAll('#prelimWizard .btn-prev').forEach(button => {
             button.addEventListener('click', () => { 
                 jumpToStep(currentStep - 1); 
             });
         });
 
-        // --- 5. SUBMIT FORM ---
+        // --- 4. SUBMIT FORM ---
         document.getElementById('scoringForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
             const statusMessage = document.getElementById('status-message');
@@ -829,8 +808,6 @@
                 return;
             }
 
-            const submittedCandidate = selectedRadio.value;
-
             fetch('/submit_score', { 
                 method: 'POST', 
                 body: new FormData(this) 
@@ -839,11 +816,10 @@
             .then(data => {
                 statusMessage.textContent = "✅ Scores submitted successfully!"; 
                 statusMessage.className = "success";
-                
-                delete candidateMemory[submittedCandidate];
 
                 document.getElementById('scoringForm').reset();
-                jumpToStep(1);
+                if (currentMode === 'prelim') jumpToStep(1);
+                else jumpToTop5Step(1);
                 
                 placeholderCircle.style.display = 'flex'; 
                 previewImg.style.display = 'none'; 
