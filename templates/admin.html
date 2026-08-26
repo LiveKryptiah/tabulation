@@ -8,12 +8,45 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body { font-family: 'Geist', sans-serif; background-color: #f8f9fa; margin: 0; padding: 25px; color: #333; }
         
-        .admin-container { max-width: 1550px; margin: 0 auto; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; }
+        .admin-container { max-width: 1550px; margin: 0 auto; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-radius: 14px; overflow: hidden; }
         
         .header-title { background-color: #a67c52; color: white; text-align: center; padding: 20px; font-size: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         
+        /* Category Pill Navigation Bar (Matching Screenshot UI) */
+        .category-pill-nav {
+            display: flex;
+            gap: 8px;
+            background: #fafbfc;
+            padding: 8px 16px;
+            border-bottom: 1px solid #edf2f7;
+            border-top: 1px solid #edf2f7;
+            overflow-x: auto;
+            align-items: center;
+        }
+        .pill-btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3182ce;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .pill-btn.active {
+            background-color: #a67c52;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.3);
+        }
+        .pill-btn:hover:not(.active) {
+            background-color: #edf2f7;
+        }
+
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
         th { background-color: #e6d3a3; color: #1e1e24; padding: 14px 10px; font-size: 13px; border: 1px solid #dcdcdc; font-weight: 700; vertical-align: middle; }
         td { padding: 12px 10px; border: 1px solid #dcdcdc; font-size: 14px; }
@@ -68,6 +101,9 @@
         .legend-table { width: 100%; font-size: 12px; text-align: left; }
         .legend-table th, .legend-table td { padding: 8px 12px; border: 1px solid #eee; background-color: white; }
         .legend-table th { background-color: #f8f9fa; font-weight: 700; }
+
+        .tab-view { display: none; }
+        .tab-view.active { display: block; }
     </style>
 </head>
 <body>
@@ -90,46 +126,192 @@
             </div>
         </div>
 
-        <!-- Top 5 Finalist Spotlight Banner -->
-        <div style="background: linear-gradient(135deg, #fdfaf7 0%, #f4eae0 100%); border-bottom: 2px solid #a67c52; padding: 20px; text-align: center;">
-            <div style="font-weight: 700; font-size: 16px; color: #a67c52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
-                👑 AUTOMATIC TOP 5 SELECTION SPOTLIGHT
-            </div>
-            <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <div style="color: #6c757d; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
-            </div>
+        <!-- Category Pill Navigation Bar (Matching Screenshot UI) -->
+        <div class="category-pill-nav">
+            <button type="button" class="pill-btn active" onclick="switchAdminTab(0)">🏆 Overall & Top 5</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(1)">1. Prod</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(2)">2. Casual</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(3)">3. Swim</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(4)">4. Adv</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(5)">5. Gown</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(6)">6. Q&A</button>
         </div>
-        
-        <table id="tabulationTable">
-            <thead>
-                <tr>
-                    <th>Candidate</th>
-                    <th class="col-prelim">Prelim Avg (100 pts)</th>
-                    <th class="col-prelim">30% Prelim Weight</th>
-                    <th class="col-beauty">30% Beauty (Judge Avg)</th>
-                    <th class="col-brain">40% Brain (Judge Avg)</th>
-                    <th class="col-final">FINAL SCORE (100%)</th>
-                    <th>RANK</th>
-                    <th>TOP 5 STATUS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cand in candidates %}
-                <tr class="candidate-row" data-cand="{{ cand.number }}">
-                    <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                    <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
-                    <td class="prelim-30 col-prelim" style="font-weight: bold;">{{ cand.prelim_30 }}</td>
-                    <td class="beauty-30 col-beauty" style="font-weight: bold; color: #a67c52;">{{ cand.beauty_30 }}</td>
-                    <td class="brain-40 col-brain" style="font-weight: bold; color: #007bff;">{{ cand.brain_40 }}</td>
-                    <td class="final-score col-final">{{ cand.final_score }}</td>
-                    <td class="rank-cell col-rank">-</td>
-                    <td class="top5-cell">-</td>
-                </tr>
-                {% else %}
-                <tr><td colspan="8" style="padding: 30px; color: #888;">No preliminary scores recorded yet. Have judges submit scores first!</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+        <!-- TAB 0: OVERALL & TOP 5 TABULATION -->
+        <div class="tab-view active" id="tabView-0">
+            <!-- Top 5 Finalist Spotlight Banner -->
+            <div style="background: linear-gradient(135deg, #fdfaf7 0%, #f4eae0 100%); border-bottom: 2px solid #a67c52; padding: 20px; text-align: center;">
+                <div style="font-weight: 700; font-size: 16px; color: #a67c52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                    👑 AUTOMATIC TOP 5 SELECTION SPOTLIGHT
+                </div>
+                <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="color: #6c757d; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th class="col-prelim">Prelim Avg (100 pts)</th>
+                        <th class="col-prelim">30% Prelim Weight</th>
+                        <th class="col-beauty">30% Beauty (Judge Avg)</th>
+                        <th class="col-brain">40% Brain (Judge Avg)</th>
+                        <th class="col-final">FINAL SCORE (100%)</th>
+                        <th>RANK</th>
+                        <th>TOP 5 STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr class="candidate-row" data-cand="{{ cand.number }}">
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
+                        <td class="prelim-30 col-prelim" style="font-weight: bold;">{{ cand.prelim_30 }}</td>
+                        <td class="beauty-30 col-beauty" style="font-weight: bold; color: #a67c52;">{{ cand.beauty_30 }}</td>
+                        <td class="brain-40 col-brain" style="font-weight: bold; color: #007bff;">{{ cand.brain_40 }}</td>
+                        <td class="final-score col-final">{{ cand.final_score }}</td>
+                        <td class="rank-cell col-rank">-</td>
+                        <td class="top5-cell">-</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" style="padding: 30px; color: #888;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 1: PRODUCTION -->
+        <div class="tab-view" id="tabView-1">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Production Category Score (Max 100)</th>
+                        <th>Weighted Contribution (15%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.prod_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 2: CASUAL WEAR -->
+        <div class="tab-view" id="tabView-2">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Casual Wear Category Score (Max 100)</th>
+                        <th>Weighted Contribution (15%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.casual_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 3: SWIMWEAR -->
+        <div class="tab-view" id="tabView-3">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Swimwear Category Score (Max 100)</th>
+                        <th>Weighted Contribution (15%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.swim_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 4: ADVOCACY -->
+        <div class="tab-view" id="tabView-4">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Advocacy Category Score (Max 100)</th>
+                        <th>Weighted Contribution (20%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.adv_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 5: EVENING GOWN -->
+        <div class="tab-view" id="tabView-5">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Evening Gown Category Score (Max 100)</th>
+                        <th>Weighted Contribution (15%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.gown_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 6: Q&A -->
+        <div class="tab-view" id="tabView-6">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Q&A Category Score (Max 100)</th>
+                        <th>Weighted Contribution (20%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="font-weight: bold;">{{ cand.qa_avg }} pts</td>
+                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- Exact Criteria Reference Tables -->
         <div class="legend-container">
@@ -169,10 +351,22 @@
     </div>
 
     <script>
+        function switchAdminTab(index) {
+            document.querySelectorAll('.pill-btn').forEach((btn, i) => {
+                if (i === index) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            document.querySelectorAll('.tab-view').forEach((view, i) => {
+                if (i === index) view.classList.add('active');
+                else view.classList.remove('active');
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', calculateTabulation);
 
         function calculateTabulation() {
-            const rows = document.querySelectorAll('.candidate-row');
+            const rows = document.querySelectorAll('#tabView-0 .candidate-row');
             let candidates = [];
 
             rows.forEach((row) => {
@@ -193,9 +387,7 @@
                 });
             });
 
-            // Sort by highest Final Score
             const sortedCandidates = [...candidates].sort((a, b) => b.score - a.score);
-
             const top5List = [];
 
             sortedCandidates.forEach((cand, sortedIndex) => {
@@ -245,14 +437,13 @@
             spotlightContainer.innerHTML = html;
         }
 
-        // Real-Time 3-Second Auto-Polling for Admin Panel
         function pollLiveData() {
             fetch('/api/admin_data')
             .then(res => res.json())
             .then(data => {
                 if (!data.candidates) return;
                 data.candidates.forEach(cand => {
-                    const rows = document.querySelectorAll('.candidate-row');
+                    const rows = document.querySelectorAll('#tabView-0 .candidate-row');
                     rows.forEach(row => {
                         const nameTd = row.querySelector('td');
                         if (nameTd && nameTd.textContent.trim() === cand.name) {

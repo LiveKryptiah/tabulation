@@ -195,6 +195,7 @@ def admin_panel():
 # --- HELPER & API FOR REAL-TIME TABULATION ---
 def get_tabulation_data():
     prelim_results = {}
+    category_results = {}
     judge_progress = {}
     
     if os.path.exists(CSV_FILE):
@@ -212,6 +213,23 @@ def get_tabulation_data():
                         if cand_num not in prelim_results:
                             prelim_results[cand_num] = []
                         prelim_results[cand_num].append(score)
+                        
+                        if cand_num not in category_results:
+                            category_results[cand_num] = {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []}
+
+                        p_val = float(row.get('Production (Max 100)', 0))
+                        c_val = float(row.get('Casual Wear (Max 100)', 0))
+                        s_val = float(row.get('Swimwear (Max 100)', 0))
+                        a_val = float(row.get('Advocacy (Max 100)', 0))
+                        g_val = float(row.get('Evening Gown (Max 100)', 0))
+                        q_val = float(row.get('Q&A (Max 100)', 0))
+
+                        category_results[cand_num]['prod'].append(p_val)
+                        category_results[cand_num]['casual'].append(c_val)
+                        category_results[cand_num]['swim'].append(s_val)
+                        category_results[cand_num]['adv'].append(a_val)
+                        category_results[cand_num]['gown'].append(g_val)
+                        category_results[cand_num]['qa'].append(q_val)
                         
                         if j_slot not in judge_progress:
                             judge_progress[j_slot] = set()
@@ -254,14 +272,13 @@ def get_tabulation_data():
         p_scores = prelim_results.get(cand_num, [])
         b_scores = top5_beauty_results.get(cand_num, [])
         br_scores = top5_brain_results.get(cand_num, [])
+        cats = category_results.get(cand_num, {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []})
 
         prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0
         prelim_30 = prelim_avg * 0.30
 
         beauty_30 = sum(b_scores) / len(b_scores) if b_scores else 0
         brain_40  = sum(br_scores) / len(br_scores) if br_scores else 0
-
-        final_score = prelim_30 + beauty_30 + brain_40
 
         candidates_data.append({
             'number': cand_num,
@@ -271,6 +288,12 @@ def get_tabulation_data():
             'beauty_30': round(beauty_30, 2),
             'brain_40': round(brain_40, 2),
             'final_score': round(final_score, 2),
+            'prod_avg': round(sum(cats['prod']) / len(cats['prod']), 2) if cats['prod'] else 0,
+            'casual_avg': round(sum(cats['casual']) / len(cats['casual']), 2) if cats['casual'] else 0,
+            'swim_avg': round(sum(cats['swim']) / len(cats['swim']), 2) if cats['swim'] else 0,
+            'adv_avg': round(sum(cats['adv']) / len(cats['adv']), 2) if cats['adv'] else 0,
+            'gown_avg': round(sum(cats['gown']) / len(cats['gown']), 2) if cats['gown'] else 0,
+            'qa_avg': round(sum(cats['qa']) / len(cats['qa']), 2) if cats['qa'] else 0,
             'has_top5_scores': len(b_scores) > 0 or len(br_scores) > 0,
             'submission_count': len(p_scores)
         })
