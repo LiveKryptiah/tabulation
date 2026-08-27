@@ -96,7 +96,7 @@ PRELIM_STORE = {}  # (cand_str, judge_slot) -> dict
 TOP5_STORE = {}    # (cand_str, judge_slot) -> dict
 
 def sync_stores_from_csv():
-    """Load existing CSV files into memory store if not already present."""
+    """Load existing CSV files into memory store."""
     if os.path.exists(CSV_FILE):
         try:
             with open(CSV_FILE, mode='r', encoding='utf-8') as f:
@@ -108,20 +108,38 @@ def sync_stores_from_csv():
                         j_slot = row[1].strip()
                         j_name = row[2].strip()
                         key = (cand_str, j_slot)
-                        if key not in PRELIM_STORE:
-                            PRELIM_STORE[key] = {
-                                'candidate_str': cand_str,
-                                'judge_slot': j_slot,
-                                'judge_name': j_name,
-                                'prod': to_float(row[3]),
-                                'casual': to_float(row[4]),
-                                'swim': to_float(row[5]),
-                                'adv': to_float(row[6]),
-                                'gown': to_float(row[7]),
-                                'qa': to_float(row[8]),
-                                'grand_total': to_float(row[9]),
-                                'timestamp': row[10] if len(row) > 10 else ''
-                            }
+
+                        prod_val = to_float(row[3])
+                        cas_val = to_float(row[4])
+                        swim_val = to_float(row[5])
+                        adv_val = to_float(row[6])
+                        gown_val = to_float(row[7])
+                        qa_val = to_float(row[8])
+                        g_total = to_float(row[9])
+
+                        existing = PRELIM_STORE.get(key, {})
+                        new_p = max(prod_val, existing.get('prod', 0))
+                        new_c = max(cas_val, existing.get('casual', 0))
+                        new_s = max(swim_val, existing.get('swim', 0))
+                        new_a = max(adv_val, existing.get('adv', 0))
+                        new_g = max(gown_val, existing.get('gown', 0))
+                        new_q = max(qa_val, existing.get('qa', 0))
+                        calc_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+                        final_total = g_total if g_total > 0 else calc_total
+
+                        PRELIM_STORE[key] = {
+                            'candidate_str': cand_str,
+                            'judge_slot': j_slot,
+                            'judge_name': j_name,
+                            'prod': round(new_p, 2),
+                            'casual': round(new_c, 2),
+                            'swim': round(new_s, 2),
+                            'adv': round(new_a, 2),
+                            'gown': round(new_g, 2),
+                            'qa': round(new_q, 2),
+                            'grand_total': round(final_total, 2),
+                            'timestamp': row[10] if len(row) > 10 else ''
+                        }
         except Exception as e:
             print("Error reading prelim CSV to store:", e)
 
@@ -136,23 +154,39 @@ def sync_stores_from_csv():
                         j_slot = row[1].strip()
                         j_name = row[2].strip()
                         key = (cand_str, j_slot)
-                        if key not in TOP5_STORE:
-                            TOP5_STORE[key] = {
-                                'candidate': cand_str,
-                                'judge_slot': j_slot,
-                                'judge_name': j_name,
-                                'b_facial': to_float(row[3]),
-                                'b_poise': to_float(row[4]),
-                                'b_conf': to_float(row[5]),
-                                'beauty_total': to_float(row[6]),
-                                'br_substance': to_float(row[7]),
-                                'br_intelligence': to_float(row[8]),
-                                'br_clarity': to_float(row[9]),
-                                'br_delivery': to_float(row[10]),
-                                'brain_total': to_float(row[11]),
-                                'top5_total': to_float(row[12]),
-                                'timestamp': row[13] if len(row) > 13 else ''
-                            }
+
+                        b_fac = to_float(row[3])
+                        b_poi = to_float(row[4])
+                        b_cnf = to_float(row[5])
+                        b_tot = to_float(row[6])
+                        br_sub = to_float(row[7])
+                        br_int = to_float(row[8])
+                        br_cla = to_float(row[9])
+                        br_del = to_float(row[10])
+                        br_tot = to_float(row[11])
+                        t5_tot = to_float(row[12])
+
+                        existing = TOP5_STORE.get(key, {})
+                        new_b_tot = max(b_tot, existing.get('beauty_total', 0))
+                        new_br_tot = max(br_tot, existing.get('brain_total', 0))
+                        final_t5 = max(t5_tot, new_b_tot + new_br_tot)
+
+                        TOP5_STORE[key] = {
+                            'candidate': cand_str,
+                            'judge_slot': j_slot,
+                            'judge_name': j_name,
+                            'b_facial': b_fac,
+                            'b_poise': b_poi,
+                            'b_conf': b_cnf,
+                            'beauty_total': round(new_b_tot, 2),
+                            'br_substance': br_sub,
+                            'br_intelligence': br_int,
+                            'br_clarity': br_cla,
+                            'br_delivery': br_del,
+                            'brain_total': round(new_br_tot, 2),
+                            'top5_total': round(final_t5, 2),
+                            'timestamp': row[13] if len(row) > 13 else ''
+                        }
         except Exception as e:
             print("Error reading top5 CSV to store:", e)
 
