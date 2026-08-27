@@ -1086,6 +1086,15 @@
             }
         }
 
+        // Save active candidate number to localStorage
+        function setActiveCandidate(candNum) {
+            activeCandidateNum = candNum;
+            try {
+                if (candNum) localStorage.setItem('pageant_active_cand', candNum);
+                else localStorage.removeItem('pageant_active_cand');
+            } catch (e) {}
+        }
+
         // --- 1. CANDIDATE SELECTION ---
         const radioButtons = document.querySelectorAll('input[name="candidate_number"]');
         const previewImg = document.getElementById('preview-img');
@@ -1093,12 +1102,12 @@
         const previewName = document.getElementById('preview-name');
 
         radioButtons.forEach(radio => {
-            radio.addEventListener('click', function() {
+            radio.addEventListener('change', function() {
                 const newCandNum = this.value;
                 if (activeCandidateNum && activeCandidateNum !== newCandNum) {
                     saveCandidateDraft(activeCandidateNum);
                 }
-                activeCandidateNum = newCandNum;
+                setActiveCandidate(newCandNum);
                 
                 placeholderCircle.style.display = 'none';
                 previewImg.style.display = 'block';
@@ -1112,11 +1121,10 @@
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
                 if (!activeCandidateNum) {
-                    // Auto-select candidate if typing without explicit click
                     const firstRadio = document.querySelector('input[name="candidate_number"]:checked') || document.querySelector('input[name="candidate_number"]');
                     if (firstRadio) {
                         firstRadio.checked = true;
-                        activeCandidateNum = firstRadio.value;
+                        setActiveCandidate(firstRadio.value);
                     }
                 }
                 if (activeCandidateNum) {
@@ -1167,7 +1175,7 @@
             
             // Clear candidate selection radio & preview for fresh category scoring
             document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
-            activeCandidateNum = null;
+            setActiveCandidate(null);
             resetCandidatePreview();
             
             // Clear input fields for the new category step
@@ -1188,7 +1196,7 @@
             document.getElementById('top5Tab2').classList.toggle('active', stepNumber === 2);
             
             document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
-            activeCandidateNum = null;
+            setActiveCandidate(null);
             resetCandidatePreview();
             
             document.querySelectorAll('.right-panel input[type="number"]').forEach(input => input.value = '');
@@ -1201,7 +1209,7 @@
             button.addEventListener('click', () => {
                 if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
                 const step = currentStep;
-                const completedSet = candidateDrafts['prelim']?.[step] || {};
+                const completedSet = candidateCompleted['prelim']?.[step] || {};
                 const completedCount = Object.keys(completedSet).length;
 
                 if (completedCount < 12) {
@@ -1222,7 +1230,7 @@
             button.addEventListener('click', () => {
                 if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
                 const step = currentTop5Step;
-                const completedSet = candidateDrafts['top5']?.[step] || {};
+                const completedSet = candidateCompleted['top5']?.[step] || {};
                 const completedCount = Object.keys(completedSet).length;
 
                 if (completedCount < 5) {
@@ -1240,7 +1248,7 @@
 
             const statusMessage = document.getElementById('status-message');
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
-            const completedSet = candidateDrafts[currentMode]?.[step] || {};
+            const completedSet = candidateCompleted[currentMode]?.[step] || {};
             const completedCount = Object.keys(completedSet).length;
             const required = currentMode === 'prelim' ? 12 : 5;
 
@@ -1293,8 +1301,9 @@
                 try {
                     localStorage.removeItem('pageant_candidate_drafts');
                     localStorage.removeItem('pageant_candidate_completed');
+                    localStorage.removeItem('pageant_active_cand');
                 } catch(e) {}
-                activeCandidateNum = null;
+                setActiveCandidate(null);
 
                 if (currentMode === 'prelim') jumpToStep(1);
                 else jumpToTop5Step(1);
@@ -1314,6 +1323,21 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             updateCategoryProgress();
+            
+            // Restore active candidate selection and draft inputs on page reload!
+            const savedActive = localStorage.getItem('pageant_active_cand');
+            if (savedActive) {
+                const radio = document.querySelector(`input[name="candidate_number"][value="${savedActive}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    setActiveCandidate(savedActive);
+                    placeholderCircle.style.display = 'none';
+                    previewImg.style.display = 'block';
+                    previewImg.src = radio.getAttribute('data-img');
+                    previewName.textContent = radio.getAttribute('data-name');
+                    loadCandidateDraft(savedActive);
+                }
+            }
         });
     </script>
 </body>
