@@ -467,6 +467,13 @@ def get_tabulation_data():
             else:
                 j_breakdown[j_id] = '-'
 
+        prod_j = {j_id: round(cand_cats[j_id]['prod'], 2) if (j_id in cand_cats and 'prod' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+        casual_j = {j_id: round(cand_cats[j_id]['casual'], 2) if (j_id in cand_cats and 'casual' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+        swim_j = {j_id: round(cand_cats[j_id]['swim'], 2) if (j_id in cand_cats and 'swim' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+        adv_j = {j_id: round(cand_cats[j_id]['adv'], 2) if (j_id in cand_cats and 'adv' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+        gown_j = {j_id: round(cand_cats[j_id]['gown'], 2) if (j_id in cand_cats and 'gown' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+        qa_j = {j_id: round(cand_cats[j_id]['qa'], 2) if (j_id in cand_cats and 'qa' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
+
         candidates_data.append({
             'number': cand_num,
             'name': f"Candidate {cand_num}",
@@ -480,17 +487,18 @@ def get_tabulation_data():
             'judge_3': j_breakdown.get('Judge 3', '-'),
             'judge_4': j_breakdown.get('Judge 4', '-'),
             'judge_5': j_breakdown.get('Judge 5', '-'),
-            'p_j1': p_dict.get('Judge 1', '-'),
-            'p_j2': p_dict.get('Judge 2', '-'),
-            'p_j3': p_dict.get('Judge 3', '-'),
-            'p_j4': p_dict.get('Judge 4', '-'),
-            'p_j5': p_dict.get('Judge 5', '-'),
             'prod_avg': round(prod_avg, 2),
             'casual_avg': round(casual_avg, 2),
             'swim_avg': round(swim_avg, 2),
             'adv_avg': round(adv_avg, 2),
             'gown_avg': round(gown_avg, 2),
             'qa_avg': round(qa_avg, 2),
+            'prod_j': prod_j,
+            'casual_j': casual_j,
+            'swim_j': swim_j,
+            'adv_j': adv_j,
+            'gown_j': gown_j,
+            'qa_j': qa_j,
             'has_top5_scores': len(b_scores) > 0 or len(br_scores) > 0,
             'submission_count': len(p_scores)
         })
