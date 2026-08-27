@@ -515,20 +515,22 @@
             let candidates = [];
 
             rows.forEach((row) => {
-                const prelim30 = parseFloat(row.querySelector('.prelim-30').textContent) || 0;
-                const beauty30 = parseFloat(row.querySelector('.beauty-30').textContent) || 0;
-                const brain40  = parseFloat(row.querySelector('.brain-40').textContent) || 0;
+                const prelimVal = parseFloat(row.querySelector('.prelim-val')?.textContent) || 0;
+                const prelim30  = parseFloat(row.querySelector('.prelim-30')?.textContent) || 0;
+                const beauty30  = parseFloat(row.querySelector('.beauty-30')?.textContent) || 0;
+                const brain40   = parseFloat(row.querySelector('.brain-40')?.textContent) || 0;
 
                 const finalScore = prelim30 + beauty30 + brain40;
-                row.querySelector('.final-score').textContent = finalScore.toFixed(2);
+                const finalScoreEl = row.querySelector('.final-score');
+                if (finalScoreEl) finalScoreEl.textContent = finalScore.toFixed(2);
 
                 const candName = row.querySelector('td').textContent.trim();
 
                 candidates.push({
                     element: row,
                     name: candName,
-                    score: finalScore,
-                    hasScores: (prelim30 > 0 || beauty30 > 0 || brain40 > 0)
+                    score: prelimVal > 0 ? prelimVal : finalScore,
+                    hasScores: (prelimVal > 0 || prelim30 > 0 || beauty30 > 0 || brain40 > 0)
                 });
             });
 
@@ -539,6 +541,8 @@
                 const rank = sortedIndex + 1;
                 const rankCell = cand.element.querySelector('.rank-cell');
                 const top5Cell = cand.element.querySelector('.top5-cell');
+
+                if (!rankCell || !top5Cell) return;
 
                 if (!cand.hasScores) {
                     rankCell.textContent = "-";
