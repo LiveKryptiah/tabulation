@@ -344,16 +344,19 @@ def save_score():
 # --- ROUTE: FETCH CURRENT JUDGE'S SCORES FOR AUTOMATIC RESTORATION ON RELOAD ---
 @app.route('/api/my_judge_scores')
 def get_my_judge_scores():
-    judge_slot = request.args.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
+    judge_slot = session.get('judge_slot') or request.args.get('judge_slot') or 'Judge 1'
     sync_stores_from_csv()
     
     prelim_done = {}     # step -> { candNum: true }
     top5_done = {}       # step -> { candNum: true }
+    prelim_scores = {}   # candNum -> item
+    top5_scores = {}     # candNum -> item
 
     for (cand_str, j_slot), item in PRELIM_STORE.items():
         if j_slot.strip() == judge_slot.strip():
             try:
                 cand_num = str(int(cand_str.replace('Candidate ', '')))
+                prelim_scores[cand_num] = item
                 if item.get('prod', 0) > 0:
                     if '1' not in prelim_done: prelim_done['1'] = {}
                     prelim_done['1'][cand_num] = True
@@ -379,6 +382,7 @@ def get_my_judge_scores():
         if j_slot.strip() == judge_slot.strip():
             try:
                 cand_num = str(int(cand_str.replace('Candidate ', '')))
+                top5_scores[cand_num] = item
                 if item.get('beauty_total', 0) > 0:
                     if '1' not in top5_done: top5_done['1'] = {}
                     top5_done['1'][cand_num] = True
@@ -390,7 +394,9 @@ def get_my_judge_scores():
 
     return jsonify({
         'prelim_done': prelim_done,
-        'top5_done': top5_done
+        'top5_done': top5_done,
+        'prelim_scores': prelim_scores,
+        'top5_scores': top5_scores
     })
 
 # --- ROUTE 3: The Live Leaderboard ---
