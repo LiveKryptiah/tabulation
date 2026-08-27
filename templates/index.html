@@ -205,53 +205,56 @@
             flex-shrink: 0;
         }
 
-        /* Selected Candidate Preview Box */
+        /* Selected Candidate Preview Box (Large Featured Section) */
         .selected-preview { 
-            background: #000000;
-            border: 1px solid #3a3a3f;
-            border-radius: 10px;
-            padding: 6px 12px;
+            background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 80%), #000000;
+            border: 1.5px solid #10b981;
+            border-radius: 14px;
+            padding: 14px 18px;
             text-align: center; 
-            margin-bottom: 10px; 
-            min-height: 70px; 
+            margin-bottom: 12px; 
+            min-height: 140px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
             flex-shrink: 0;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
         }
         .selected-preview img { 
-            width: 44px; 
-            height: 44px; 
+            width: 88px; 
+            height: 88px; 
             object-fit: cover; 
             border-radius: 50%; 
-            border: 2px solid #10b981; 
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); 
+            border: 3px solid #10b981; 
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); 
             display: none; 
+            transition: all 0.3s ease;
         }
         .placeholder-circle { 
-            width: 40px; 
-            height: 40px; 
+            width: 64px; 
+            height: 64px; 
             border-radius: 50%; 
             background-color: #0a0a0a; 
-            border: 1px dashed #3a3a3f; 
+            border: 2px dashed #3a3a3f; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             color: #5a5a5f; 
-            font-size: 8.5px; 
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            text-align: center; 
-            padding: 2px; 
-        }
-        .selected-preview h3 { 
-            margin: 4px 0 0 0; 
-            color: #ffffff; 
-            font-size: 12px; 
-            font-weight: 800;
+            font-size: 10px; 
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-align: center; 
+            padding: 4px; 
+        }
+        .selected-preview h3 { 
+            margin: 10px 0 0 0; 
+            color: #ffffff; 
+            font-size: 18px; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
         }
 
         /* Candidate Grid - Compact & Non-Stretched */
