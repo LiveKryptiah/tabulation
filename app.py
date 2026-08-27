@@ -219,7 +219,7 @@ def save_score():
         gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_grace')) + to_float(request.form.get('e_styling')) + to_float(request.form.get('e_impact'))
         qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_communication')) + to_float(request.form.get('q_composure'))
 
-        grand_total = prod_sum + cas_sum + swim_sum + adv_sum + gown_sum + qa_sum
+        grand_total = (prod_sum * 0.15) + (cas_sum * 0.15) + (swim_sum * 0.15) + (adv_sum * 0.20) + (gown_sum * 0.15) + (qa_sum * 0.20)
         
         update_or_append_prelim_csv(
             "Candidate " + str(candidate), 
@@ -448,9 +448,8 @@ def get_tabulation_data():
         gown_avg = sum(gown_scores) / len(gown_scores) if gown_scores else 0.0
         qa_avg = sum(qa_scores) / len(qa_scores) if qa_scores else 0.0
 
-        calc_prelim_total = prod_avg + casual_avg + swim_avg + adv_avg + gown_avg + qa_avg
         p_scores = list(p_dict.values())
-        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else calc_prelim_total
+        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0.0
         prelim_30 = prelim_avg * 0.30
 
         b_scores = list(b_dict.values())
