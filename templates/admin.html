@@ -225,8 +225,6 @@
                     <tr>
                         <th rowspan="2">CANDIDATE</th>
                         <th colspan="6">PRELIMINARY CATEGORIES (MAX 100 PTS EACH)</th>
-                        <th rowspan="2" class="col-prelim">PRELIM TOTAL<br>(100 PTS)</th>
-                        <th rowspan="2" class="col-prelim">30% PRELIM<br>WEIGHT</th>
                         <th rowspan="2" class="col-rank">RANK</th>
                         <th rowspan="2">TOP 5 STATUS</th>
                     </tr>
@@ -241,21 +239,19 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr class="candidate-row" data-cand="{{ cand.number }}">
-                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
+                    <tr class="candidate-row" data-cand="{{ cand.number }}" data-prelim-score="{{ cand.prelim_score }}">
+                        <td style="text-align: left; padding-left: 16px; font-weight: 700;">{{ cand.name }}</td>
                         <td class="prod-avg">{{ cand.prod_avg }}</td>
                         <td class="casual-avg">{{ cand.casual_avg }}</td>
                         <td class="swim-avg">{{ cand.swim_avg }}</td>
                         <td class="adv-avg">{{ cand.adv_avg }}</td>
                         <td class="gown-avg">{{ cand.gown_avg }}</td>
                         <td class="qa-avg">{{ cand.qa_avg }}</td>
-                        <td class="prelim-val col-prelim" style="font-weight: 800;">{{ cand.prelim_score }}</td>
-                        <td class="prelim-30 col-prelim" style="font-weight: 800; color: #10b981;">{{ cand.prelim_30 }}</td>
                         <td class="rank-cell col-rank">-</td>
                         <td class="top5-cell">-</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="11" style="padding: 20px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    <tr><td colspan="9" style="padding: 20px; color: #b3b3b3;">No scores recorded yet. Have judges submit scores first!</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -526,22 +522,14 @@
             let candidates = [];
 
             rows.forEach((row) => {
-                const prelimVal = parseFloat(row.querySelector('.prelim-val')?.textContent) || 0;
-                const prelim30  = parseFloat(row.querySelector('.prelim-30')?.textContent) || 0;
-                const beauty30  = parseFloat(row.querySelector('.beauty-30')?.textContent) || 0;
-                const brain40   = parseFloat(row.querySelector('.brain-40')?.textContent) || 0;
-
-                const finalScore = prelim30 + beauty30 + brain40;
-                const finalScoreEl = row.querySelector('.final-score');
-                if (finalScoreEl) finalScoreEl.textContent = finalScore.toFixed(2);
-
+                const prelimScore = parseFloat(row.getAttribute('data-prelim-score')) || 0;
                 const candName = row.querySelector('td').textContent.trim();
 
                 candidates.push({
                     element: row,
                     name: candName,
-                    score: prelimVal > 0 ? prelimVal : finalScore,
-                    hasScores: (prelimVal > 0 || prelim30 > 0 || beauty30 > 0 || brain40 > 0)
+                    score: prelimScore,
+                    hasScores: prelimScore > 0
                 });
             });
 
@@ -628,8 +616,7 @@
                             if (row.querySelector('.adv-avg')) row.querySelector('.adv-avg').textContent = cand.adv_avg.toFixed(2);
                             if (row.querySelector('.gown-avg')) row.querySelector('.gown-avg').textContent = cand.gown_avg.toFixed(2);
                             if (row.querySelector('.qa-avg')) row.querySelector('.qa-avg').textContent = cand.qa_avg.toFixed(2);
-                            if (row.querySelector('.prelim-val')) row.querySelector('.prelim-val').textContent = cand.prelim_score.toFixed(2);
-                            if (row.querySelector('.prelim-30')) row.querySelector('.prelim-30').textContent = cand.prelim_30.toFixed(2);
+                            row.setAttribute('data-prelim-score', cand.prelim_score.toFixed(2));
                         }
                     });
 
