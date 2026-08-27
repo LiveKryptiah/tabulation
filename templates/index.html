@@ -1326,19 +1326,13 @@
 
             if (currentMode === 'prelim') {
                 const pSum = getVal('p_presence') + getVal('p_execution') + getVal('p_energy') + getVal('p_personality');
-                const pW = pSum * 0.15;
                 const cSum = getVal('c_poise') + getVal('c_carriage') + getVal('c_presence') + getVal('c_impact');
-                const cW = cSum * 0.15;
                 const sSum = getVal('s_confidence') + getVal('s_carriage') + getVal('s_presence') + getVal('s_impact');
-                const sW = sSum * 0.15;
                 const aSum = getVal('a_relevance') + getVal('a_content') + getVal('a_feasibility') + getVal('a_communication') + getVal('a_sincerity');
-                const aW = aSum * 0.20;
                 const eSum = getVal('e_elegance') + getVal('e_carriage') + getVal('e_grace') + getVal('e_styling') + getVal('e_impact');
-                const eW = eSum * 0.15;
                 const qSum = getVal('q_relevance') + getVal('q_clarity') + getVal('q_insight') + getVal('q_communication') + getVal('q_composure');
-                const qW = qSum * 0.20;
 
-                const total = pW + cW + sW + aW + eW + qW;
+                const total = pSum + cSum + sSum + aSum + eSum + qSum;
                 document.getElementById('grandTotalPreview').textContent = total.toFixed(2) + ' / 100';
             } else {
                 const beauty = getVal('b_facial') + getVal('b_poise') + getVal('b_conf');

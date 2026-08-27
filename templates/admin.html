@@ -224,30 +224,30 @@
                 <thead>
                     <tr>
                         <th rowspan="2">CANDIDATE</th>
-                        <th colspan="6">PRELIMINARY CATEGORY WEIGHTED CONTRIBUTIONS (100% TOTAL)</th>
+                        <th colspan="6">PRELIMINARY CATEGORIES (MAX POINTS EACH)</th>
                         <th rowspan="2" class="col-prelim">PRELIM TOTAL<br>(100 PTS MAX)</th>
                         <th rowspan="2" class="col-rank">RANK</th>
                         <th rowspan="2">TOP 5 STATUS</th>
                     </tr>
                     <tr>
-                        <th>1. PROD (15%)</th>
-                        <th>2. CASUAL (15%)</th>
-                        <th>3. SWIM (15%)</th>
-                        <th>4. ADV (20%)</th>
-                        <th>5. GOWN (15%)</th>
-                        <th>6. Q&A (20%)</th>
+                        <th>1. PROD (15)</th>
+                        <th>2. CASUAL (15)</th>
+                        <th>3. SWIM (15)</th>
+                        <th>4. ADV (20)</th>
+                        <th>5. GOWN (15)</th>
+                        <th>6. Q&A (20)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr class="candidate-row" data-cand="{{ cand.number }}" data-prelim-score="{{ cand.prelim_score }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 700;">{{ cand.name }}</td>
-                        <td class="prod-avg">{{ cand.prod_w }}%</td>
-                        <td class="casual-avg">{{ cand.casual_w }}%</td>
-                        <td class="swim-avg">{{ cand.swim_w }}%</td>
-                        <td class="adv-avg">{{ cand.adv_w }}%</td>
-                        <td class="gown-avg">{{ cand.gown_w }}%</td>
-                        <td class="qa-avg">{{ cand.qa_w }}%</td>
+                        <td class="prod-avg">{{ cand.prod_avg }}</td>
+                        <td class="casual-avg">{{ cand.casual_avg }}</td>
+                        <td class="swim-avg">{{ cand.swim_avg }}</td>
+                        <td class="adv-avg">{{ cand.adv_avg }}</td>
+                        <td class="gown-avg">{{ cand.gown_avg }}</td>
+                        <td class="qa-avg">{{ cand.qa_avg }}</td>
                         <td class="prelim-val" style="font-weight: 800; color: #1ed760;">{{ cand.prelim_score }}</td>
                         <td class="rank-cell col-rank">-</td>
                         <td class="top5-cell">-</td>
@@ -335,8 +335,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (15%)</th>
+                        <th>PRODUCTION AVG (15 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -348,8 +347,7 @@
                         <td class="cat-prod-j3">{{ cand.prod_j['Judge 3'] }}</td>
                         <td class="cat-prod-j4">{{ cand.prod_j['Judge 4'] }}</td>
                         <td class="cat-prod-j5">{{ cand.prod_j['Judge 5'] }}</td>
-                        <td class="cat-prod-avg">{{ cand.prod_avg }} pts</td>
-                        <td class="cat-prod-weight" style="font-weight: 800; color: #1ed760;">{{ cand.prod_w }}%</td>
+                        <td class="cat-prod-avg" style="font-weight: 800; color: #1ed760;">{{ cand.prod_avg }} / 15</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -367,8 +365,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (15%)</th>
+                        <th>CASUAL WEAR AVG (15 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -380,8 +377,7 @@
                         <td class="cat-casual-j3">{{ cand.casual_j['Judge 3'] }}</td>
                         <td class="cat-casual-j4">{{ cand.casual_j['Judge 4'] }}</td>
                         <td class="cat-casual-j5">{{ cand.casual_j['Judge 5'] }}</td>
-                        <td class="cat-casual-avg">{{ cand.casual_avg }} pts</td>
-                        <td class="cat-casual-weight" style="font-weight: 800; color: #1ed760;">{{ cand.casual_w }}%</td>
+                        <td class="cat-casual-avg" style="font-weight: 800; color: #1ed760;">{{ cand.casual_avg }} / 15</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -399,8 +395,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (15%)</th>
+                        <th>SWIMWEAR AVG (15 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -412,8 +407,7 @@
                         <td class="cat-swim-j3">{{ cand.swim_j['Judge 3'] }}</td>
                         <td class="cat-swim-j4">{{ cand.swim_j['Judge 4'] }}</td>
                         <td class="cat-swim-j5">{{ cand.swim_j['Judge 5'] }}</td>
-                        <td class="cat-swim-avg">{{ cand.swim_avg }} pts</td>
-                        <td class="cat-swim-weight" style="font-weight: 800; color: #1ed760;">{{ cand.swim_w }}%</td>
+                        <td class="cat-swim-avg" style="font-weight: 800; color: #1ed760;">{{ cand.swim_avg }} / 15</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -431,8 +425,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (20%)</th>
+                        <th>ADVOCACY AVG (20 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -444,8 +437,7 @@
                         <td class="cat-adv-j3">{{ cand.adv_j['Judge 3'] }}</td>
                         <td class="cat-adv-j4">{{ cand.adv_j['Judge 4'] }}</td>
                         <td class="cat-adv-j5">{{ cand.adv_j['Judge 5'] }}</td>
-                        <td class="cat-adv-avg">{{ cand.adv_avg }} pts</td>
-                        <td class="cat-adv-weight" style="font-weight: 800; color: #1ed760;">{{ cand.adv_w }}%</td>
+                        <td class="cat-adv-avg" style="font-weight: 800; color: #1ed760;">{{ cand.adv_avg }} / 20</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -463,8 +455,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (15%)</th>
+                        <th>EVENING GOWN AVG (15 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -476,8 +467,7 @@
                         <td class="cat-gown-j3">{{ cand.gown_j['Judge 3'] }}</td>
                         <td class="cat-gown-j4">{{ cand.gown_j['Judge 4'] }}</td>
                         <td class="cat-gown-j5">{{ cand.gown_j['Judge 5'] }}</td>
-                        <td class="cat-gown-avg">{{ cand.gown_avg }} pts</td>
-                        <td class="cat-gown-weight" style="font-weight: 800; color: #1ed760;">{{ cand.gown_w }}%</td>
+                        <td class="cat-gown-avg" style="font-weight: 800; color: #1ed760;">{{ cand.gown_avg }} / 15</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -495,8 +485,7 @@
                         <th>JUDGE 3</th>
                         <th>JUDGE 4</th>
                         <th>JUDGE 5</th>
-                        <th>CATEGORY AVG (100 PTS)</th>
-                        <th>WEIGHTED CONTRIBUTION (20%)</th>
+                        <th>Q&A AVG (20 PTS MAX)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -508,8 +497,7 @@
                         <td class="cat-qa-j3">{{ cand.qa_j['Judge 3'] }}</td>
                         <td class="cat-qa-j4">{{ cand.qa_j['Judge 4'] }}</td>
                         <td class="cat-qa-j5">{{ cand.qa_j['Judge 5'] }}</td>
-                        <td class="cat-qa-avg">{{ cand.qa_avg }} pts</td>
-                        <td class="cat-qa-weight" style="font-weight: 800; color: #1ed760;">{{ cand.qa_w }}%</td>
+                        <td class="cat-qa-avg" style="font-weight: 800; color: #1ed760;">{{ cand.qa_avg }} / 20</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -720,12 +708,12 @@
                     rows.forEach(row => {
                         const nameTd = row.querySelector('td');
                         if (nameTd && nameTd.textContent.trim() === cand.name) {
-                            if (row.querySelector('.prod-avg')) row.querySelector('.prod-avg').textContent = `${cand.prod_w.toFixed(2)}%`;
-                            if (row.querySelector('.casual-avg')) row.querySelector('.casual-avg').textContent = `${cand.casual_w.toFixed(2)}%`;
-                            if (row.querySelector('.swim-avg')) row.querySelector('.swim-avg').textContent = `${cand.swim_w.toFixed(2)}%`;
-                            if (row.querySelector('.adv-avg')) row.querySelector('.adv-avg').textContent = `${cand.adv_w.toFixed(2)}%`;
-                            if (row.querySelector('.gown-avg')) row.querySelector('.gown-avg').textContent = `${cand.gown_w.toFixed(2)}%`;
-                            if (row.querySelector('.qa-avg')) row.querySelector('.qa-avg').textContent = `${cand.qa_w.toFixed(2)}%`;
+                            if (row.querySelector('.prod-avg')) row.querySelector('.prod-avg').textContent = cand.prod_avg.toFixed(2);
+                            if (row.querySelector('.casual-avg')) row.querySelector('.casual-avg').textContent = cand.casual_avg.toFixed(2);
+                            if (row.querySelector('.swim-avg')) row.querySelector('.swim-avg').textContent = cand.swim_avg.toFixed(2);
+                            if (row.querySelector('.adv-avg')) row.querySelector('.adv-avg').textContent = cand.adv_avg.toFixed(2);
+                            if (row.querySelector('.gown-avg')) row.querySelector('.gown-avg').textContent = cand.gown_avg.toFixed(2);
+                            if (row.querySelector('.qa-avg')) row.querySelector('.qa-avg').textContent = cand.qa_avg.toFixed(2);
                             if (row.querySelector('.prelim-val')) row.querySelector('.prelim-val').textContent = cand.prelim_score.toFixed(2);
                             row.setAttribute('data-prelim-score', cand.prelim_score.toFixed(2));
                         }
@@ -740,8 +728,7 @@
                         if (catRow.querySelector('.cat-prod-j3')) catRow.querySelector('.cat-prod-j3').textContent = cand.prod_j ? cand.prod_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-prod-j4')) catRow.querySelector('.cat-prod-j4').textContent = cand.prod_j ? cand.prod_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-prod-j5')) catRow.querySelector('.cat-prod-j5').textContent = cand.prod_j ? cand.prod_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-prod-avg')) catRow.querySelector('.cat-prod-avg').textContent = `${cand.prod_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-prod-weight')) catRow.querySelector('.cat-prod-weight').textContent = `${cand.prod_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-prod-avg')) catRow.querySelector('.cat-prod-avg').textContent = `${cand.prod_avg.toFixed(2)} / 15`;
 
                         // Casual
                         if (catRow.querySelector('.cat-casual-j1')) catRow.querySelector('.cat-casual-j1').textContent = cand.casual_j ? cand.casual_j['Judge 1'] : '-';
@@ -749,8 +736,7 @@
                         if (catRow.querySelector('.cat-casual-j3')) catRow.querySelector('.cat-casual-j3').textContent = cand.casual_j ? cand.casual_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-casual-j4')) catRow.querySelector('.cat-casual-j4').textContent = cand.casual_j ? cand.casual_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-casual-j5')) catRow.querySelector('.cat-casual-j5').textContent = cand.casual_j ? cand.casual_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-casual-avg')) catRow.querySelector('.cat-casual-avg').textContent = `${cand.casual_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-casual-weight')) catRow.querySelector('.cat-casual-weight').textContent = `${cand.casual_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-casual-avg')) catRow.querySelector('.cat-casual-avg').textContent = `${cand.casual_avg.toFixed(2)} / 15`;
 
                         // Swim
                         if (catRow.querySelector('.cat-swim-j1')) catRow.querySelector('.cat-swim-j1').textContent = cand.swim_j ? cand.swim_j['Judge 1'] : '-';
@@ -758,8 +744,7 @@
                         if (catRow.querySelector('.cat-swim-j3')) catRow.querySelector('.cat-swim-j3').textContent = cand.swim_j ? cand.swim_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-swim-j4')) catRow.querySelector('.cat-swim-j4').textContent = cand.swim_j ? cand.swim_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-swim-j5')) catRow.querySelector('.cat-swim-j5').textContent = cand.swim_j ? cand.swim_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-swim-avg')) catRow.querySelector('.cat-swim-avg').textContent = `${cand.swim_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-swim-weight')) catRow.querySelector('.cat-swim-weight').textContent = `${cand.swim_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-swim-avg')) catRow.querySelector('.cat-swim-avg').textContent = `${cand.swim_avg.toFixed(2)} / 15`;
 
                         // Adv
                         if (catRow.querySelector('.cat-adv-j1')) catRow.querySelector('.cat-adv-j1').textContent = cand.adv_j ? cand.adv_j['Judge 1'] : '-';
@@ -767,8 +752,7 @@
                         if (catRow.querySelector('.cat-adv-j3')) catRow.querySelector('.cat-adv-j3').textContent = cand.adv_j ? cand.adv_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-adv-j4')) catRow.querySelector('.cat-adv-j4').textContent = cand.adv_j ? cand.adv_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-adv-j5')) catRow.querySelector('.cat-adv-j5').textContent = cand.adv_j ? cand.adv_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-adv-avg')) catRow.querySelector('.cat-adv-avg').textContent = `${cand.adv_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-adv-weight')) catRow.querySelector('.cat-adv-weight').textContent = `${cand.adv_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-adv-avg')) catRow.querySelector('.cat-adv-avg').textContent = `${cand.adv_avg.toFixed(2)} / 20`;
 
                         // Gown
                         if (catRow.querySelector('.cat-gown-j1')) catRow.querySelector('.cat-gown-j1').textContent = cand.gown_j ? cand.gown_j['Judge 1'] : '-';
@@ -776,8 +760,7 @@
                         if (catRow.querySelector('.cat-gown-j3')) catRow.querySelector('.cat-gown-j3').textContent = cand.gown_j ? cand.gown_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-gown-j4')) catRow.querySelector('.cat-gown-j4').textContent = cand.gown_j ? cand.gown_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-gown-j5')) catRow.querySelector('.cat-gown-j5').textContent = cand.gown_j ? cand.gown_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-gown-avg')) catRow.querySelector('.cat-gown-avg').textContent = `${cand.gown_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-gown-weight')) catRow.querySelector('.cat-gown-weight').textContent = `${cand.gown_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-gown-avg')) catRow.querySelector('.cat-gown-avg').textContent = `${cand.gown_avg.toFixed(2)} / 15`;
 
                         // QA
                         if (catRow.querySelector('.cat-qa-j1')) catRow.querySelector('.cat-qa-j1').textContent = cand.qa_j ? cand.qa_j['Judge 1'] : '-';
@@ -785,8 +768,7 @@
                         if (catRow.querySelector('.cat-qa-j3')) catRow.querySelector('.cat-qa-j3').textContent = cand.qa_j ? cand.qa_j['Judge 3'] : '-';
                         if (catRow.querySelector('.cat-qa-j4')) catRow.querySelector('.cat-qa-j4').textContent = cand.qa_j ? cand.qa_j['Judge 4'] : '-';
                         if (catRow.querySelector('.cat-qa-j5')) catRow.querySelector('.cat-qa-j5').textContent = cand.qa_j ? cand.qa_j['Judge 5'] : '-';
-                        if (catRow.querySelector('.cat-qa-avg')) catRow.querySelector('.cat-qa-avg').textContent = `${cand.qa_avg.toFixed(2)} pts`;
-                        if (catRow.querySelector('.cat-qa-weight')) catRow.querySelector('.cat-qa-weight').textContent = `${cand.qa_w.toFixed(2)}%`;
+                        if (catRow.querySelector('.cat-qa-avg')) catRow.querySelector('.cat-qa-avg').textContent = `${cand.qa_avg.toFixed(2)} / 20`;
                     });
                 });
 

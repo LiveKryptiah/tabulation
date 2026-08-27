@@ -219,7 +219,7 @@ def save_score():
         gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_grace')) + to_float(request.form.get('e_styling')) + to_float(request.form.get('e_impact'))
         qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_communication')) + to_float(request.form.get('q_composure'))
 
-        grand_total = (prod_sum * 0.15) + (cas_sum * 0.15) + (swim_sum * 0.15) + (adv_sum * 0.20) + (gown_sum * 0.15) + (qa_sum * 0.20)
+        grand_total = prod_sum + cas_sum + swim_sum + adv_sum + gown_sum + qa_sum
         
         update_or_append_prelim_csv(
             "Candidate " + str(candidate), 
@@ -448,14 +448,7 @@ def get_tabulation_data():
         gown_avg = sum(gown_scores) / len(gown_scores) if gown_scores else 0.0
         qa_avg = sum(qa_scores) / len(qa_scores) if qa_scores else 0.0
 
-        prod_w = prod_avg * 0.15
-        casual_w = casual_avg * 0.15
-        swim_w = swim_avg * 0.15
-        adv_w = adv_avg * 0.20
-        gown_w = gown_avg * 0.15
-        qa_w = qa_avg * 0.20
-
-        calc_prelim_total = prod_w + casual_w + swim_w + adv_w + gown_w + qa_w
+        calc_prelim_total = prod_avg + casual_avg + swim_avg + adv_avg + gown_avg + qa_avg
         p_scores = list(p_dict.values())
         prelim_avg = sum(p_scores) / len(p_scores) if p_scores else calc_prelim_total
         prelim_30 = prelim_avg * 0.30
@@ -504,12 +497,6 @@ def get_tabulation_data():
             'adv_avg': round(adv_avg, 2),
             'gown_avg': round(gown_avg, 2),
             'qa_avg': round(qa_avg, 2),
-            'prod_w': round(prod_w, 2),
-            'casual_w': round(casual_w, 2),
-            'swim_w': round(swim_w, 2),
-            'adv_w': round(adv_w, 2),
-            'gown_w': round(gown_w, 2),
-            'qa_w': round(qa_w, 2),
             'prod_j': prod_j,
             'casual_j': casual_j,
             'swim_j': swim_j,
