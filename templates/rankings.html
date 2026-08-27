@@ -14,24 +14,22 @@
         
         body { 
             font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: #000000; 
+            background-color: #121212; 
             color: #ffffff; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 30px 20px;
-            background-image: linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);
         }
 
         .rankings-card { 
-            background-color: #0a0a0a; 
+            background-color: #181818; 
             padding: 40px; 
-            border-radius: 16px; 
-            border: 1px solid #3a3a3f;
+            border-radius: 12px; 
             width: 100%; 
             max-width: 900px; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            box-shadow: rgba(0,0,0,0.5) 0px 8px 24px;
         }
 
         .eyebrow {
@@ -39,7 +37,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: #10b981;
+            color: #1ed760;
             text-align: center;
             margin-bottom: 8px;
         }
@@ -49,11 +47,11 @@
             color: #ffffff; 
             margin-bottom: 30px; 
             font-size: 24px; 
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase; 
-            letter-spacing: 1.6px; 
+            letter-spacing: 1.8px; 
             padding-bottom: 16px;
-            border-bottom: 1px solid #3a3a3f;
+            border-bottom: 1px solid #282828;
         }
 
         table {
@@ -63,21 +61,21 @@
         }
 
         th {
-            background-color: #000000;
-            color: #8e8e93;
+            background-color: #1f1f1f;
+            color: #b3b3b3;
             padding: 14px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            border: 1px solid #3a3a3f;
+            letter-spacing: 1.4px;
+            border: 1px solid #282828;
         }
 
         td {
             padding: 14px;
             font-size: 14px;
             font-weight: 600;
-            border: 1px solid #3a3a3f;
+            border: 1px solid #282828;
             color: #ffffff;
         }
 
@@ -85,29 +83,29 @@
             background-color: rgba(255, 255, 255, 0.02);
         }
 
-        .rank-top1 { color: #10b981; font-weight: 800; font-size: 16px; }
-        .score-val { color: #10b981; font-weight: 800; font-size: 16px; }
+        .rank-top1 { color: #1ed760; font-weight: 800; font-size: 16px; }
+        .score-val { color: #1ed760; font-weight: 700; font-size: 16px; }
 
         .btn-home {
             display: inline-block;
             margin-top: 30px;
-            padding: 12px 28px;
-            background: transparent;
-            color: #ffffff;
-            border: 1px solid #10b981;
-            border-radius: 32px; /* rounded.pill */
+            padding: 14px 32px;
+            background-color: #1ed760;
+            color: #000000;
+            border: 1px solid transparent;
+            border-radius: 9999px;
             font-size: 12px;
             font-weight: 700;
             text-decoration: none;
             text-transform: uppercase;
-            letter-spacing: 1.4px;
+            letter-spacing: 1.8px;
             transition: all 0.2s ease;
         }
 
         .btn-home:hover {
-            background-color: #10b981;
-            color: #000000;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            background-color: #1fdf64;
+            box-shadow: 0 0 20px rgba(30, 215, 96, 0.4);
+            transform: scale(1.02);
         }
     </style>
 </head>
