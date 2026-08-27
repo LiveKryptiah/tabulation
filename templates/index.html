@@ -1147,7 +1147,16 @@
                 else tab.classList.remove('active');
             });
             
-            if (activeCandidateNum) loadCandidateDraft(activeCandidateNum);
+            // Clear candidate selection radio & preview for fresh category scoring
+            document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+            activeCandidateNum = null;
+            resetCandidatePreview();
+            
+            // Clear input fields for the new category step
+            document.querySelectorAll('.right-panel input[type="number"]').forEach(input => input.value = '');
+            updateLiveTotal();
+            
+            // Refresh category progress badges for the new category step
             updateCategoryProgress();
         }
 
@@ -1160,7 +1169,13 @@
             document.getElementById('top5Tab1').classList.toggle('active', stepNumber === 1);
             document.getElementById('top5Tab2').classList.toggle('active', stepNumber === 2);
             
-            if (activeCandidateNum) loadCandidateDraft(activeCandidateNum);
+            document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+            activeCandidateNum = null;
+            resetCandidatePreview();
+            
+            document.querySelectorAll('.right-panel input[type="number"]').forEach(input => input.value = '');
+            updateLiveTotal();
+            
             updateCategoryProgress();
         }
 
