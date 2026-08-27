@@ -102,13 +102,13 @@ def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum,
             if headers:
                 rows.append(headers)
                 for row in reader:
-                    if len(row) >= 3 and row[0] == candidate_str and row[1] == judge_slot:
-                        old_p = float(row[3]) if len(row) > 3 and float(row[3]) > 0 else 0
-                        old_c = float(row[4]) if len(row) > 4 and float(row[4]) > 0 else 0
-                        old_s = float(row[5]) if len(row) > 5 and float(row[5]) > 0 else 0
-                        old_a = float(row[6]) if len(row) > 6 and float(row[6]) > 0 else 0
-                        old_g = float(row[7]) if len(row) > 7 and float(row[7]) > 0 else 0
-                        old_q = float(row[8]) if len(row) > 8 and float(row[8]) > 0 else 0
+                    if len(row) >= 3 and row[0].strip() == candidate_str.strip() and row[1].strip() == judge_slot.strip():
+                        old_p = to_float(row[3]) if len(row) > 3 else 0
+                        old_c = to_float(row[4]) if len(row) > 4 else 0
+                        old_s = to_float(row[5]) if len(row) > 5 else 0
+                        old_a = to_float(row[6]) if len(row) > 6 else 0
+                        old_g = to_float(row[7]) if len(row) > 7 else 0
+                        old_q = to_float(row[8]) if len(row) > 8 else 0
 
                         new_p = prod_sum if prod_sum > 0 else old_p
                         new_c = cas_sum if cas_sum > 0 else old_c
@@ -153,7 +153,7 @@ def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poi
             if header:
                 rows.append(header)
             for row in reader:
-                if len(row) >= 3 and row[0] == candidate and row[1] == judge_slot:
+                if len(row) >= 3 and row[0].strip() == candidate.strip() and row[1].strip() == judge_slot.strip():
                     rows.append([
                         candidate, judge_slot, judge_name,
                         b_facial, b_poise, b_conf, round(beauty_total, 2),
@@ -408,8 +408,8 @@ def get_tabulation_data():
                 if cand_str:
                     try:
                         cand_num = int(cand_str.replace('Candidate ', ''))
-                        b_val = float(b_tot) if b_tot else 0
-                        br_val = float(br_tot) if br_tot else 0
+                        b_val = to_float(b_tot)
+                        br_val = to_float(br_tot)
 
                         if b_tot:
                             if cand_num not in top5_beauty_by_judge: top5_beauty_by_judge[cand_num] = {}
