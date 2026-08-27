@@ -882,6 +882,12 @@
         }
 
         // --- CANDIDATE DRAFT TRACKING & LOCALSTORAGE PERSISTENCE ---
+        const currentJudgeSlot = "{{ judge_slot }}";
+        const currentJudgeName = "{{ judge_name }}";
+        const draftStorageKey = 'pageant_candidate_drafts_' + currentJudgeSlot;
+        const completedStorageKey = 'pageant_candidate_completed_' + currentJudgeSlot;
+        const activeStorageKey = 'pageant_active_cand_' + currentJudgeSlot;
+
         let candidateDrafts = { prelim: {}, top5: {} };
         let candidateCompleted = { prelim: {}, top5: {} };
         let currentStep = 1;
@@ -890,17 +896,17 @@
         let syncDebounceTimer = null;
 
         try {
-            const savedDrafts = localStorage.getItem('pageant_candidate_drafts');
+            const savedDrafts = localStorage.getItem(draftStorageKey);
             if (savedDrafts) candidateDrafts = JSON.parse(savedDrafts);
             
-            const savedCompleted = localStorage.getItem('pageant_candidate_completed');
+            const savedCompleted = localStorage.getItem(completedStorageKey);
             if (savedCompleted) candidateCompleted = JSON.parse(savedCompleted);
         } catch (e) {}
 
         function persistDrafts() {
             try {
-                localStorage.setItem('pageant_candidate_drafts', JSON.stringify(candidateDrafts));
-                localStorage.setItem('pageant_candidate_completed', JSON.stringify(candidateCompleted));
+                localStorage.setItem(draftStorageKey, JSON.stringify(candidateDrafts));
+                localStorage.setItem(completedStorageKey, JSON.stringify(candidateCompleted));
             } catch (e) {}
         }
 
@@ -913,6 +919,8 @@
                 const formData = new FormData();
                 formData.append('round_type', currentMode);
                 formData.append('candidate_number', candNum);
+                formData.append('judge_slot', currentJudgeSlot);
+                formData.append('judge_name', currentJudgeName);
 
                 let hasData = false;
                 for (const s in modeDrafts) {
@@ -1273,6 +1281,8 @@
                 const formData = new FormData();
                 formData.append('round_type', currentMode);
                 formData.append('candidate_number', candNum);
+                formData.append('judge_slot', currentJudgeSlot);
+                formData.append('judge_name', currentJudgeName);
 
                 for (const s in modeDrafts) {
                     const cScores = modeDrafts[s]?.[candNum];
@@ -1299,9 +1309,9 @@
                 candidateDrafts[currentMode] = {};
                 candidateCompleted[currentMode] = {};
                 try {
-                    localStorage.removeItem('pageant_candidate_drafts');
-                    localStorage.removeItem('pageant_candidate_completed');
-                    localStorage.removeItem('pageant_active_cand');
+                    localStorage.removeItem(draftStorageKey);
+                    localStorage.removeItem(completedStorageKey);
+                    localStorage.removeItem(activeStorageKey);
                 } catch(e) {}
                 setActiveCandidate(null);
 
@@ -1325,7 +1335,7 @@
             updateCategoryProgress();
             
             // Restore active candidate selection and draft inputs on page reload!
-            const savedActive = localStorage.getItem('pageant_active_cand');
+            const savedActive = localStorage.getItem(activeStorageKey);
             if (savedActive) {
                 const radio = document.querySelector(`input[name="candidate_number"][value="${savedActive}"]`);
                 if (radio) {
@@ -1339,8 +1349,8 @@
                 }
             }
 
-            // Ultimate backup: Sync saved completion states directly from server!
-            fetch('/api/my_judge_scores')
+            // Ultimate backup: Sync saved completion states directly from server for THIS judge!
+            fetch('/api/my_judge_scores?judge_slot=' + encodeURIComponent(currentJudgeSlot))
             .then(res => res.json())
             .then(data => {
                 if (data.prelim_done) {

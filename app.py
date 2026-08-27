@@ -149,8 +149,8 @@ def save_score():
     init_csv()
     round_type = request.form.get('round_type', 'prelim')
     candidate = request.form.get('candidate_number', '')
-    judge_slot = session.get('judge_slot', request.form.get('judge_slot', 'Judge 1'))
-    judge_name = session.get('judge_name', request.form.get('judge_name', judge_slot))
+    judge_slot = request.form.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
+    judge_name = request.form.get('judge_name') or session.get('judge_name') or judge_slot
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if round_type == 'top5':
@@ -196,10 +196,12 @@ def save_score():
             prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, 
             grand_total, timestamp
         )
+        return "Preliminary score submitted successfully!"
+
 # --- ROUTE: FETCH CURRENT JUDGE'S SCORES FOR AUTOMATIC RESTORATION ON RELOAD ---
 @app.route('/api/my_judge_scores')
 def get_my_judge_scores():
-    judge_slot = session.get('judge_slot', request.args.get('judge_slot', 'Judge 1'))
+    judge_slot = request.args.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
     init_csv()
     
     prelim_done = {}     # step -> { candNum: true }
