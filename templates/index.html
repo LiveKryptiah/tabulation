@@ -886,6 +886,43 @@
         let currentStep = 1;
         let currentTop5Step = 1;
         let activeCandidateNum = null;
+        let syncDebounceTimer = null;
+
+        function autoSyncDraftToBackend(candNum) {
+            if (!candNum) return;
+            clearTimeout(syncDebounceTimer);
+            
+            syncDebounceTimer = setTimeout(() => {
+                const modeDrafts = candidateDrafts[currentMode] || {};
+                const formData = new FormData();
+                formData.append('round_type', currentMode);
+                formData.append('candidate_number', candNum);
+
+                let hasData = false;
+                for (const s in modeDrafts) {
+                    const cScores = modeDrafts[s]?.[candNum];
+                    if (cScores) {
+                        for (const [key, val] of Object.entries(cScores)) {
+                            formData.append(key, val);
+                            hasData = true;
+                        }
+                    }
+                }
+
+                if (hasData) {
+                    fetch('/submit_score', { method: 'POST', body: formData })
+                    .then(() => {
+                        const statusMessage = document.getElementById('status-message');
+                        if (statusMessage) {
+                            statusMessage.textContent = "AUTO-SAVED TO ADMIN TABULATION";
+                            statusMessage.className = "success";
+                            setTimeout(() => { statusMessage.textContent = ""; }, 2000);
+                        }
+                    })
+                    .catch(err => console.log("Auto-sync background save", err));
+                }
+            }, 500);
+        }
 
         function saveCandidateDraft(candNum) {
             if (!candNum) return;
@@ -927,6 +964,7 @@
             }
 
             updateCategoryProgress();
+            autoSyncDraftToBackend(candNum);
         }
 
         function loadCandidateDraft(candNum) {
@@ -1052,9 +1090,17 @@
             });
         });
 
-        // --- 2. LIVE GRAND TOTAL CALCULATOR ---
+        // --- 2. LIVE GRAND TOTAL CALCULATOR & AUTO-SAVE ---
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
+                if (!activeCandidateNum) {
+                    // Auto-select candidate if typing without explicit click
+                    const firstRadio = document.querySelector('input[name="candidate_number"]:checked') || document.querySelector('input[name="candidate_number"]');
+                    if (firstRadio) {
+                        firstRadio.checked = true;
+                        activeCandidateNum = firstRadio.value;
+                    }
+                }
                 if (activeCandidateNum) {
                     saveCandidateDraft(activeCandidateNum);
                 }
