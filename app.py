@@ -91,92 +91,170 @@ def to_float(val):
     except (ValueError, TypeError):
         return 0.0
 
-def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, grand_total, timestamp):
-    rows = []
-    updated = False
-    
+# Global In-Memory Score Stores (Preserves all judges data seamlessly)
+PRELIM_STORE = {}  # (cand_str, judge_slot) -> dict
+TOP5_STORE = {}    # (cand_str, judge_slot) -> dict
+
+def sync_stores_from_csv():
+    """Load existing CSV files into memory store if not already present."""
     if os.path.exists(CSV_FILE):
-        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.reader(file)
-            headers = next(reader, None)
-            if headers:
-                rows.append(headers)
+        try:
+            with open(CSV_FILE, mode='r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                headers = next(reader, None)
                 for row in reader:
-                    if len(row) >= 3 and row[0].strip() == candidate_str.strip() and row[1].strip() == judge_slot.strip():
-                        old_p = to_float(row[3]) if len(row) > 3 else 0
-                        old_c = to_float(row[4]) if len(row) > 4 else 0
-                        old_s = to_float(row[5]) if len(row) > 5 else 0
-                        old_a = to_float(row[6]) if len(row) > 6 else 0
-                        old_g = to_float(row[7]) if len(row) > 7 else 0
-                        old_q = to_float(row[8]) if len(row) > 8 else 0
+                    if len(row) >= 10:
+                        cand_str = row[0].strip()
+                        j_slot = row[1].strip()
+                        j_name = row[2].strip()
+                        key = (cand_str, j_slot)
+                        if key not in PRELIM_STORE:
+                            PRELIM_STORE[key] = {
+                                'candidate_str': cand_str,
+                                'judge_slot': j_slot,
+                                'judge_name': j_name,
+                                'prod': to_float(row[3]),
+                                'casual': to_float(row[4]),
+                                'swim': to_float(row[5]),
+                                'adv': to_float(row[6]),
+                                'gown': to_float(row[7]),
+                                'qa': to_float(row[8]),
+                                'grand_total': to_float(row[9]),
+                                'timestamp': row[10] if len(row) > 10 else ''
+                            }
+        except Exception as e:
+            print("Error reading prelim CSV to store:", e)
 
-                        new_p = prod_sum if prod_sum > 0 else old_p
-                        new_c = cas_sum if cas_sum > 0 else old_c
-                        new_s = swim_sum if swim_sum > 0 else old_s
-                        new_a = adv_sum if adv_sum > 0 else old_a
-                        new_g = gown_sum if gown_sum > 0 else old_g
-                        new_q = qa_sum if qa_sum > 0 else old_q
+    if os.path.exists(TOP5_CSV_FILE):
+        try:
+            with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                headers = next(reader, None)
+                for row in reader:
+                    if len(row) >= 13:
+                        cand_str = row[0].strip()
+                        j_slot = row[1].strip()
+                        j_name = row[2].strip()
+                        key = (cand_str, j_slot)
+                        if key not in TOP5_STORE:
+                            TOP5_STORE[key] = {
+                                'candidate': cand_str,
+                                'judge_slot': j_slot,
+                                'judge_name': j_name,
+                                'b_facial': to_float(row[3]),
+                                'b_poise': to_float(row[4]),
+                                'b_conf': to_float(row[5]),
+                                'beauty_total': to_float(row[6]),
+                                'br_substance': to_float(row[7]),
+                                'br_intelligence': to_float(row[8]),
+                                'br_clarity': to_float(row[9]),
+                                'br_delivery': to_float(row[10]),
+                                'brain_total': to_float(row[11]),
+                                'top5_total': to_float(row[12]),
+                                'timestamp': row[13] if len(row) > 13 else ''
+                            }
+        except Exception as e:
+            print("Error reading top5 CSV to store:", e)
 
-                        g_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, grand_total, timestamp):
+    sync_stores_from_csv()
+    key = (candidate_str.strip(), judge_slot.strip())
+    existing = PRELIM_STORE.get(key, {})
 
-                        rows.append([
-                            candidate_str, judge_slot, judge_name,
-                            round(new_p, 2), round(new_c, 2), round(new_s, 2), round(new_a, 2), round(new_g, 2), round(new_q, 2),
-                            round(g_total, 2), timestamp
-                        ])
-                        updated = True
-                    else:
-                        rows.append(row)
+    old_p = existing.get('prod', 0)
+    old_c = existing.get('casual', 0)
+    old_s = existing.get('swim', 0)
+    old_a = existing.get('adv', 0)
+    old_g = existing.get('gown', 0)
+    old_q = existing.get('qa', 0)
 
-    if not updated:
-        if not rows:
-            init_csv()
-            with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-                rows = list(csv.reader(file))
+    new_p = prod_sum if prod_sum > 0 else old_p
+    new_c = cas_sum if cas_sum > 0 else old_c
+    new_s = swim_sum if swim_sum > 0 else old_s
+    new_a = adv_sum if adv_sum > 0 else old_a
+    new_g = gown_sum if gown_sum > 0 else old_g
+    new_q = qa_sum if qa_sum > 0 else old_q
+
+    g_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+
+    PRELIM_STORE[key] = {
+        'candidate_str': candidate_str,
+        'judge_slot': judge_slot,
+        'judge_name': judge_name,
+        'prod': round(new_p, 2),
+        'casual': round(new_c, 2),
+        'swim': round(new_s, 2),
+        'adv': round(new_a, 2),
+        'gown': round(new_g, 2),
+        'qa': round(new_q, 2),
+        'grand_total': round(g_total, 2),
+        'timestamp': timestamp
+    }
+
+    # Write out full combined store
+    rows = [[
+        'Candidate', 'Judge ID', 'Judge Name',
+        'Production (Max 100)', 'Casual Wear (Max 100)', 'Swimwear (Max 100)',
+        'Advocacy (Max 100)', 'Evening Gown (Max 100)', 'Q&A (Max 100)',
+        'FINAL SCORE', 'Timestamp'
+    ]]
+    for item in PRELIM_STORE.values():
         rows.append([
-            candidate_str, judge_slot, judge_name,
-            round(prod_sum, 2), round(cas_sum, 2), round(swim_sum, 2), round(adv_sum, 2), round(gown_sum, 2), round(qa_sum, 2),
-            round(grand_total, 2), timestamp
+            item['candidate_str'], item['judge_slot'], item['judge_name'],
+            item['prod'], item['casual'], item['swim'],
+            item['adv'], item['gown'], item['qa'],
+            item['grand_total'], item['timestamp']
         ])
 
-    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerows(rows)
+    try:
+        with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerows(rows)
+    except Exception as e:
+        print("Error writing prelim CSV:", e)
 
 def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poise, b_conf, beauty_total, br_substance, br_intelligence, br_clarity, br_delivery, brain_total, top5_total, timestamp):
-    rows = []
-    found = False
-    if os.path.exists(TOP5_CSV_FILE):
-        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            header = next(reader, None)
-            if header:
-                rows.append(header)
-            for row in reader:
-                if len(row) >= 3 and row[0].strip() == candidate.strip() and row[1].strip() == judge_slot.strip():
-                    rows.append([
-                        candidate, judge_slot, judge_name,
-                        b_facial, b_poise, b_conf, round(beauty_total, 2),
-                        br_substance, br_intelligence, br_clarity, br_delivery, round(brain_total, 2),
-                        round(top5_total, 2), timestamp
-                    ])
-                    found = True
-                else:
-                    rows.append(row)
+    sync_stores_from_csv()
+    key = (candidate.strip(), judge_slot.strip())
 
-    if not found:
-        if not rows:
-            rows.append(["Candidate", "Judge ID", "Judge Name", "Beauty Facial (Max 15)", "Beauty Poise (Max 10)", "Beauty Confidence (Max 5)", "BEAUTY TOTAL (30)", "Brain Substance (Max 15)", "Brain Intelligence (Max 10)", "Brain Clarity (Max 10)", "Brain Delivery (Max 5)", "BRAIN TOTAL (40)", "TOP5 TOTAL (70)", "Timestamp"])
+    TOP5_STORE[key] = {
+        'candidate': candidate,
+        'judge_slot': judge_slot,
+        'judge_name': judge_name,
+        'b_facial': b_facial,
+        'b_poise': b_poise,
+        'b_conf': b_conf,
+        'beauty_total': round(beauty_total, 2),
+        'br_substance': br_substance,
+        'br_intelligence': br_intelligence,
+        'br_clarity': br_clarity,
+        'br_delivery': br_delivery,
+        'brain_total': round(brain_total, 2),
+        'top5_total': round(top5_total, 2),
+        'timestamp': timestamp
+    }
+
+    # Write out full combined store
+    rows = [[
+        'Candidate', 'Judge ID', 'Judge Name',
+        'Beauty Facial (Max 15)', 'Beauty Poise (Max 10)', 'Beauty Confidence (Max 5)', 'BEAUTY TOTAL (30)',
+        'Brain Substance (Max 15)', 'Brain Intelligence (Max 10)', 'Brain Clarity (Max 10)', 'Brain Delivery (Max 5)', 'BRAIN TOTAL (40)',
+        'TOP5 TOTAL (70)', 'Timestamp'
+    ]]
+    for item in TOP5_STORE.values():
         rows.append([
-            candidate, judge_slot, judge_name,
-            b_facial, b_poise, b_conf, round(beauty_total, 2),
-            br_substance, br_intelligence, br_clarity, br_delivery, round(brain_total, 2),
-            round(top5_total, 2), timestamp
+            item['candidate'], item['judge_slot'], item['judge_name'],
+            item['b_facial'], item['b_poise'], item['b_conf'], item['beauty_total'],
+            item['br_substance'], item['br_intelligence'], item['br_clarity'], item['br_delivery'], item['brain_total'],
+            item['top5_total'], item['timestamp']
         ])
 
-    with open(TOP5_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerows(rows)
+    try:
+        with open(TOP5_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
+    except Exception as e:
+        print("Error writing top5 CSV:", e)
 
 # --- ROUTE 2: Saving Judge Scores (Prelim or Top 5) ---
 @app.route('/submit_score', methods=['POST'])
@@ -342,87 +420,71 @@ def admin_panel():
 
 # --- HELPER & API FOR REAL-TIME TABULATION ---
 def get_tabulation_data():
+    sync_stores_from_csv()
+
     prelim_by_judge = {}     # cand_num -> { judge_slot: score }
     category_by_judge = {}   # cand_num -> { judge_slot: { 'prod': p, 'casual': c, ... } }
     judge_progress = {}
-    
-    if os.path.exists(CSV_FILE):
-        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                cand_str = row.get('Candidate', '')
-                score_str = row.get('FINAL SCORE', '')
-                j_slot = row.get('Judge ID', 'Unknown')
-                
-                if cand_str:
-                    try:
-                        cand_num = int(cand_str.replace('Candidate ', ''))
-                        score = to_float(score_str)
-                        
-                        p_val = to_float(row.get('Production (Max 100)', 0))
-                        c_val = to_float(row.get('Casual Wear (Max 100)', 0))
-                        s_val = to_float(row.get('Swimwear (Max 100)', 0))
-                        a_val = to_float(row.get('Advocacy (Max 100)', 0))
-                        g_val = to_float(row.get('Evening Gown (Max 100)', 0))
-                        q_val = to_float(row.get('Q&A (Max 100)', 0))
 
-                        calc_score = (p_val * 0.15) + (c_val * 0.15) + (s_val * 0.15) + (a_val * 0.20) + (g_val * 0.15) + (q_val * 0.20)
-                        final_prelim_val = score if score > 0 else calc_score
+    for (cand_str, j_slot), item in PRELIM_STORE.items():
+        try:
+            cand_num = int(cand_str.replace('Candidate ', ''))
+            score = item['grand_total']
+            p_val = item['prod']
+            c_val = item['casual']
+            s_val = item['swim']
+            a_val = item['adv']
+            g_val = item['gown']
+            q_val = item['qa']
 
-                        if cand_num not in prelim_by_judge:
-                            prelim_by_judge[cand_num] = {}
-                        if final_prelim_val > 0:
-                            prelim_by_judge[cand_num][j_slot] = final_prelim_val
-                        
-                        if cand_num not in category_by_judge:
-                            category_by_judge[cand_num] = {}
-                        if j_slot not in category_by_judge[cand_num]:
-                            category_by_judge[cand_num][j_slot] = {}
+            calc_score = (p_val * 0.15) + (c_val * 0.15) + (s_val * 0.15) + (a_val * 0.20) + (g_val * 0.15) + (q_val * 0.20)
+            final_prelim_val = score if score > 0 else calc_score
 
-                        if p_val > 0: category_by_judge[cand_num][j_slot]['prod'] = p_val
-                        if c_val > 0: category_by_judge[cand_num][j_slot]['casual'] = c_val
-                        if s_val > 0: category_by_judge[cand_num][j_slot]['swim'] = s_val
-                        if a_val > 0: category_by_judge[cand_num][j_slot]['adv'] = a_val
-                        if g_val > 0: category_by_judge[cand_num][j_slot]['gown'] = g_val
-                        if q_val > 0: category_by_judge[cand_num][j_slot]['qa'] = q_val
-                        
-                        if j_slot not in judge_progress:
-                            judge_progress[j_slot] = set()
-                        judge_progress[j_slot].add(cand_num)
-                    except ValueError:
-                        pass
+            if cand_num not in prelim_by_judge:
+                prelim_by_judge[cand_num] = {}
+            if final_prelim_val > 0:
+                prelim_by_judge[cand_num][j_slot] = final_prelim_val
 
-    # Read Top 5 Judge Scores (Per Judge Breakdown)
+            if cand_num not in category_by_judge:
+                category_by_judge[cand_num] = {}
+            if j_slot not in category_by_judge[cand_num]:
+                category_by_judge[cand_num][j_slot] = {}
+
+            if p_val > 0: category_by_judge[cand_num][j_slot]['prod'] = p_val
+            if c_val > 0: category_by_judge[cand_num][j_slot]['casual'] = c_val
+            if s_val > 0: category_by_judge[cand_num][j_slot]['swim'] = s_val
+            if a_val > 0: category_by_judge[cand_num][j_slot]['adv'] = a_val
+            if g_val > 0: category_by_judge[cand_num][j_slot]['gown'] = g_val
+            if q_val > 0: category_by_judge[cand_num][j_slot]['qa'] = q_val
+
+            if j_slot not in judge_progress:
+                judge_progress[j_slot] = set()
+            judge_progress[j_slot].add(cand_num)
+        except ValueError:
+            pass
+
+    # Read Top 5 Judge Scores from TOP5_STORE
     top5_beauty_by_judge = {} # cand_num -> { judge_slot: b_score }
     top5_brain_by_judge = {}  # cand_num -> { judge_slot: br_score }
 
-    if os.path.exists(TOP5_CSV_FILE):
-        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                cand_str = row.get('Candidate', '')
-                b_tot = row.get('BEAUTY TOTAL (30)', '')
-                br_tot = row.get('BRAIN TOTAL (40)', '')
-                j_slot = row.get('Judge ID', 'Unknown')
+    for (cand_str, j_slot), item in TOP5_STORE.items():
+        try:
+            cand_num = int(cand_str.replace('Candidate ', ''))
+            b_val = item['beauty_total']
+            br_val = item['brain_total']
 
-                if cand_str:
-                    try:
-                        cand_num = int(cand_str.replace('Candidate ', ''))
-                        b_val = to_float(b_tot)
-                        br_val = to_float(br_tot)
+            if b_val > 0:
+                if cand_num not in top5_beauty_by_judge: top5_beauty_by_judge[cand_num] = {}
+                top5_beauty_by_judge[cand_num][j_slot] = b_val
+            if br_val > 0:
+                if cand_num not in top5_brain_by_judge: top5_brain_by_judge[cand_num] = {}
+                top5_brain_by_judge[cand_num][j_slot] = br_val
 
-                        if b_tot:
-                            if cand_num not in top5_beauty_by_judge: top5_beauty_by_judge[cand_num] = {}
-                            top5_beauty_by_judge[cand_num][j_slot] = b_val
-                        if br_tot:
-                            if cand_num not in top5_brain_by_judge: top5_brain_by_judge[cand_num] = {}
-                            top5_brain_by_judge[cand_num][j_slot] = br_val
-
-                        if j_slot not in judge_progress:
-                            judge_progress[j_slot] = set()
-                        judge_progress[j_slot].add(cand_num)
-                    except ValueError:
-                        pass
+            if j_slot not in judge_progress:
+                judge_progress[j_slot] = set()
+            judge_progress[j_slot].add(cand_num)
+        except ValueError:
+            pass
 
     candidates_data = []
     all_cand_nums = set(range(1, 13)).union(prelim_by_judge.keys()).union(top5_beauty_by_judge.keys())
