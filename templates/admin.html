@@ -9,21 +9,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
+        html, body { 
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
             background-color: #000000; 
             color: #ffffff; 
             margin: 0; 
-            padding: 24px; 
+            padding: 10px 14px; 
+            display: flex;
+            flex-direction: column;
             background-image: linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);
         }
         
         .admin-container { 
-            max-width: 1650px; 
-            margin: 0 auto; 
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             background: #0a0a0a; 
             box-shadow: 0 20px 60px rgba(0,0,0,0.8); 
-            border-radius: 16px; 
+            border-radius: 14px; 
             border: 1px solid #3a3a3f;
             overflow: hidden; 
         }
@@ -32,51 +39,54 @@
             background-color: #000000; 
             color: #ffffff; 
             text-align: center; 
-            padding: 24px; 
-            font-size: 24px; 
+            padding: 14px 20px; 
+            font-size: 18px; 
             font-weight: 800; 
-            letter-spacing: 1.6px; 
+            letter-spacing: 1.4px; 
             text-transform: uppercase; 
             border-bottom: 1px solid #3a3a3f;
+            flex-shrink: 0;
         }
         
         /* Multi-Judge Progress Banner */
         .progress-banner {
             background-color: #000000;
             color: #ffffff;
-            padding: 14px 28px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 12px;
             border-bottom: 1px solid #3a3a3f;
+            flex-shrink: 0;
         }
         .judge-badge {
             background: transparent;
             border: 1px solid #10b981;
             color: #10b981;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-left: 6px;
-            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 16px;
+            margin-left: 4px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
         }
         
         /* Category Pill Navigation Bar */
         .category-pill-nav {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             background: #000000;
-            padding: 12px 24px;
+            padding: 8px 16px;
             border-bottom: 1px solid #3a3a3f;
             overflow-x: auto;
             align-items: center;
+            flex-shrink: 0;
         }
         .pill-btn {
-            padding: 10px 22px;
-            border-radius: 32px; /* rounded.pill */
-            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 32px;
+            font-size: 11px;
             font-weight: 700;
             color: #8e8e93;
             background: transparent;
@@ -85,7 +95,7 @@
             transition: all 0.2s ease;
             white-space: nowrap;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
         }
         .pill-btn.active {
             background-color: #10b981;
@@ -98,39 +108,42 @@
             color: #ffffff;
         }
 
-        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; }
         th { 
             background-color: #000000; 
             color: #8e8e93; 
-            padding: 14px 10px; 
-            font-size: 11px; 
+            padding: 10px 8px; 
+            font-size: 10px; 
             border: 1px solid #3a3a3f; 
             font-weight: 800; 
             vertical-align: middle; 
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        td { padding: 12px 10px; border: 1px solid #3a3a3f; font-size: 13px; color: #ffffff; }
+        td { padding: 10px 8px; border: 1px solid #3a3a3f; font-size: 12px; color: #ffffff; }
         
         tr:nth-child(even) td { background-color: rgba(255, 255, 255, 0.02); }
         
         .col-prelim { background-color: rgba(253, 250, 240, 0.03); }
         .col-beauty { background-color: rgba(16, 185, 129, 0.04); }
         .col-brain { background-color: rgba(245, 248, 250, 0.03); }
-        .col-final { background-color: rgba(16, 185, 129, 0.12); font-weight: 800; font-size: 15px; color: #10b981; }
+        .col-final { background-color: rgba(16, 185, 129, 0.12); font-weight: 800; font-size: 14px; color: #10b981; }
         .col-rank { font-weight: 800; }
 
         .qualified { color: #10b981; font-weight: 800; background-color: rgba(16, 185, 129, 0.15) !important; }
-        .title-winner { color: #10b981; font-weight: 800; font-size: 13px; background-color: rgba(16, 185, 129, 0.1); letter-spacing: 0.8px; }
+        .title-winner { color: #10b981; font-weight: 800; font-size: 12px; background-color: rgba(16, 185, 129, 0.1); letter-spacing: 0.6px; }
         
         /* Spotlight Card */
         .spotlight-card {
             background: #000000;
             border: 1px solid #10b981;
-            border-radius: 12px;
-            padding: 16px 24px;
-            min-width: 190px;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            padding: 10px 16px;
+            min-width: 160px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -138,37 +151,37 @@
         .spotlight-rank {
             background: #10b981;
             color: #000000;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
-            padding: 3px 12px;
-            border-radius: 12px;
-            margin-bottom: 8px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
         .spotlight-name {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 800;
             color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
         .spotlight-score {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 800;
             color: #10b981;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
+            margin-top: 2px;
+            letter-spacing: 0.4px;
         }
 
-        .legend-container { display: flex; gap: 20px; padding: 28px; background-color: #000000; border-top: 1px solid #3a3a3f; flex-wrap: wrap; }
-        .legend-box { flex: 1; min-width: 300px; border: 1px solid #3a3a3f; border-radius: 8px; overflow: hidden; }
-        .legend-header { background-color: #0a0a0a; color: #10b981; border-bottom: 1px solid #3a3a3f; padding: 12px; font-weight: 800; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; }
-        .legend-table { width: 100%; font-size: 12px; text-align: left; }
-        .legend-table th, .legend-table td { padding: 10px 14px; border: 1px solid #3a3a3f; background-color: #000000; color: #ffffff; }
-        .legend-table th { background-color: #0a0a0a; font-weight: 700; color: #8e8e93; text-transform: uppercase; letter-spacing: 1px; }
+        .legend-container { display: flex; gap: 14px; padding: 12px; background-color: #000000; border-top: 1px solid #3a3a3f; flex-wrap: wrap; flex-shrink: 0; }
+        .legend-box { flex: 1; min-width: 250px; border: 1px solid #3a3a3f; border-radius: 6px; overflow: hidden; }
+        .legend-header { background-color: #0a0a0a; color: #10b981; border-bottom: 1px solid #3a3a3f; padding: 6px 10px; font-weight: 800; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .legend-table { width: 100%; font-size: 11px; text-align: left; }
+        .legend-table th, .legend-table td { padding: 6px 10px; border: 1px solid #3a3a3f; background-color: #000000; color: #ffffff; }
+        .legend-table th { background-color: #0a0a0a; font-weight: 700; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.8px; }
 
-        .tab-view { display: none; }
+        .tab-view { flex: 1; min-height: 0; overflow-y: auto; display: none; }
         .tab-view.active { display: block; }
     </style>
 </head>
@@ -188,7 +201,7 @@
                 {% endfor %}
             </div>
             <div>
-                <a href="/login" style="color: #10b981; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">JUDGES LOGIN PORTAL</a>
+                <a href="/login" style="color: #10b981; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">JUDGES LOGIN PORTAL</a>
             </div>
         </div>
 
@@ -207,12 +220,12 @@
         <!-- TAB 0: OVERALL & TOP 5 TABULATION -->
         <div class="tab-view active" id="tabView-0">
             <!-- Top 5 Finalist Spotlight Banner -->
-            <div style="background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 80%), #000000; border-bottom: 1px solid #3a3a3f; padding: 24px; text-align: center;">
-                <div style="font-weight: 800; font-size: 14px; color: #10b981; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 16px;">
+            <div style="background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 80%), #000000; border-bottom: 1px solid #3a3a3f; padding: 14px 20px; text-align: center;">
+                <div style="font-weight: 800; font-size: 12px; color: #10b981; text-transform: uppercase; letter-spacing: 1.4px; margin-bottom: 10px;">
                     AUTOMATIC TOP 5 SELECTION SPOTLIGHT
                 </div>
-                <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-                    <div style="color: #8e8e93; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
+                <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                    <div style="color: #8e8e93; font-size: 12px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
                 </div>
             </div>
             
@@ -242,7 +255,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr class="candidate-row" data-cand="{{ cand.number }}">
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
                         <td class="prelim-30 col-prelim" style="font-weight: 800;">{{ cand.prelim_30 }}</td>
                         <td class="j1-val">{{ cand.judge_1 }}</td>
@@ -257,7 +270,7 @@
                         <td class="top5-cell">-</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="13" style="padding: 30px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    <tr><td colspan="13" style="padding: 20px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -265,7 +278,7 @@
 
         <!-- TAB 7: TOP 5 JUDGE BREAKDOWN & CORONATION SHEET -->
         <div class="tab-view" id="tabView-7">
-            <div style="background: #000000; border-bottom: 1px solid #3a3a3f; padding: 16px 28px; font-weight: 800; color: #10b981; text-align: center; font-size: 14px; text-transform: uppercase; letter-spacing: 1.6px;">
+            <div style="background: #000000; border-bottom: 1px solid #3a3a3f; padding: 12px 20px; font-weight: 800; color: #10b981; text-align: center; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px;">
                 OFFICIAL TOP 5 FINALISTS JUDGE-BY-JUDGE BREAKDOWN & TITLE ASSIGNMENT
             </div>
             <table>
@@ -288,8 +301,8 @@
                 <tbody id="top5BreakdownBody">
                     {% for cand in top5_candidates %}
                     <tr>
-                        <td style="font-weight: 800; font-size: 15px;">Rank #{{ cand.top5_rank }}</td>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 800; font-size: 14px;">Rank #{{ cand.top5_rank }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td class="col-prelim" style="font-weight: 800;">{{ cand.prelim_30 }}</td>
                         <td>{{ cand.judge_1 }}</td>
                         <td>{{ cand.judge_2 }}</td>
@@ -302,7 +315,7 @@
                         <td class="title-winner">{{ cand.title }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="12" style="padding: 30px; color: #8e8e93;">Waiting for judge scores to display Top 5 breakdown...</td></tr>
+                    <tr><td colspan="12" style="padding: 20px; color: #8e8e93;">Waiting for judge scores to display Top 5 breakdown...</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -321,7 +334,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.prod_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
                     </tr>
@@ -343,7 +356,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.casual_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
                     </tr>
@@ -365,7 +378,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.swim_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
                     </tr>
@@ -387,7 +400,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.adv_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
                     </tr>
@@ -409,7 +422,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.gown_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
                     </tr>
@@ -431,7 +444,7 @@
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td style="font-weight: 700;">{{ cand.qa_avg }} pts</td>
                         <td style="font-weight: 800; color: #10b981;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
                     </tr>
@@ -555,7 +568,7 @@
         function updateSpotlightCards(top5List) {
             const spotlightContainer = document.getElementById('top5Spotlight');
             if (top5List.length === 0) {
-                spotlightContainer.innerHTML = `<div style="color: #8e8e93; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
+                spotlightContainer.innerHTML = `<div style="color: #8e8e93; font-size: 12px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
                 return;
             }
 
@@ -605,8 +618,8 @@
                         data.top5_candidates.forEach(cand => {
                             html += `
                                 <tr>
-                                    <td style="font-weight: 800; font-size: 15px;">Rank #${cand.top5_rank}</td>
-                                    <td style="text-align: left; padding-left: 20px; font-weight: 800;">${cand.name}</td>
+                                    <td style="font-weight: 800; font-size: 14px;">Rank #${cand.top5_rank}</td>
+                                    <td style="text-align: left; padding-left: 16px; font-weight: 800;">${cand.name}</td>
                                     <td class="col-prelim" style="font-weight: 800;">${cand.prelim_30.toFixed(2)}</td>
                                     <td>${cand.judge_1}</td>
                                     <td>${cand.judge_2}</td>
