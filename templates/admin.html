@@ -190,9 +190,9 @@
     <div class="admin-container">
         <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION TABULATION</div>
         
-        <!-- Multi-Judge Progress Banner -->
+        <!-- Live Judge Submission Status Badges -->
         <div class="progress-banner">
-            <div>
+            <div id="liveJudgeBadges">
                 <strong style="text-transform: uppercase; letter-spacing: 1px;">Live Judge Submissions:</strong>
                 {% for j, count in judge_summary.items() %}
                 <span class="judge-badge">{{ j }}: {{ count }} CANDIDATE(S)</span>
@@ -333,10 +333,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.prod_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
+                        <td class="cat-prod-avg" style="font-weight: 700;">{{ cand.prod_avg }} pts</td>
+                        <td class="cat-prod-weight" style="font-weight: 800; color: #10b981;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -355,10 +355,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.casual_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
+                        <td class="cat-casual-avg" style="font-weight: 700;">{{ cand.casual_avg }} pts</td>
+                        <td class="cat-casual-weight" style="font-weight: 800; color: #10b981;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -377,10 +377,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.swim_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
+                        <td class="cat-swim-avg" style="font-weight: 700;">{{ cand.swim_avg }} pts</td>
+                        <td class="cat-swim-weight" style="font-weight: 800; color: #10b981;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -399,10 +399,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.adv_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
+                        <td class="cat-adv-avg" style="font-weight: 700;">{{ cand.adv_avg }} pts</td>
+                        <td class="cat-adv-weight" style="font-weight: 800; color: #10b981;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -421,10 +421,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.gown_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
+                        <td class="cat-gown-avg" style="font-weight: 700;">{{ cand.gown_avg }} pts</td>
+                        <td class="cat-gown-weight" style="font-weight: 800; color: #10b981;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -443,10 +443,10 @@
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
-                    <tr>
+                    <tr data-cat-cand="{{ cand.number }}">
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td style="font-weight: 700;">{{ cand.qa_avg }} pts</td>
-                        <td style="font-weight: 800; color: #10b981;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
+                        <td class="cat-qa-avg" style="font-weight: 700;">{{ cand.qa_avg }} pts</td>
+                        <td class="cat-qa-weight" style="font-weight: 800; color: #10b981;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -511,7 +511,10 @@
             if (activeBtn) activeBtn.classList.add('active');
         }
 
-        document.addEventListener('DOMContentLoaded', calculateTabulation);
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateTabulation();
+            pollLiveData();
+        });
 
         function calculateTabulation() {
             const rows = document.querySelectorAll('#tabView-0 .candidate-row');
@@ -589,7 +592,20 @@
             fetch('/api/admin_data')
             .then(res => res.json())
             .then(data => {
+                // Update Judge Progress Badges
+                const badgeContainer = document.getElementById('liveJudgeBadges');
+                if (badgeContainer && data.judge_summary) {
+                    let badgeHtml = '<strong style="text-transform: uppercase; letter-spacing: 1px;">Live Judge Submissions:</strong> ';
+                    for (const [jSlot, count] of Object.entries(data.judge_summary)) {
+                        badgeHtml += `<span class="judge-badge">${jSlot}: ${count} CANDIDATE(S)</span> `;
+                    }
+                    if (Object.keys(data.judge_summary).length === 0) badgeHtml = `<span style="color: #8e8e93;">Waiting for judge submissions...</span>`;
+                    badgeContainer.innerHTML = badgeHtml;
+                }
+
                 if (!data.candidates) return;
+
+                // Update Overall & Top 5 Table + Category Sub-Tables
                 data.candidates.forEach(cand => {
                     const rows = document.querySelectorAll('#tabView-0 .candidate-row');
                     rows.forEach(row => {
@@ -607,7 +623,42 @@
                             row.querySelector('.final-score').textContent = cand.final_score.toFixed(2);
                         }
                     });
+
+                    // Update Sub-Tables (Prod, Casual, Swim, Adv, Gown, Q&A)
+                    const catRows = document.querySelectorAll(`tr[data-cat-cand="${cand.number}"]`);
+                    catRows.forEach(catRow => {
+                        const prodAvg = catRow.querySelector('.cat-prod-avg');
+                        const prodW = catRow.querySelector('.cat-prod-weight');
+                        if (prodAvg) prodAvg.textContent = `${cand.prod_avg.toFixed(2)} pts`;
+                        if (prodW) prodW.textContent = `${(cand.prod_avg * 0.15).toFixed(2)}%`;
+
+                        const casualAvg = catRow.querySelector('.cat-casual-avg');
+                        const casualW = catRow.querySelector('.cat-casual-weight');
+                        if (casualAvg) casualAvg.textContent = `${cand.casual_avg.toFixed(2)} pts`;
+                        if (casualW) casualW.textContent = `${(cand.casual_avg * 0.15).toFixed(2)}%`;
+
+                        const swimAvg = catRow.querySelector('.cat-swim-avg');
+                        const swimW = catRow.querySelector('.cat-swim-weight');
+                        if (swimAvg) swimAvg.textContent = `${cand.swim_avg.toFixed(2)} pts`;
+                        if (swimW) swimW.textContent = `${(cand.swim_avg * 0.15).toFixed(2)}%`;
+
+                        const advAvg = catRow.querySelector('.cat-adv-avg');
+                        const advW = catRow.querySelector('.cat-adv-weight');
+                        if (advAvg) advAvg.textContent = `${cand.adv_avg.toFixed(2)} pts`;
+                        if (advW) advW.textContent = `${(cand.adv_avg * 0.20).toFixed(2)}%`;
+
+                        const gownAvg = catRow.querySelector('.cat-gown-avg');
+                        const gownW = catRow.querySelector('.cat-gown-weight');
+                        if (gownAvg) gownAvg.textContent = `${cand.gown_avg.toFixed(2)} pts`;
+                        if (gownW) gownW.textContent = `${(cand.gown_avg * 0.15).toFixed(2)}%`;
+
+                        const qaAvg = catRow.querySelector('.cat-qa-avg');
+                        const qaW = catRow.querySelector('.cat-qa-weight');
+                        if (qaAvg) qaAvg.textContent = `${cand.qa_avg.toFixed(2)} pts`;
+                        if (qaW) qaW.textContent = `${(cand.qa_avg * 0.20).toFixed(2)}%`;
+                    });
                 });
+
                 calculateTabulation();
 
                 // Update Top 5 Breakdown Table
@@ -640,7 +691,8 @@
             .catch(err => {});
         }
 
-        setInterval(pollLiveData, 3000);
+        // Auto-sync live data every 1 second (1000ms)
+        setInterval(pollLiveData, 1000);
     </script>
 
 </body>
