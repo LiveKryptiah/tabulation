@@ -885,14 +885,10 @@
         let candidateDrafts = { prelim: {}, top5: {} };
         let currentStep = 1;
         let currentTop5Step = 1;
+        let activeCandidateNum = null;
 
-        function saveCurrentCandidateDraft() {
-            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
-            if (!selectedRadio) {
-                updateCategoryProgress();
-                return;
-            }
-            const candNum = selectedRadio.value;
+        function saveCandidateDraft(candNum) {
+            if (!candNum) return;
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
             
             if (!candidateDrafts[currentMode][step]) {
@@ -908,12 +904,14 @@
             const inputs = currentStepEl.querySelectorAll('input[type="number"]');
             let isComplete = true;
             let scores = {};
+            let hasAnyValue = false;
             
             inputs.forEach(input => {
                 const val = parseFloat(input.value);
-                if (isNaN(val) || val === null || val === undefined || input.value === '') {
+                if (isNaN(val) || val === null || val === undefined || input.value.trim() === '') {
                     isComplete = false;
                 } else {
+                    hasAnyValue = true;
                     scores[input.name] = val;
                 }
             });
@@ -921,7 +919,11 @@
             if (isComplete) {
                 candidateDrafts[currentMode][step][candNum] = scores;
             } else {
-                delete candidateDrafts[currentMode][step][candNum];
+                if (hasAnyValue) {
+                    candidateDrafts[currentMode][step][candNum] = scores;
+                } else {
+                    delete candidateDrafts[currentMode][step][candNum];
+                }
             }
 
             updateCategoryProgress();
@@ -931,20 +933,25 @@
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
             const draft = candidateDrafts[currentMode]?.[step]?.[candNum];
             
-            const currentStepEl = currentMode === 'prelim' 
-                ? document.getElementById(`step-${step}`) 
-                : document.getElementById(`top5-step-${step}`);
-                
-            if (!currentStepEl) return;
-
-            const inputs = currentStepEl.querySelectorAll('input[type="number"]');
-            inputs.forEach(input => {
-                if (draft && draft[input.name] !== undefined) {
-                    input.value = draft[input.name];
-                } else {
-                    input.value = '';
-                }
+            // Clear ALL inputs in right panel first so ungraded candidates start 100% EMPTY!
+            document.querySelectorAll('.right-panel input[type="number"]').forEach(input => {
+                input.value = '';
             });
+
+            if (draft) {
+                const currentStepEl = currentMode === 'prelim' 
+                    ? document.getElementById(`step-${step}`) 
+                    : document.getElementById(`top5-step-${step}`);
+                    
+                if (currentStepEl) {
+                    const inputs = currentStepEl.querySelectorAll('input[type="number"]');
+                    inputs.forEach(input => {
+                        if (draft[input.name] !== undefined) {
+                            input.value = draft[input.name];
+                        }
+                    });
+                }
+            }
             updateLiveTotal();
         }
 
@@ -1003,7 +1010,7 @@
                         nextBtn.style.color = '#000000';
                         nextBtn.innerHTML = `NEXT CATEGORY (${completedCount}/${totalRequired} COMPLETE) &rarr;`;
                     } else {
-                        nextBtn.disabled = false; // allow click to show friendly alert if incomplete
+                        nextBtn.disabled = false;
                         nextBtn.style.opacity = '0.7';
                         nextBtn.style.backgroundColor = 'transparent';
                         nextBtn.style.color = '#10b981';
@@ -1030,20 +1037,27 @@
         const previewName = document.getElementById('preview-name');
 
         radioButtons.forEach(radio => {
-            radio.addEventListener('change', function() {
-                saveCurrentCandidateDraft();
+            radio.addEventListener('click', function() {
+                const newCandNum = this.value;
+                if (activeCandidateNum && activeCandidateNum !== newCandNum) {
+                    saveCandidateDraft(activeCandidateNum);
+                }
+                activeCandidateNum = newCandNum;
+                
                 placeholderCircle.style.display = 'none';
                 previewImg.style.display = 'block';
                 previewImg.src = this.getAttribute('data-img');
                 previewName.textContent = this.getAttribute('data-name');
-                loadCandidateDraft(this.value);
+                loadCandidateDraft(newCandNum);
             });
         });
 
         // --- 2. LIVE GRAND TOTAL CALCULATOR ---
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
-                saveCurrentCandidateDraft();
+                if (activeCandidateNum) {
+                    saveCandidateDraft(activeCandidateNum);
+                }
                 updateLiveTotal();
             });
         });
@@ -1077,7 +1091,7 @@
 
         // --- 3. STEPPER NAVIGATION & WIZARD ---
         function jumpToStep(stepNumber) {
-            saveCurrentCandidateDraft();
+            if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
             currentStep = stepNumber;
             document.querySelectorAll('#prelimWizard .step-content').forEach(step => step.classList.remove('active'));
             document.getElementById(`step-${stepNumber}`).classList.add('active');
@@ -1087,13 +1101,12 @@
                 else tab.classList.remove('active');
             });
             
-            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
-            if (selectedRadio) loadCandidateDraft(selectedRadio.value);
+            if (activeCandidateNum) loadCandidateDraft(activeCandidateNum);
             updateCategoryProgress();
         }
 
         function jumpToTop5Step(stepNumber) {
-            saveCurrentCandidateDraft();
+            if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
             currentTop5Step = stepNumber;
             document.querySelectorAll('#top5Wizard .step-content').forEach(step => step.classList.remove('active'));
             document.getElementById(`top5-step-${stepNumber}`).classList.add('active');
@@ -1101,14 +1114,13 @@
             document.getElementById('top5Tab1').classList.toggle('active', stepNumber === 1);
             document.getElementById('top5Tab2').classList.toggle('active', stepNumber === 2);
             
-            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
-            if (selectedRadio) loadCandidateDraft(selectedRadio.value);
+            if (activeCandidateNum) loadCandidateDraft(activeCandidateNum);
             updateCategoryProgress();
         }
 
         document.querySelectorAll('#prelimWizard .btn-next').forEach(button => {
             button.addEventListener('click', () => {
-                saveCurrentCandidateDraft();
+                if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
                 const step = currentStep;
                 const completedSet = candidateDrafts['prelim']?.[step] || {};
                 const completedCount = Object.keys(completedSet).length;
@@ -1129,7 +1141,7 @@
 
         document.querySelectorAll('#top5Wizard .btn-next').forEach(button => {
             button.addEventListener('click', () => {
-                saveCurrentCandidateDraft();
+                if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
                 const step = currentTop5Step;
                 const completedSet = candidateDrafts['top5']?.[step] || {};
                 const completedCount = Object.keys(completedSet).length;
@@ -1145,7 +1157,7 @@
         // --- 4. SUBMIT FORM ---
         document.getElementById('scoringForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
-            saveCurrentCandidateDraft();
+            if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
 
             const statusMessage = document.getElementById('status-message');
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
