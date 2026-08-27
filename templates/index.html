@@ -811,8 +811,12 @@
                 document.getElementById('scorePreviewLabel').textContent = "PRELIMINARY GRAND TOTAL:";
                 banner.style.display = 'none';
                 
-                // Show all candidates in prelim mode
-                document.querySelectorAll('.candidate-card').forEach(card => {
+                // Show all candidates in prelim mode in numerical order (1 to 12)
+                const grid = document.querySelector('.candidate-grid');
+                const cards = Array.from(document.querySelectorAll('.candidate-card'));
+                cards.sort((a, b) => parseInt(a.getAttribute('data-cand-num')) - parseInt(b.getAttribute('data-cand-num')));
+                cards.forEach(card => {
+                    grid.appendChild(card);
                     card.style.display = 'block';
                     const badge = card.querySelector('.top5-star-badge');
                     if (badge) badge.style.display = 'none';
@@ -838,18 +842,39 @@
                 if (data.candidates && data.candidates.length > 0) {
                     // Sort candidates by prelim score descending
                     const sorted = [...data.candidates].sort((a, b) => b.prelim_score - a.prelim_score);
-                    const top5Nums = new Set(sorted.slice(0, 5).map(c => c.number));
+                    const top5List = sorted.slice(0, 5);
+                    const top5RankMap = {};
+                    top5List.forEach((c, idx) => {
+                        top5RankMap[c.number] = { rank: idx + 1, score: c.prelim_score };
+                    });
 
-                    document.querySelectorAll('.candidate-card').forEach(card => {
+                    const grid = document.querySelector('.candidate-grid');
+                    const cards = Array.from(document.querySelectorAll('.candidate-card'));
+
+                    // Re-order candidate cards in DOM by Top 5 Rank (#1 to #5)
+                    cards.sort((a, b) => {
+                        const numA = parseInt(a.getAttribute('data-cand-num'));
+                        const numB = parseInt(b.getAttribute('data-cand-num'));
+                        const rankA = top5RankMap[numA] ? top5RankMap[numA].rank : 99;
+                        const rankB = top5RankMap[numB] ? top5RankMap[numB].rank : 99;
+                        return rankA - rankB;
+                    });
+
+                    cards.forEach(card => {
+                        grid.appendChild(card);
                         const num = parseInt(card.getAttribute('data-cand-num'));
                         const badge = card.querySelector('.top5-star-badge');
-                        if (top5Nums.has(num)) {
+                        
+                        if (top5RankMap[num]) {
                             card.style.display = 'block';
-                            if (badge) badge.style.display = 'block';
+                            if (badge) {
+                                badge.textContent = `★ RANK #${top5RankMap[num].rank}`;
+                                badge.style.display = 'block';
+                            }
                         } else {
                             card.style.display = 'none';
                             const radio = card.querySelector('input[type="radio"]');
-                            if (radio.checked) {
+                            if (radio && radio.checked) {
                                 radio.checked = false;
                                 resetCandidatePreview();
                             }
@@ -857,7 +882,7 @@
                     });
                 }
             })
-            .catch(err => {});
+            .catch(err => console.error("Error filtering top 5 candidates", err));
         }
 
         function resetCandidatePreview() {
