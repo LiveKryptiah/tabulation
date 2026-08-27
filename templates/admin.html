@@ -3,105 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Live Tabulation Dashboard</title>
+    <title>Admin Dashboard - MISS SK YOUTH AMBASSADRESS 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Geist', sans-serif; background-color: #f8f9fa; margin: 0; padding: 25px; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: #000000; 
+            color: #ffffff; 
+            margin: 0; 
+            padding: 24px; 
+            background-image: linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);
+        }
         
-        .admin-container { max-width: 1600px; margin: 0 auto; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-radius: 14px; overflow: hidden; }
+        .admin-container { 
+            max-width: 1650px; 
+            margin: 0 auto; 
+            background: #0a0a0a; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8); 
+            border-radius: 16px; 
+            border: 1px solid #3a3a3f;
+            overflow: hidden; 
+        }
         
-        .header-title { background-color: #a67c52; color: white; text-align: center; padding: 20px; font-size: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .header-title { 
+            background-color: #000000; 
+            color: #ffffff; 
+            text-align: center; 
+            padding: 24px; 
+            font-size: 24px; 
+            font-weight: 800; 
+            letter-spacing: 1.6px; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #3a3a3f;
+        }
         
-        /* Category Pill Navigation Bar */
+        /* Multi-Judge Progress Banner */
+        .progress-banner {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-bottom: 1px solid #3a3a3f;
+        }
+        .judge-badge {
+            background: transparent;
+            border: 1px solid #a67c52;
+            color: #a67c52;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+        
+        /* Category Pill Navigation Bar (Matching design.md pill standards) */
         .category-pill-nav {
             display: flex;
-            gap: 8px;
-            background: #fafbfc;
-            padding: 10px 18px;
-            border-bottom: 1px solid #edf2f7;
-            border-top: 1px solid #edf2f7;
+            gap: 10px;
+            background: #000000;
+            padding: 12px 24px;
+            border-bottom: 1px solid #3a3a3f;
             overflow-x: auto;
             align-items: center;
         }
         .pill-btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 10px 22px;
+            border-radius: 32px; /* rounded.pill */
+            font-size: 12px;
             font-weight: 700;
-            color: #3182ce;
+            color: #8e8e93;
             background: transparent;
-            border: none;
+            border: 1px solid #3a3a3f;
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
         .pill-btn.active {
             background-color: #a67c52;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.3);
+            color: #000000;
+            border-color: #a67c52;
+            box-shadow: 0 0 15px rgba(166, 124, 82, 0.35);
         }
         .pill-btn:hover:not(.active) {
-            background-color: #edf2f7;
+            border-color: #ffffff;
+            color: #ffffff;
         }
 
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
-        th { background-color: #e6d3a3; color: #1e1e24; padding: 12px 8px; font-size: 12px; border: 1px solid #dcdcdc; font-weight: 700; vertical-align: middle; }
-        td { padding: 10px 8px; border: 1px solid #dcdcdc; font-size: 13px; }
+        th { 
+            background-color: #000000; 
+            color: #8e8e93; 
+            padding: 14px 10px; 
+            font-size: 11px; 
+            border: 1px solid #3a3a3f; 
+            font-weight: 800; 
+            vertical-align: middle; 
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        td { padding: 12px 10px; border: 1px solid #3a3a3f; font-size: 13px; color: #ffffff; }
         
-        tr:nth-child(even) td { background-color: #fcfcfc; }
+        tr:nth-child(even) td { background-color: rgba(255, 255, 255, 0.02); }
         
-        .col-prelim { background-color: #fdfaf0; }
-        .col-beauty { background-color: #faf5eb; }
-        .col-brain { background-color: #f5f8fa; }
-        .col-final { background-color: #fff9e6; font-weight: bold; font-size: 15px; color: #1e1e24; }
-        .col-rank { font-weight: bold; }
+        .col-prelim { background-color: rgba(253, 250, 240, 0.03); }
+        .col-beauty { background-color: rgba(250, 245, 235, 0.03); }
+        .col-brain { background-color: rgba(245, 248, 250, 0.03); }
+        .col-final { background-color: rgba(166, 124, 82, 0.1); font-weight: 800; font-size: 15px; color: #a67c52; }
+        .col-rank { font-weight: 800; }
 
-        .qualified { color: #004d00; font-weight: bold; background-color: #d4edda !important; }
-        .title-winner { color: #a67c52; font-weight: 700; font-size: 13px; background-color: #fdfaf0; }
+        .qualified { color: #28a745; font-weight: 800; background-color: rgba(40, 167, 69, 0.15) !important; }
+        .title-winner { color: #a67c52; font-weight: 800; font-size: 13px; background-color: rgba(166, 124, 82, 0.1); letter-spacing: 0.8px; }
         
         /* Spotlight Card */
         .spotlight-card {
-            background: #ffffff;
-            border: 2px solid #a67c52;
+            background: #000000;
+            border: 1px solid #a67c52;
             border-radius: 12px;
-            padding: 14px 22px;
-            min-width: 180px;
-            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.2);
+            padding: 16px 24px;
+            min-width: 190px;
+            box-shadow: 0 0 20px rgba(166, 124, 82, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         .spotlight-rank {
             background: #a67c52;
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
+            color: #000000;
+            font-size: 10px;
+            font-weight: 800;
             padding: 3px 12px;
             border-radius: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .spotlight-name {
             font-size: 16px;
-            font-weight: 700;
-            color: #1e1e24;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .spotlight-score {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             color: #28a745;
             margin-top: 4px;
+            letter-spacing: 0.5px;
         }
 
-        .legend-container { display: flex; gap: 20px; padding: 25px; background-color: #fff; border-top: 2px solid #eee; flex-wrap: wrap; }
-        .legend-box { flex: 1; min-width: 300px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
-        .legend-header { background-color: #a67c52; color: white; padding: 10px; font-weight: 700; text-align: center; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .legend-container { display: flex; gap: 20px; padding: 28px; background-color: #000000; border-top: 1px solid #3a3a3f; flex-wrap: wrap; }
+        .legend-box { flex: 1; min-width: 300px; border: 1px solid #3a3a3f; border-radius: 8px; overflow: hidden; }
+        .legend-header { background-color: #0a0a0a; color: #a67c52; border-bottom: 1px solid #3a3a3f; padding: 12px; font-weight: 800; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; }
         .legend-table { width: 100%; font-size: 12px; text-align: left; }
-        .legend-table th, .legend-table td { padding: 8px 12px; border: 1px solid #eee; background-color: white; }
-        .legend-table th { background-color: #f8f9fa; font-weight: 700; }
+        .legend-table th, .legend-table td { padding: 10px 14px; border: 1px solid #3a3a3f; background-color: #000000; color: #ffffff; }
+        .legend-table th { background-color: #0a0a0a; font-weight: 700; color: #8e8e93; text-transform: uppercase; letter-spacing: 1px; }
 
         .tab-view { display: none; }
         .tab-view.active { display: block; }
@@ -113,48 +178,48 @@
         <div class="header-title">MISS SK YOUTH AMBASSADRESS 2026 – TOP 5 SELECTION TABULATION</div>
         
         <!-- Multi-Judge Progress Banner -->
-        <div style="background-color: #2b2d42; color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+        <div class="progress-banner">
             <div>
-                <strong>Live Judge Submissions:</strong>
+                <strong style="text-transform: uppercase; letter-spacing: 1px;">Live Judge Submissions:</strong>
                 {% for j, count in judge_summary.items() %}
-                <span style="background: #a67c52; padding: 3px 8px; border-radius: 4px; margin-left: 6px; font-size: 12px;">{{ j }}: {{ count }} candidate(s)</span>
+                <span class="judge-badge">{{ j }}: {{ count }} CANDIDATE(S)</span>
                 {% else %}
-                <span style="color: #bbb;">Waiting for judge submissions...</span>
+                <span style="color: #8e8e93;">Waiting for judge submissions...</span>
                 {% endfor %}
             </div>
             <div>
-                <a href="/login" style="color: #ffd166; text-decoration: none; font-size: 13px;">🔑 Judges Login Portal</a>
+                <a href="/login" style="color: #a67c52; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">🔑 JUDGES LOGIN PORTAL</a>
             </div>
         </div>
 
-        <!-- Category Pill Navigation Bar (Matching Screenshot UI) -->
+        <!-- Category Pill Navigation Bar (Matching Screenshot UI & design.md) -->
         <div class="category-pill-nav">
-            <button type="button" class="pill-btn active" onclick="switchAdminTab(0)">🏆 Overall & Top 5</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(7)">👑 Top 5 Judge Breakdown</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(1)">1. Prod</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(2)">2. Casual</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(3)">3. Swim</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(4)">4. Adv</button>
-            <button type="button" class="pill-btn" onclick="switchAdminTab(5)">5. Gown</button>
+            <button type="button" class="pill-btn active" onclick="switchAdminTab(0)">🏆 OVERALL & TOP 5</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(7)">👑 TOP 5 JUDGE BREAKDOWN</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(1)">1. PROD</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(2)">2. CASUAL</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(3)">3. SWIM</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(4)">4. ADV</button>
+            <button type="button" class="pill-btn" onclick="switchAdminTab(5)">5. GOWN</button>
             <button type="button" class="pill-btn" onclick="switchAdminTab(6)">6. Q&A</button>
         </div>
 
         <!-- TAB 0: OVERALL & TOP 5 TABULATION -->
         <div class="tab-view active" id="tabView-0">
             <!-- Top 5 Finalist Spotlight Banner -->
-            <div style="background: linear-gradient(135deg, #fdfaf7 0%, #f4eae0 100%); border-bottom: 2px solid #a67c52; padding: 20px; text-align: center;">
-                <div style="font-weight: 700; font-size: 16px; color: #a67c52; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+            <div style="background: radial-gradient(circle at 50% 0%, rgba(166, 124, 82, 0.12) 0%, transparent 80%), #000000; border-bottom: 1px solid #3a3a3f; padding: 24px; text-align: center;">
+                <div style="font-weight: 800; font-size: 14px; color: #a67c52; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 16px;">
                     👑 AUTOMATIC TOP 5 SELECTION SPOTLIGHT
                 </div>
-                <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                    <div style="color: #6c757d; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
+                <div id="top5Spotlight" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                    <div style="color: #8e8e93; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
                 </div>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th rowspan="2">Candidate</th>
+                        <th rowspan="2">CANDIDATE</th>
                         <th colspan="2" class="col-prelim">PRELIMINARY (30%)</th>
                         <th colspan="5">JUDGE BREAKDOWN (TOP 5 FINALS - 70 PTS)</th>
                         <th colspan="2">FINALS AVERAGES</th>
@@ -163,36 +228,36 @@
                         <th rowspan="2">TOP 5 STATUS</th>
                     </tr>
                     <tr>
-                        <th class="col-prelim">Prelim Avg</th>
-                        <th class="col-prelim">30% Prelim</th>
-                        <th>Judge 1</th>
-                        <th>Judge 2</th>
-                        <th>Judge 3</th>
-                        <th>Judge 4</th>
-                        <th>Judge 5</th>
-                        <th class="col-beauty">30% Beauty</th>
-                        <th class="col-brain">40% Brain</th>
+                        <th class="col-prelim">PRELIM AVG</th>
+                        <th class="col-prelim">30% PRELIM</th>
+                        <th>JUDGE 1</th>
+                        <th>JUDGE 2</th>
+                        <th>JUDGE 3</th>
+                        <th>JUDGE 4</th>
+                        <th>JUDGE 5</th>
+                        <th class="col-beauty">30% BEAUTY</th>
+                        <th class="col-brain">40% BRAIN</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr class="candidate-row" data-cand="{{ cand.number }}">
-                        <td style="text-align: left; padding-left: 15px; font-weight: bold;">{{ cand.name }}</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
                         <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
-                        <td class="prelim-30 col-prelim" style="font-weight: bold;">{{ cand.prelim_30 }}</td>
+                        <td class="prelim-30 col-prelim" style="font-weight: 800;">{{ cand.prelim_30 }}</td>
                         <td class="j1-val">{{ cand.judge_1 }}</td>
                         <td class="j2-val">{{ cand.judge_2 }}</td>
                         <td class="j3-val">{{ cand.judge_3 }}</td>
                         <td class="j4-val">{{ cand.judge_4 }}</td>
                         <td class="j5-val">{{ cand.judge_5 }}</td>
-                        <td class="beauty-30 col-beauty" style="font-weight: bold; color: #a67c52;">{{ cand.beauty_30 }}</td>
-                        <td class="brain-40 col-brain" style="font-weight: bold; color: #007bff;">{{ cand.brain_40 }}</td>
+                        <td class="beauty-30 col-beauty" style="font-weight: 800; color: #a67c52;">{{ cand.beauty_30 }}</td>
+                        <td class="brain-40 col-brain" style="font-weight: 800; color: #007bff;">{{ cand.brain_40 }}</td>
                         <td class="final-score col-final">{{ cand.final_score }}</td>
                         <td class="rank-cell col-rank">-</td>
                         <td class="top5-cell">-</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="13" style="padding: 30px; color: #888;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    <tr><td colspan="13" style="padding: 30px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -200,22 +265,22 @@
 
         <!-- TAB 7: TOP 5 JUDGE BREAKDOWN & CORONATION SHEET -->
         <div class="tab-view" id="tabView-7">
-            <div style="background: #faf5eb; border-bottom: 2px solid #a67c52; padding: 15px 25px; font-weight: bold; color: #a67c52; text-align: center; font-size: 15px;">
+            <div style="background: #000000; border-bottom: 1px solid #3a3a3f; padding: 16px 28px; font-weight: 800; color: #a67c52; text-align: center; font-size: 14px; text-transform: uppercase; letter-spacing: 1.6px;">
                 👑 OFFICIAL TOP 5 FINALISTS JUDGE-BY-JUDGE BREAKDOWN & TITLE ASSIGNMENT
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Final Rank</th>
-                        <th>Candidate Name</th>
-                        <th class="col-prelim">30% Prelim Score</th>
-                        <th>Judge 1 (70 pts)</th>
-                        <th>Judge 2 (70 pts)</th>
-                        <th>Judge 3 (70 pts)</th>
-                        <th>Judge 4 (70 pts)</th>
-                        <th>Judge 5 (70 pts)</th>
-                        <th class="col-beauty">Beauty Avg (30%)</th>
-                        <th class="col-brain">Brain Avg (40%)</th>
+                        <th>FINAL RANK</th>
+                        <th>CANDIDATE NAME</th>
+                        <th class="col-prelim">30% PRELIM SCORE</th>
+                        <th>JUDGE 1 (70 PTS)</th>
+                        <th>JUDGE 2 (70 PTS)</th>
+                        <th>JUDGE 3 (70 PTS)</th>
+                        <th>JUDGE 4 (70 PTS)</th>
+                        <th>JUDGE 5 (70 PTS)</th>
+                        <th class="col-beauty">BEAUTY AVG (30%)</th>
+                        <th class="col-brain">BRAIN AVG (40%)</th>
                         <th class="col-final">FINAL SCORE (100%)</th>
                         <th>OFFICIAL TITLE</th>
                     </tr>
@@ -223,21 +288,21 @@
                 <tbody id="top5BreakdownBody">
                     {% for cand in top5_candidates %}
                     <tr>
-                        <td style="font-weight: bold; font-size: 15px;">Rank #{{ cand.top5_rank }}</td>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td class="col-prelim" style="font-weight: bold;">{{ cand.prelim_30 }}</td>
+                        <td style="font-weight: 800; font-size: 15px;">Rank #{{ cand.top5_rank }}</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td class="col-prelim" style="font-weight: 800;">{{ cand.prelim_30 }}</td>
                         <td>{{ cand.judge_1 }}</td>
                         <td>{{ cand.judge_2 }}</td>
                         <td>{{ cand.judge_3 }}</td>
                         <td>{{ cand.judge_4 }}</td>
                         <td>{{ cand.judge_5 }}</td>
-                        <td class="col-beauty" style="font-weight: bold; color: #a67c52;">{{ cand.beauty_30 }}</td>
-                        <td class="col-brain" style="font-weight: bold; color: #007bff;">{{ cand.brain_40 }}</td>
+                        <td class="col-beauty" style="font-weight: 800; color: #a67c52;">{{ cand.beauty_30 }}</td>
+                        <td class="col-brain" style="font-weight: 800; color: #007bff;">{{ cand.brain_40 }}</td>
                         <td class="col-final">{{ cand.final_score }}</td>
                         <td class="title-winner">{{ cand.title }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="12" style="padding: 30px; color: #888;">Waiting for judge scores to display Top 5 breakdown...</td></tr>
+                    <tr><td colspan="12" style="padding: 30px; color: #8e8e93;">Waiting for judge scores to display Top 5 breakdown...</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -248,17 +313,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Production Category Score (Max 100)</th>
-                        <th>Weighted Contribution (15%)</th>
+                        <th>CANDIDATE</th>
+                        <th>PRODUCTION CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (15%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.prod_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.prod_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.prod_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -270,17 +335,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Casual Wear Category Score (Max 100)</th>
-                        <th>Weighted Contribution (15%)</th>
+                        <th>CANDIDATE</th>
+                        <th>CASUAL WEAR CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (15%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.casual_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.casual_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.casual_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -292,17 +357,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Swimwear Category Score (Max 100)</th>
-                        <th>Weighted Contribution (15%)</th>
+                        <th>CANDIDATE</th>
+                        <th>SWIMWEAR CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (15%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.swim_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.swim_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.swim_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -314,17 +379,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Advocacy Category Score (Max 100)</th>
-                        <th>Weighted Contribution (20%)</th>
+                        <th>CANDIDATE</th>
+                        <th>ADVOCACY CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (20%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.adv_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.adv_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.adv_avg * 0.20) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -336,17 +401,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Evening Gown Category Score (Max 100)</th>
-                        <th>Weighted Contribution (15%)</th>
+                        <th>CANDIDATE</th>
+                        <th>EVENING GOWN CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (15%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.gown_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.gown_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.gown_avg * 0.15) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -358,56 +423,56 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Candidate</th>
-                        <th>Q&A Category Score (Max 100)</th>
-                        <th>Weighted Contribution (20%)</th>
+                        <th>CANDIDATE</th>
+                        <th>Q&A CATEGORY SCORE (MAX 100)</th>
+                        <th>WEIGHTED CONTRIBUTION (20%)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for cand in candidates %}
                     <tr>
-                        <td style="text-align: left; padding-left: 20px; font-weight: bold;">{{ cand.name }}</td>
-                        <td style="font-weight: bold;">{{ cand.qa_avg }} pts</td>
-                        <td style="font-weight: bold; color: #a67c52;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
+                        <td style="text-align: left; padding-left: 20px; font-weight: 800;">{{ cand.name }}</td>
+                        <td style="font-weight: 700;">{{ cand.qa_avg }} pts</td>
+                        <td style="font-weight: 800; color: #a67c52;">{{ (cand.qa_avg * 0.20) | round(2) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Exact Scoring Distribution Reference Table (From Screenshot) -->
+        <!-- Exact Scoring Distribution Reference Table (From Screenshot & design.md) -->
         <div class="legend-container">
             <div class="legend-box">
                 <div class="legend-header">SCORING DISTRIBUTION</div>
                 <table class="legend-table">
-                    <tr><th>Component</th><th style="text-align: right;">Weight</th></tr>
-                    <tr><td>Overall Preliminary Performance</td><td style="font-weight: bold; text-align: right;">30%</td></tr>
-                    <tr><td>Beauty</td><td style="font-weight: bold; text-align: right;">30%</td></tr>
-                    <tr><td>Brain</td><td style="font-weight: bold; text-align: right;">40%</td></tr>
-                    <tr style="font-weight: 700; background-color: #fdfaf7;"><td>TOTAL</td><td style="font-weight: bold; text-align: right; color: #a67c52;">100%</td></tr>
+                    <tr><th>COMPONENT</th><th style="text-align: right;">WEIGHT</th></tr>
+                    <tr><td>Overall Preliminary Performance</td><td style="font-weight: 800; text-align: right;">30%</td></tr>
+                    <tr><td>Beauty</td><td style="font-weight: 800; text-align: right;">30%</td></tr>
+                    <tr><td>Brain</td><td style="font-weight: 800; text-align: right;">40%</td></tr>
+                    <tr style="font-weight: 800; background-color: rgba(166, 124, 82, 0.1);"><td>TOTAL</td><td style="font-weight: 800; text-align: right; color: #a67c52;">100%</td></tr>
                 </table>
             </div>
 
             <div class="legend-box">
                 <div class="legend-header">BEAUTY CRITERIA BREAKDOWN (30%)</div>
                 <table class="legend-table">
-                    <tr><th>Criterion</th><th style="text-align: right;">Weight</th></tr>
-                    <tr><td>Facial beauty and appeal</td><td style="text-align: right; font-weight: bold;">15%</td></tr>
-                    <tr><td>Poise, elegance, and stage presence</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
-                    <tr><td>Confidence and overall impression</td><td style="text-align: right; font-weight: bold;">5%</td></tr>
-                    <tr style="font-weight: 700; background-color: #faf5eb;"><td>BEAUTY TOTAL</td><td style="text-align: right; color: #a67c52;">30%</td></tr>
+                    <tr><th>CRITERION</th><th style="text-align: right;">WEIGHT</th></tr>
+                    <tr><td>Facial beauty and appeal</td><td style="text-align: right; font-weight: 800;">15%</td></tr>
+                    <tr><td>Poise, elegance, and stage presence</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
+                    <tr><td>Confidence and overall impression</td><td style="text-align: right; font-weight: 800;">5%</td></tr>
+                    <tr style="font-weight: 800; background-color: rgba(166, 124, 82, 0.1);"><td>BEAUTY TOTAL</td><td style="text-align: right; color: #a67c52;">30%</td></tr>
                 </table>
             </div>
 
             <div class="legend-box">
                 <div class="legend-header">BRAIN CRITERIA BREAKDOWN (40%)</div>
                 <table class="legend-table">
-                    <tr><th>Criterion</th><th style="text-align: right;">Weight</th></tr>
-                    <tr><td>Relevance and substance of answer</td><td style="text-align: right; font-weight: bold;">15%</td></tr>
-                    <tr><td>Intelligence and critical thinking</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
-                    <tr><td>Clarity and organization of thoughts</td><td style="text-align: right; font-weight: bold;">10%</td></tr>
-                    <tr><td>Confidence and delivery</td><td style="text-align: right; font-weight: bold;">5%</td></tr>
-                    <tr style="font-weight: 700; background-color: #f5f8fa;"><td>BRAIN TOTAL</td><td style="text-align: right; color: #007bff;">40%</td></tr>
+                    <tr><th>CRITERION</th><th style="text-align: right;">WEIGHT</th></tr>
+                    <tr><td>Relevance and substance of answer</td><td style="text-align: right; font-weight: 800;">15%</td></tr>
+                    <tr><td>Intelligence and critical thinking</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
+                    <tr><td>Clarity and organization of thoughts</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
+                    <tr><td>Confidence and delivery</td><td style="text-align: right; font-weight: 800;">5%</td></tr>
+                    <tr style="font-weight: 800; background-color: rgba(0, 123, 255, 0.1);"><td>BRAIN TOTAL</td><td style="text-align: right; color: #007bff;">40%</td></tr>
                 </table>
             </div>
         </div>
@@ -490,7 +555,7 @@
         function updateSpotlightCards(top5List) {
             const spotlightContainer = document.getElementById('top5Spotlight');
             if (top5List.length === 0) {
-                spotlightContainer.innerHTML = `<div style="color: #6c757d; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
+                spotlightContainer.innerHTML = `<div style="color: #8e8e93; font-size: 13px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
                 return;
             }
 
@@ -540,16 +605,16 @@
                         data.top5_candidates.forEach(cand => {
                             html += `
                                 <tr>
-                                    <td style="font-weight: bold; font-size: 15px;">Rank #${cand.top5_rank}</td>
-                                    <td style="text-align: left; padding-left: 20px; font-weight: bold;">${cand.name}</td>
-                                    <td class="col-prelim" style="font-weight: bold;">${cand.prelim_30.toFixed(2)}</td>
+                                    <td style="font-weight: 800; font-size: 15px;">Rank #${cand.top5_rank}</td>
+                                    <td style="text-align: left; padding-left: 20px; font-weight: 800;">${cand.name}</td>
+                                    <td class="col-prelim" style="font-weight: 800;">${cand.prelim_30.toFixed(2)}</td>
                                     <td>${cand.judge_1}</td>
                                     <td>${cand.judge_2}</td>
                                     <td>${cand.judge_3}</td>
                                     <td>${cand.judge_4}</td>
                                     <td>${cand.judge_5}</td>
-                                    <td class="col-beauty" style="font-weight: bold; color: #a67c52;">${cand.beauty_30.toFixed(2)}</td>
-                                    <td class="col-brain" style="font-weight: bold; color: #007bff;">${cand.brain_40.toFixed(2)}</td>
+                                    <td class="col-beauty" style="font-weight: 800; color: #a67c52;">${cand.beauty_30.toFixed(2)}</td>
+                                    <td class="col-brain" style="font-weight: 800; color: #007bff;">${cand.brain_40.toFixed(2)}</td>
                                     <td class="col-final">${cand.final_score.toFixed(2)}</td>
                                     <td class="title-winner">${cand.title}</td>
                                 </tr>

@@ -3,150 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judges Scoring Form - SK Federation Pageant</title>
+    <title>Judges Scoring - MISS SK YOUTH AMBASSADRESS 2026</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body { 
-            font-family: 'Geist', sans-serif; 
-            background-color: #f4f6f8; 
-            color: #2b2d42;
-            margin: 0; 
-            padding: 20px; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: #000000; 
+            color: #ffffff; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 24px 20px;
+            background-image: linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);
         }
 
-        /* Top Judge Session Header */
+        /* Top Judge Navigation Bar */
         .top-navbar {
             width: 100%;
-            max-width: 1100px;
-            margin-bottom: 15px;
+            max-width: 1200px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #ffffff;
-            padding: 14px 24px;
+            background: #0a0a0a;
+            padding: 16px 28px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border: 1px solid #eaeaea;
+            border: 1px solid #3a3a3f;
         }
         .judge-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
         .judge-avatar {
-            width: 40px;
-            height: 40px;
-            background: #a67c52;
-            color: white;
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            color: #a67c52;
+            border: 2px solid #a67c52;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            box-shadow: 0 3px 8px rgba(166, 124, 82, 0.3);
+            box-shadow: 0 0 15px rgba(166, 124, 82, 0.2);
         }
         .judge-details {
             display: flex;
             flex-direction: column;
         }
         .judge-title {
-            font-weight: 700;
-            font-size: 15px;
-            color: #1e1e24;
+            font-weight: 800;
+            font-size: 14px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
         .judge-slot-tag {
             color: #a67c52;
         }
         .btn-logout {
-            background-color: #fff0f0;
-            color: #d90429;
+            background-color: transparent;
+            color: #ffffff;
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            border: 1px solid #ffccd5;
+            padding: 10px 20px;
+            border-radius: 32px; /* rounded.pill */
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border: 1px solid #3a3a3f;
             transition: all 0.2s ease;
         }
         .btn-logout:hover {
-            background-color: #d90429;
-            color: white;
+            border-color: #d90429;
+            color: #ff4d6d;
+            background: rgba(217, 4, 41, 0.1);
         }
 
         /* Round Selector Buttons Banner */
         .round-selector-banner {
             width: 100%;
-            max-width: 1100px;
-            margin-bottom: 15px;
+            max-width: 1200px;
+            margin-bottom: 20px;
             display: flex;
-            gap: 12px;
+            gap: 16px;
         }
         .round-btn {
             flex: 1;
-            padding: 14px 20px;
-            border: 2px solid #e2e8f0;
-            background: #ffffff;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            color: #4a5568;
+            padding: 16px 24px;
+            border: 1px solid #3a3a3f;
+            background: #0a0a0a;
+            border-radius: 32px; /* rounded.pill */
+            font-weight: 800;
+            font-size: 13px;
+            color: #8e8e93;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
         }
         .round-btn.active {
             border-color: #a67c52;
             background: #a67c52;
+            color: #000000;
+            box-shadow: 0 0 25px rgba(166, 124, 82, 0.35);
+        }
+        .round-btn:hover:not(.active) {
+            border-color: #ffffff;
             color: #ffffff;
-            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.3);
         }
 
         /* Main Container Card */
         .tabulation-card { 
-            background-color: #ffffff; 
-            padding: 30px 35px; 
+            background-color: #0a0a0a; 
+            padding: 36px 40px; 
             border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
+            border: 1px solid #3a3a3f;
             width: 100%; 
-            max-width: 1100px; 
-            border: 1px solid #eaeaea;
+            max-width: 1200px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
 
         .header-title { 
             text-align: center; 
-            color: #1e1e24; 
-            margin: 0 0 25px 0; 
-            font-size: 24px; 
+            color: #ffffff; 
+            margin: 0 0 28px 0; 
+            font-size: 22px; 
             text-transform: uppercase; 
-            letter-spacing: 1px; 
-            font-weight: 700;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
+            letter-spacing: 1.6px; 
+            font-weight: 800;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #3a3a3f;
         }
 
         .form-layout { 
             display: flex; 
-            gap: 35px; 
+            gap: 40px; 
         }
         
         /* LEFT PANEL (Candidates Selection) */
         .left-panel { 
             flex: 1.1; 
-            border-right: 2px dashed #eee; 
-            padding-right: 35px; 
+            border-right: 1px solid #3a3a3f; 
+            padding-right: 40px; 
             display: flex; 
             flex-direction: column; 
         }
@@ -154,77 +165,83 @@
         .section-label { 
             font-weight: 700; 
             color: #a67c52; 
-            font-size: 14px; 
+            font-size: 11px; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px; 
+            letter-spacing: 1.5px;
+            margin-bottom: 16px; 
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .top5-badge-banner {
-            background-color: #fff9e6;
-            border: 1px solid #ffeba8;
-            color: #8a6d3b;
-            padding: 8px 12px;
+            background-color: rgba(166, 124, 82, 0.15);
+            border: 1px solid #a67c52;
+            color: #a67c52;
+            padding: 10px 14px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            margin-bottom: 12px;
+            letter-spacing: 1.2px;
+            margin-bottom: 16px;
             display: none;
             text-align: center;
+            text-transform: uppercase;
         }
 
         /* Selected Preview */
         .selected-preview { 
-            background: #faf8f5;
-            border: 2px solid #f0e6d8;
+            background: #000000;
+            border: 1px solid #3a3a3f;
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             text-align: center; 
-            margin-bottom: 20px; 
-            min-height: 140px; 
+            margin-bottom: 24px; 
+            min-height: 160px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
         }
         .selected-preview img { 
-            width: 85px; 
-            height: 85px; 
+            width: 90px; 
+            height: 90px; 
             object-fit: cover; 
             border-radius: 50%; 
-            border: 3px solid #a67c52; 
-            box-shadow: 0 4px 10px rgba(166, 124, 82, 0.2); 
+            border: 2px solid #a67c52; 
+            box-shadow: 0 0 20px rgba(166, 124, 82, 0.3); 
             display: none; 
         }
         .placeholder-circle { 
             width: 80px; 
             height: 80px; 
             border-radius: 50%; 
-            background-color: #e9ecef; 
-            border: 2px dashed #adb5bd; 
+            background-color: #0a0a0a; 
+            border: 1px dashed #3a3a3f; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            color: #6c757d; 
-            font-size: 12px; 
+            color: #5a5a5f; 
+            font-size: 11px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
             text-align: center; 
             padding: 8px; 
         }
         .selected-preview h3 { 
-            margin: 10px 0 0 0; 
-            color: #1e1e24; 
+            margin: 12px 0 0 0; 
+            color: #ffffff; 
             font-size: 18px; 
-            font-weight: 700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
 
         /* Candidate Grid (3 Rows x 4 Columns) */
         .candidate-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 10px; 
+            gap: 12px; 
         }
         input[type="radio"] { 
             display: none; 
@@ -237,25 +254,28 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            padding: 10px 6px; 
-            background-color: #ffffff; 
-            border: 2px solid #e9ecef; 
+            padding: 12px 8px; 
+            background-color: #000000; 
+            border: 1px solid #3a3a3f; 
             border-radius: 10px; 
             transition: all 0.2s ease; 
             text-align: center;
             position: relative;
         }
         .candidate-box img { 
-            width: 42px; 
-            height: 42px; 
+            width: 44px; 
+            height: 44px; 
             border-radius: 50%; 
             object-fit: cover; 
-            margin-bottom: 6px; 
+            margin-bottom: 8px; 
+            border: 1px solid #3a3a3f;
         }
         .candidate-box span { 
-            font-weight: 600; 
-            color: #495057; 
-            font-size: 12px; 
+            font-weight: 700; 
+            color: #8e8e93; 
+            font-size: 11px; 
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
             white-space: nowrap;
         }
         .top5-star-badge {
@@ -263,23 +283,23 @@
             top: -6px;
             right: -6px;
             background: #a67c52;
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
+            color: #000000;
+            font-size: 9px;
+            font-weight: 800;
             padding: 2px 6px;
             border-radius: 10px;
             display: none;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(166, 124, 82, 0.4);
         }
         input[type="radio"]:checked + .candidate-box { 
             border-color: #a67c52; 
-            background-color: #fcf9f5; 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.2);
+            background-color: rgba(166, 124, 82, 0.08); 
+            box-shadow: 0 0 15px rgba(166, 124, 82, 0.25);
         }
         input[type="radio"]:checked + .candidate-box span {
             color: #a67c52;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         /* RIGHT PANEL (Criteria Wizard) */
@@ -293,30 +313,32 @@
         /* Stepper Tabs Navigation */
         .stepper-nav {
             display: flex;
-            gap: 4px;
-            margin-bottom: 20px;
-            background: #f8f9fa;
-            padding: 5px;
-            border-radius: 10px;
-            border: 1px solid #e9ecef;
+            gap: 6px;
+            margin-bottom: 24px;
+            background: #000000;
+            padding: 6px;
+            border-radius: 32px; /* rounded.pill */
+            border: 1px solid #3a3a3f;
             overflow-x: auto;
         }
         .step-tab {
             flex: 1;
             text-align: center;
-            padding: 8px 4px;
+            padding: 10px 8px;
             font-size: 11px;
-            font-weight: 600;
-            color: #6c757d;
-            border-radius: 6px;
+            font-weight: 700;
+            color: #8e8e93;
+            border-radius: 32px; /* rounded.pill */
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .step-tab.active {
             background-color: #a67c52;
-            color: white;
-            box-shadow: 0 2px 6px rgba(166, 124, 82, 0.3);
+            color: #000000;
+            box-shadow: 0 0 15px rgba(166, 124, 82, 0.3);
         }
 
         /* Step Card */
@@ -337,94 +359,104 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #a67c52;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #a67c52;
         }
         .category-title {
             font-size: 16px;
-            font-weight: 700;
-            color: #1e1e24;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
         .category-weight {
-            background: #eef7ed;
+            background: rgba(40, 167, 69, 0.15);
             color: #28a745;
-            padding: 4px 10px;
+            border: 1px solid #28a745;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .criteria-item { 
-            margin-bottom: 14px; 
+            margin-bottom: 18px; 
         }
         .criteria-item label { 
-            font-size: 13px; 
-            font-weight: 600; 
-            color: #343a40; 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: #8e8e93; 
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px; 
+            margin-bottom: 8px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .criteria-item label span.range-hint {
-            color: #6c757d;
-            font-weight: 400;
-            font-size: 12px;
+            color: #a67c52;
+            font-weight: 600;
         }
         .criteria-item input[type="number"] { 
             width: 100%; 
-            padding: 10px 14px; 
-            border: 2px solid #dee2e6; 
+            padding: 12px 16px; 
+            border: 1px solid #3a3a3f; 
             border-radius: 8px; 
             font-size: 16px; 
-            font-weight: 600;
+            font-weight: 700;
             box-sizing: border-box; 
-            background-color: #f8f9fa; 
+            background-color: #000000; 
+            color: #ffffff;
             font-family: inherit;
-            transition: border-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .criteria-item input[type="number"]:focus {
             outline: none;
             border-color: #a67c52;
-            background-color: #ffffff;
+            box-shadow: 0 0 12px rgba(166, 124, 82, 0.3);
         }
 
         /* Live Calculated Score Counter */
         .live-score-box {
-            background: #fdfaf7;
-            border: 1px solid #f0e6d8;
-            padding: 12px 18px;
-            border-radius: 10px;
+            background: #000000;
+            border: 1px solid #3a3a3f;
+            padding: 16px 20px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
-            margin-bottom: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
         .live-score-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #6c757d;
+            font-size: 12px;
+            font-weight: 700;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
         .live-score-value {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             color: #a67c52;
+            letter-spacing: 1px;
         }
 
         /* Action Buttons */
         .button-group { 
             display: flex; 
-            gap: 12px; 
-            margin-top: 10px; 
+            gap: 14px; 
+            margin-top: 14px; 
         }
         button { 
             flex: 1; 
-            padding: 12px 18px; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 15px; 
+            padding: 14px 20px; 
+            color: #ffffff; 
+            border: 1px solid #3a3a3f; 
+            border-radius: 32px; /* rounded.pill */
+            font-size: 12px; 
             font-weight: 700; 
             cursor: pointer; 
             transition: all 0.2s ease; 
@@ -432,28 +464,32 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            background: transparent;
         }
-        .btn-next { background-color: #a67c52; }
-        .btn-next:hover { background-color: #8c653f; }
-        .btn-prev { background-color: #6c757d; }
-        .btn-prev:hover { background-color: #495057; }
-        .btn-submit { background-color: #28a745; }
-        .btn-submit:hover { background-color: #218838; }
+        .btn-next { border-color: #a67c52; color: #a67c52; }
+        .btn-next:hover { background-color: #a67c52; color: #000000; box-shadow: 0 0 15px rgba(166, 124, 82, 0.3); }
+        .btn-prev { border-color: #3a3a3f; color: #8e8e93; }
+        .btn-prev:hover { border-color: #ffffff; color: #ffffff; }
+        .btn-submit { border-color: #28a745; color: #28a745; }
+        .btn-submit:hover { background-color: #28a745; color: #000000; box-shadow: 0 0 15px rgba(40, 167, 69, 0.3); }
 
         #status-message { 
             text-align: center; 
-            margin-top: 12px; 
+            margin-top: 14px; 
             font-weight: 700; 
             min-height: 20px; 
-            font-size: 14px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
         .success { color: #28a745; }
-        .error { color: #d90429; }
+        .error { color: #ff4d6d; }
 
         @media (max-width: 850px) {
-            .form-layout { flex-direction: column; gap: 20px; }
-            .left-panel { border-right: none; border-bottom: 2px dashed #eee; padding-right: 0; padding-bottom: 25px; }
+            .form-layout { flex-direction: column; gap: 24px; }
+            .left-panel { border-right: none; border-bottom: 1px solid #3a3a3f; padding-right: 0; padding-bottom: 28px; }
             .candidate-grid { grid-template-columns: repeat(4, 1fr); }
             .round-selector-banner { flex-direction: column; }
         }
@@ -466,36 +502,36 @@
         <div class="judge-info">
             <div class="judge-avatar">⚖️</div>
             <div class="judge-details">
-                <div class="judge-title">Logged in as: <span class="judge-slot-tag">{{ judge_slot }}</span></div>
-                <div style="font-size: 12px; color: #6c757d;">Official Judge: <strong>{{ judge_name }}</strong></div>
+                <div class="judge-title">AUTHENTICATED: <span class="judge-slot-tag">{{ judge_slot }}</span></div>
+                <div style="font-size: 11px; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.8px;">Judge: <strong>{{ judge_name }}</strong></div>
             </div>
         </div>
         <div>
-            <a href="/logout" class="btn-logout">Switch / Logout</a>
+            <a href="/logout" class="btn-logout">Sign Out</a>
         </div>
     </div>
 
     <!-- Round Selector Mode Switcher Button -->
     <div class="round-selector-banner">
         <button type="button" class="round-btn active" id="btnPrelimRound" onclick="setRoundMode('prelim')">
-            🔘 Preliminary Round (100% Full Pageant)
+            🔘 PRELIMINARY ROUND (100% FULL PAGEANT)
         </button>
         <button type="button" class="round-btn" id="btnTop5Round" onclick="setRoundMode('top5')">
-            🏆 TOP 5 FINALS ROUND (Beauty 30% + Brain 40%)
+            🏆 TOP 5 FINALS ROUND (BEAUTY 30% + BRAIN 40%)
         </button>
     </div>
 
     <!-- Main Tabulation Card -->
     <div class="tabulation-card">
-        <div class="header-title" id="formHeaderTitle">SK Pageant Preliminary Judging</div>
+        <div class="header-title" id="formHeaderTitle">SK PAGEANT PRELIMINARY JUDGING</div>
         
         <form id="scoringForm" class="form-layout">
             <input type="hidden" name="round_type" id="round_type_input" value="prelim">
             
             <!-- LEFT PANEL: Candidate Grid -->
             <div class="left-panel">
-                <div class="section-label">📌 1. Select Candidate</div>
-                <div class="top5-badge-banner" id="top5BadgeBanner">👑 TOP 5 QUALIFIED FINALISTS MODE: Scoring Top 5 Only</div>
+                <div class="section-label">📌 1. SELECT CANDIDATE</div>
+                <div class="top5-badge-banner" id="top5BadgeBanner">👑 TOP 5 QUALIFIED FINALISTS MODE ACTIVE</div>
                 
                 <div class="selected-preview">
                     <div id="placeholder-circle" class="placeholder-circle">Select Candidate Below</div>
@@ -509,84 +545,84 @@
                         <input type="radio" name="candidate_number" value="1" data-img="/static/candidate1.jpg" data-name="Candidate 1" required>
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate1.jpg" alt="Cand 1"><span>Cand. 1</span>
+                            <img src="/static/candidate1.jpg" alt="Cand 1"><span>CAND. 1</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="2">
                         <input type="radio" name="candidate_number" value="2" data-img="/static/candidate2.jpg" data-name="Candidate 2">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate2.jpg" alt="Cand 2"><span>Cand. 2</span>
+                            <img src="/static/candidate2.jpg" alt="Cand 2"><span>CAND. 2</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="3">
                         <input type="radio" name="candidate_number" value="3" data-img="/static/candidate3.jpg" data-name="Candidate 3">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate3.jpg" alt="Cand 3"><span>Cand. 3</span>
+                            <img src="/static/candidate3.jpg" alt="Cand 3"><span>CAND. 3</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="4">
                         <input type="radio" name="candidate_number" value="4" data-img="/static/candidate4.jpg" data-name="Candidate 4">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate4.jpg" alt="Cand 4"><span>Cand. 4</span>
+                            <img src="/static/candidate4.jpg" alt="Cand 4"><span>CAND. 4</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="5">
                         <input type="radio" name="candidate_number" value="5" data-img="/static/candidate5.jpg" data-name="Candidate 5">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate5.jpg" alt="Cand 5"><span>Cand. 5</span>
+                            <img src="/static/candidate5.jpg" alt="Cand 5"><span>CAND. 5</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="6">
                         <input type="radio" name="candidate_number" value="6" data-img="/static/candidate6.jpg" data-name="Candidate 6">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate6.jpg" alt="Cand 6"><span>Cand. 6</span>
+                            <img src="/static/candidate6.jpg" alt="Cand 6"><span>CAND. 6</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="7">
                         <input type="radio" name="candidate_number" value="7" data-img="/static/candidate7.jpg" data-name="Candidate 7">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate7.jpg" alt="Cand 7"><span>Cand. 7</span>
+                            <img src="/static/candidate7.jpg" alt="Cand 7"><span>CAND. 7</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="8">
                         <input type="radio" name="candidate_number" value="8" data-img="/static/candidate8.jpg" data-name="Candidate 8">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate8.jpg" alt="Cand 8"><span>Cand. 8</span>
+                            <img src="/static/candidate8.jpg" alt="Cand 8"><span>CAND. 8</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="9">
                         <input type="radio" name="candidate_number" value="9" data-img="/static/candidate9.jpg" data-name="Candidate 9">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate9.jpg" alt="Cand 9"><span>Cand. 9</span>
+                            <img src="/static/candidate9.jpg" alt="Cand 9"><span>CAND. 9</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="10">
                         <input type="radio" name="candidate_number" value="10" data-img="/static/candidate10.jpg" data-name="Candidate 10">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate10.jpg" alt="Cand 10"><span>Cand. 10</span>
+                            <img src="/static/candidate10.jpg" alt="Cand 10"><span>CAND. 10</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="11">
                         <input type="radio" name="candidate_number" value="11" data-img="/static/candidate11.jpg" data-name="Candidate 11">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate11.jpg" alt="Cand 11"><span>Cand. 11</span>
+                            <img src="/static/candidate11.jpg" alt="Cand 11"><span>CAND. 11</span>
                         </div>
                     </label>
                     <label class="candidate-card" data-cand-num="12">
                         <input type="radio" name="candidate_number" value="12" data-img="/static/candidate12.jpg" data-name="Candidate 12">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
-                            <img src="/static/candidate12.jpg" alt="Cand 12"><span>Cand. 12</span>
+                            <img src="/static/candidate12.jpg" alt="Cand 12"><span>CAND. 12</span>
                         </div>
                     </label>
                 </div>
@@ -598,143 +634,143 @@
                 <!-- PRELIMINARY ROUND WIZARD -->
                 <div id="prelimWizard">
                     <div class="stepper-nav">
-                        <div class="step-tab active" onclick="jumpToStep(1)">1. Prod</div>
-                        <div class="step-tab" onclick="jumpToStep(2)">2. Casual</div>
-                        <div class="step-tab" onclick="jumpToStep(3)">3. Swim</div>
-                        <div class="step-tab" onclick="jumpToStep(4)">4. Adv</div>
-                        <div class="step-tab" onclick="jumpToStep(5)">5. Gown</div>
+                        <div class="step-tab active" onclick="jumpToStep(1)">1. PROD</div>
+                        <div class="step-tab" onclick="jumpToStep(2)">2. CASUAL</div>
+                        <div class="step-tab" onclick="jumpToStep(3)">3. SWIM</div>
+                        <div class="step-tab" onclick="jumpToStep(4)">4. ADV</div>
+                        <div class="step-tab" onclick="jumpToStep(5)">5. GOWN</div>
                         <div class="step-tab" onclick="jumpToStep(6)">6. Q&A</div>
                     </div>
 
                     <!-- STEP 1: PRODUCTION -->
                     <div class="step-content active" id="step-1">
                         <div class="category-header">
-                            <span class="category-title">1. Production & Opening</span>
-                            <span class="category-weight">15% Weight</span>
+                            <span class="category-title">1. PRODUCTION & OPENING</span>
+                            <span class="category-weight">15% WEIGHT</span>
                         </div>
-                        <div class="criteria-item"><label>Stage Presence & Charisma <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="p_presence" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Execution & Precision <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="p_execution" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Energy & Projection <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="p_energy" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Overall Personality <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="p_personality" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="button-group"><button type="button" class="btn-next">Next Category &#8594;</button></div>
+                        <div class="criteria-item"><label>STAGE PRESENCE & CHARISMA <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="p_presence" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>EXECUTION & PRECISION <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="p_execution" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>ENERGY & PROJECTION <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="p_energy" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>OVERALL PERSONALITY <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="p_personality" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-next">NEXT CATEGORY &#8594;</button></div>
                     </div>
 
                     <!-- STEP 2: CASUAL WEAR -->
                     <div class="step-content" id="step-2">
-                        <div class="category-header"><span class="category-title">2. Casual Wear</span><span class="category-weight">15% Weight</span></div>
-                        <div class="criteria-item"><label>Poise & Grace <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="c_poise" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Carriage & Posture <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="c_carriage" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Stage Presence <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="c_presence" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Overall Impact & Style <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="c_impact" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
+                        <div class="category-header"><span class="category-title">2. CASUAL WEAR</span><span class="category-weight">15% WEIGHT</span></div>
+                        <div class="criteria-item"><label>POISE & GRACE <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="c_poise" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>CARRIAGE & POSTURE <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="c_carriage" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>STAGE PRESENCE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="c_presence" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>OVERALL IMPACT & STYLE <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="c_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; PREV</button><button type="button" class="btn-next">NEXT CATEGORY &#8594;</button></div>
                     </div>
 
                     <!-- STEP 3: SWIMWEAR -->
                     <div class="step-content" id="step-3">
-                        <div class="category-header"><span class="category-title">3. Swimwear</span><span class="category-weight">15% Weight</span></div>
-                        <div class="criteria-item"><label>Confidence & Poise <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="s_confidence" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Carriage & Ramp Skills <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="s_carriage" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Stage Projection <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="s_presence" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="s_impact" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
+                        <div class="category-header"><span class="category-title">3. SWIMWEAR</span><span class="category-weight">15% WEIGHT</span></div>
+                        <div class="criteria-item"><label>CONFIDENCE & POISE <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="s_confidence" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>CARRIAGE & RAMP SKILLS <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="s_carriage" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>STAGE PROJECTION <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="s_presence" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>OVERALL IMPACT <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="s_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; PREV</button><button type="button" class="btn-next">NEXT CATEGORY &#8594;</button></div>
                     </div>
 
                     <!-- STEP 4: ADVOCACY -->
                     <div class="step-content" id="step-4">
-                        <div class="category-header"><span class="category-title">4. Advocacy & Youth Speech</span><span class="category-weight">20% Weight</span></div>
-                        <div class="criteria-item"><label>Relevance & Significance <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="a_relevance" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Content & Substance <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="a_content" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Feasibility & Potential <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="a_feasibility" min="1" max="20" placeholder="1 - 20"></div>
-                        <div class="criteria-item"><label>Communication & Delivery <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="a_communication" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="criteria-item"><label>Sincerity & Conviction <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="a_sincerity" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
+                        <div class="category-header"><span class="category-title">4. ADVOCACY & YOUTH SPEECH</span><span class="category-weight">20% WEIGHT</span></div>
+                        <div class="criteria-item"><label>RELEVANCE & SIGNIFICANCE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="a_relevance" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>CONTENT & SUBSTANCE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="a_content" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>FEASIBILITY & POTENTIAL <span class="range-hint">(1 - 20 PTS)</span></label><input type="number" name="a_feasibility" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>COMMUNICATION & DELIVERY <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="a_communication" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>SINCERITY & CONVICTION <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="a_sincerity" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; PREV</button><button type="button" class="btn-next">NEXT CATEGORY &#8594;</button></div>
                     </div>
 
                     <!-- STEP 5: EVENING GOWN -->
                     <div class="step-content" id="step-5">
-                        <div class="category-header"><span class="category-title">5. Evening Gown</span><span class="category-weight">15% Weight</span></div>
-                        <div class="criteria-item"><label>Elegance & Poise <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="e_elegance" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Carriage & Stage Presence <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="e_carriage" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Grace & Ramp Skills <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="e_grace" min="1" max="20" placeholder="1 - 20"></div>
-                        <div class="criteria-item"><label>Gown Styling & Fit <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="e_styling" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="criteria-item"><label>Overall Impact <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="e_impact" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="button" class="btn-next">Next Category &#8594;</button></div>
+                        <div class="category-header"><span class="category-title">5. EVENING GOWN</span><span class="category-weight">15% WEIGHT</span></div>
+                        <div class="criteria-item"><label>ELEGANCE & POISE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="e_elegance" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>CARRIAGE & STAGE PRESENCE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="e_carriage" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>GRACE & RAMP SKILLS <span class="range-hint">(1 - 20 PTS)</span></label><input type="number" name="e_grace" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>GOWN STYLING & FIT <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="e_styling" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>OVERALL IMPACT <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="e_impact" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; PREV</button><button type="button" class="btn-next">NEXT CATEGORY &#8594;</button></div>
                     </div>
 
                     <!-- STEP 6: QUESTION & ANSWER -->
                     <div class="step-content" id="step-6">
-                        <div class="category-header"><span class="category-title">6. Question & Answer</span><span class="category-weight">20% Weight</span></div>
-                        <div class="criteria-item"><label>Relevance & Substance <span class="range-hint">(1 - 30 pts)</span></label><input type="number" name="q_relevance" min="1" max="30" placeholder="1 - 30"></div>
-                        <div class="criteria-item"><label>Clarity & Thought Structure <span class="range-hint">(1 - 25 pts)</span></label><input type="number" name="q_clarity" min="1" max="25" placeholder="1 - 25"></div>
-                        <div class="criteria-item"><label>Critical Thinking & Insight <span class="range-hint">(1 - 20 pts)</span></label><input type="number" name="q_insight" min="1" max="20" placeholder="1 - 20"></div>
-                        <div class="criteria-item"><label>Communication Skills <span class="range-hint">(1 - 15 pts)</span></label><input type="number" name="q_communication" min="1" max="15" placeholder="1 - 15"></div>
-                        <div class="criteria-item"><label>Confidence & Composure <span class="range-hint">(1 - 10 pts)</span></label><input type="number" name="q_composure" min="1" max="10" placeholder="1 - 10"></div>
-                        <div class="button-group"><button type="button" class="btn-prev">&#8592; Prev</button><button type="submit" class="btn-submit">Submit Preliminary Scores 🚀</button></div>
+                        <div class="category-header"><span class="category-title">6. QUESTION & ANSWER</span><span class="category-weight">20% WEIGHT</span></div>
+                        <div class="criteria-item"><label>RELEVANCE & SUBSTANCE <span class="range-hint">(1 - 30 PTS)</span></label><input type="number" name="q_relevance" min="1" max="30" placeholder="1 - 30"></div>
+                        <div class="criteria-item"><label>CLARITY & THOUGHT STRUCTURE <span class="range-hint">(1 - 25 PTS)</span></label><input type="number" name="q_clarity" min="1" max="25" placeholder="1 - 25"></div>
+                        <div class="criteria-item"><label>CRITICAL THINKING & INSIGHT <span class="range-hint">(1 - 20 PTS)</span></label><input type="number" name="q_insight" min="1" max="20" placeholder="1 - 20"></div>
+                        <div class="criteria-item"><label>COMMUNICATION SKILLS <span class="range-hint">(1 - 15 PTS)</span></label><input type="number" name="q_communication" min="1" max="15" placeholder="1 - 15"></div>
+                        <div class="criteria-item"><label>CONFIDENCE & COMPOSURE <span class="range-hint">(1 - 10 PTS)</span></label><input type="number" name="q_composure" min="1" max="10" placeholder="1 - 10"></div>
+                        <div class="button-group"><button type="button" class="btn-prev">&#8592; PREV</button><button type="submit" class="btn-submit">SUBMIT PRELIMINARY SCORES 🚀</button></div>
                     </div>
                 </div>
 
                 <!-- TOP 5 FINALS SCORING WIZARD -->
                 <div id="top5Wizard" style="display: none;">
                     <div class="stepper-nav">
-                        <div class="step-tab active" id="top5Tab1" onclick="jumpToTop5Step(1)">1. Beauty (30%)</div>
-                        <div class="step-tab" id="top5Tab2" onclick="jumpToTop5Step(2)">2. Brain (40%)</div>
+                        <div class="step-tab active" id="top5Tab1" onclick="jumpToTop5Step(1)">1. BEAUTY (30%)</div>
+                        <div class="step-tab" id="top5Tab2" onclick="jumpToTop5Step(2)">2. BRAIN (40%)</div>
                     </div>
 
                     <!-- TOP 5 STEP 1: BEAUTY (30%) -->
                     <div class="step-content active" id="top5-step-1">
                         <div class="category-header">
-                            <span class="category-title">1. Beauty Criteria</span>
-                            <span class="category-weight">30% Weight</span>
+                            <span class="category-title">1. BEAUTY CRITERIA</span>
+                            <span class="category-weight">30% WEIGHT</span>
                         </div>
                         <div class="criteria-item">
-                            <label>Facial Beauty & Appeal <span class="range-hint">(1 - 15 pts)</span></label>
-                            <input type="number" name="b_facial" min="0" max="15" step="0.5" placeholder="Enter 1 - 15">
+                            <label>FACIAL BEAUTY & APPEAL <span class="range-hint">(1 - 15 PTS)</span></label>
+                            <input type="number" name="b_facial" min="0" max="15" step="0.5" placeholder="ENTER 1 - 15">
                         </div>
                         <div class="criteria-item">
-                            <label>Poise, Elegance & Stage Presence <span class="range-hint">(1 - 10 pts)</span></label>
-                            <input type="number" name="b_poise" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                            <label>POISE, ELEGANCE & STAGE PRESENCE <span class="range-hint">(1 - 10 PTS)</span></label>
+                            <input type="number" name="b_poise" min="0" max="10" step="0.5" placeholder="ENTER 1 - 10">
                         </div>
                         <div class="criteria-item">
-                            <label>Confidence & Overall Impression <span class="range-hint">(1 - 5 pts)</span></label>
-                            <input type="number" name="b_conf" min="0" max="5" step="0.5" placeholder="Enter 1 - 5">
+                            <label>CONFIDENCE & OVERALL IMPRESSION <span class="range-hint">(1 - 5 PTS)</span></label>
+                            <input type="number" name="b_conf" min="0" max="5" step="0.5" placeholder="ENTER 1 - 5">
                         </div>
                         <div class="button-group">
-                            <button type="button" class="btn-next" onclick="jumpToTop5Step(2)">Next: Brain (40%) &#8594;</button>
+                            <button type="button" class="btn-next" onclick="jumpToTop5Step(2)">NEXT: BRAIN (40%) &#8594;</button>
                         </div>
                     </div>
 
                     <!-- TOP 5 STEP 2: BRAIN (40%) -->
                     <div class="step-content" id="top5-step-2">
                         <div class="category-header">
-                            <span class="category-title">2. Brain Criteria</span>
-                            <span class="category-weight">40% Weight</span>
+                            <span class="category-title">2. BRAIN CRITERIA</span>
+                            <span class="category-weight">40% WEIGHT</span>
                         </div>
                         <div class="criteria-item">
-                            <label>Relevance & Substance of Answer <span class="range-hint">(1 - 15 pts)</span></label>
-                            <input type="number" name="br_substance" min="0" max="15" step="0.5" placeholder="Enter 1 - 15">
+                            <label>RELEVANCE & SUBSTANCE OF ANSWER <span class="range-hint">(1 - 15 PTS)</span></label>
+                            <input type="number" name="br_substance" min="0" max="15" step="0.5" placeholder="ENTER 1 - 15">
                         </div>
                         <div class="criteria-item">
-                            <label>Intelligence & Critical Thinking <span class="range-hint">(1 - 10 pts)</span></label>
-                            <input type="number" name="br_intelligence" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                            <label>INTELLIGENCE & CRITICAL THINKING <span class="range-hint">(1 - 10 PTS)</span></label>
+                            <input type="number" name="br_intelligence" min="0" max="10" step="0.5" placeholder="ENTER 1 - 10">
                         </div>
                         <div class="criteria-item">
-                            <label>Clarity & Organization of Thoughts <span class="range-hint">(1 - 10 pts)</span></label>
-                            <input type="number" name="br_clarity" min="0" max="10" step="0.5" placeholder="Enter 1 - 10">
+                            <label>CLARITY & ORGANIZATION OF THOUGHTS <span class="range-hint">(1 - 10 PTS)</span></label>
+                            <input type="number" name="br_clarity" min="0" max="10" step="0.5" placeholder="ENTER 1 - 10">
                         </div>
                         <div class="criteria-item">
-                            <label>Confidence & Delivery <span class="range-hint">(1 - 5 pts)</span></label>
-                            <input type="number" name="br_delivery" min="0" max="5" step="0.5" placeholder="Enter 1 - 5">
+                            <label>CONFIDENCE & DELIVERY <span class="range-hint">(1 - 5 PTS)</span></label>
+                            <input type="number" name="br_delivery" min="0" max="5" step="0.5" placeholder="ENTER 1 - 5">
                         </div>
                         <div class="button-group">
-                            <button type="button" class="btn-prev" onclick="jumpToTop5Step(1)">&#8592; Prev</button>
-                            <button type="submit" class="btn-submit">Submit Top 5 Finals Score 🏆</button>
+                            <button type="button" class="btn-prev" onclick="jumpToTop5Step(1)">&#8592; PREV</button>
+                            <button type="submit" class="btn-submit">SUBMIT TOP 5 FINALS SCORE 🏆</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Live Score Preview Box -->
                 <div class="live-score-box">
-                    <span class="live-score-label" id="scorePreviewLabel">Preliminary Grand Total:</span>
+                    <span class="live-score-label" id="scorePreviewLabel">PRELIMINARY GRAND TOTAL:</span>
                     <span class="live-score-value" id="grandTotalPreview">0.00 / 100</span>
                 </div>
 
@@ -758,10 +794,10 @@
             if (mode === 'prelim') {
                 btnP.classList.add('active');
                 btnT.classList.remove('active');
-                headerT.textContent = "SK Pageant Preliminary Judging";
+                headerT.textContent = "SK PAGEANT PRELIMINARY JUDGING";
                 document.getElementById('prelimWizard').style.display = 'block';
                 document.getElementById('top5Wizard').style.display = 'none';
-                document.getElementById('scorePreviewLabel').textContent = "Preliminary Grand Total:";
+                document.getElementById('scorePreviewLabel').textContent = "PRELIMINARY GRAND TOTAL:";
                 banner.style.display = 'none';
                 
                 // Show all candidates in prelim mode
@@ -776,7 +812,7 @@
                 headerT.textContent = "MISS SK YOUTH AMBASSADRESS – TOP 5 FINALS JUDGING";
                 document.getElementById('prelimWizard').style.display = 'none';
                 document.getElementById('top5Wizard').style.display = 'block';
-                document.getElementById('scorePreviewLabel').textContent = "Top 5 Score Total (Beauty 30% + Brain 40%):";
+                document.getElementById('scorePreviewLabel').textContent = "TOP 5 SCORE TOTAL (BEAUTY 30% + BRAIN 40%):";
                 banner.style.display = 'block';
                 
                 filterTop5Candidates();
@@ -925,7 +961,7 @@
             })
             .then(response => response.text())
             .then(data => {
-                statusMessage.textContent = "✅ Scores submitted successfully!"; 
+                statusMessage.textContent = "✅ SCORES SUBMITTED SUCCESSFULLY!"; 
                 statusMessage.className = "success";
 
                 document.getElementById('scoringForm').reset();

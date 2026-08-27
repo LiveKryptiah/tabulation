@@ -3,149 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judge Login - SK Pageant Tabulation</title>
+    <title>Judges Portal - MISS SK YOUTH AMBASSADRESS 2026</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: 'Geist', sans-serif;
-            background: linear-gradient(135deg, #1e1e24 0%, #2b2d42 100%);
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
             padding: 20px;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(166, 124, 82, 0.15) 0%, transparent 70%),
+                linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);
         }
 
         .login-card {
-            background: #ffffff;
+            background-color: #0a0a0a;
             width: 100%;
-            max-width: 440px;
-            padding: 40px 35px;
+            max-width: 460px;
+            padding: 48px 40px;
             border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border: 1px solid #3a3a3f;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             text-align: center;
         }
 
         .logo-badge {
-            width: 70px;
-            height: 70px;
-            background-color: #a67c52;
-            color: white;
+            width: 72px;
+            height: 72px;
+            background: transparent;
+            color: #a67c52;
+            border: 2px solid #a67c52;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.4);
+            margin-bottom: 24px;
+            box-shadow: 0 0 20px rgba(166, 124, 82, 0.2);
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a67c52;
+            margin-bottom: 8px;
         }
 
         h2 {
             margin: 0 0 8px 0;
-            color: #1e1e24;
-            font-size: 22px;
-            font-weight: 700;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            line-height: 1.1;
         }
 
         p.subtitle {
-            color: #6c757d;
-            font-size: 14px;
-            margin-bottom: 25px;
+            color: #8e8e93;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            margin-bottom: 32px;
         }
 
         .form-group {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         label {
             display: block;
-            font-weight: 600;
-            font-size: 13px;
-            color: #495057;
+            font-weight: 700;
+            font-size: 11px;
+            color: #8e8e93;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.2px;
         }
 
         select, input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
+            padding: 14px 16px;
+            border: 1px solid #3a3a3f;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.2s ease;
-            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+            background-color: #000000;
+            color: #ffffff;
         }
 
         select:focus, input:focus {
             outline: none;
             border-color: #a67c52;
-            background-color: #fff;
+            box-shadow: 0 0 12px rgba(166, 124, 82, 0.3);
+        }
+
+        select option {
+            background-color: #0a0a0a;
+            color: #ffffff;
         }
 
         .btn-login {
             width: 100%;
-            padding: 14px;
-            background-color: #a67c52;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 16px 24px;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #a67c52;
+            border-radius: 32px; /* rounded.pill */
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.3);
+            letter-spacing: 1.6px;
+            transition: all 0.2s ease;
+            margin-top: 8px;
         }
 
         .btn-login:hover {
-            background-color: #8c653f;
+            background-color: #a67c52;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(166, 124, 82, 0.4);
         }
 
         .btn-login:active {
-            transform: scale(0.99);
+            transform: scale(0.98);
         }
 
         .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 20px;
+            background-color: rgba(217, 4, 41, 0.15);
+            color: #ff4d6d;
+            border: 1px solid #d90429;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 24px;
             display: none;
+            text-align: left;
         }
 
-        .hotspot-info {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: #6c757d;
+        .footer-note {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3f;
+            font-size: 11px;
+            color: #5a5a5f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background-color: #28a745;
             border-radius: 50%;
             display: inline-block;
+            box-shadow: 0 0 8px #28a745;
         }
     </style>
 </head>
@@ -153,8 +182,9 @@
 
     <div class="login-card">
         <div class="logo-badge">⚖️</div>
-        <h2>Judges Portal</h2>
-        <p class="subtitle">SK Federation Pageant Tabulation</p>
+        <div class="eyebrow">OFFICIAL JUDGING PORTAL</div>
+        <h2>SK YOUTH AMBASSADRESS 2026</h2>
+        <p class="subtitle">Secure Tabulation & Live Scoring System</p>
 
         {% if error %}
         <div class="error-message" style="display: block;">{{ error }}</div>
@@ -164,33 +194,36 @@
 
         <form action="/login" method="POST">
             <div class="form-group">
-                <label for="judge_slot">Select Account Role</label>
+                <label for="judge_slot">ACCOUNT ROLE</label>
                 <select name="judge_slot" id="judge_slot" required>
-                    <option value="Judge 1">Judge 1</option>
-                    <option value="Judge 2">Judge 2</option>
-                    <option value="Judge 3">Judge 3</option>
-                    <option value="Judge 4">Judge 4</option>
-                    <option value="Judge 5">Judge 5</option>
-                    <option value="Admin">Admin / Tabulator</option>
+                    <option value="Judge 1">JUDGE 1</option>
+                    <option value="Judge 2">JUDGE 2</option>
+                    <option value="Judge 3">JUDGE 3</option>
+                    <option value="Judge 4">JUDGE 4</option>
+                    <option value="Judge 5">JUDGE 5</option>
+                    <option value="Admin">ADMIN / TABULATOR</option>
                 </select>
             </div>
 
             <div class="form-group" id="nameGroup">
-                <label for="judge_name">Full Name (Optional)</label>
-                <input type="text" name="judge_name" id="judge_name" placeholder="e.g. Hon. Maria Santos" autocomplete="off">
+                <label for="judge_name">JUDGE FULL NAME (OPTIONAL)</label>
+                <input type="text" name="judge_name" id="judge_name" placeholder="e.g. HON. MARIA SANTOS" autocomplete="off">
             </div>
 
             <div class="form-group">
-                <label for="pin">Passcode / PIN</label>
-                <input type="password" name="pin" id="pin" placeholder="Judge PIN: 1234 | Admin: admin" required autocomplete="current-password">
+                <label for="pin">PASSCODE / PIN</label>
+                <input type="password" name="pin" id="pin" placeholder="Enter Passcode" required autocomplete="current-password">
             </div>
 
-            <button type="submit" class="btn-login">Sign In</button>
+            <button type="submit" class="btn-login">AUTHENTICATE & ACCESS</button>
         </form>
+
+        <div class="footer-note">
+            <span class="status-dot"></span> SECURE TABULATION SERVER ONLINE
+        </div>
     </div>
 
     <script>
-        // Auto-fill last used judge name if stored locally
         document.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('tabulation_judge_name');
             const savedSlot = localStorage.getItem('tabulation_judge_slot');
