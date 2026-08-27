@@ -1338,6 +1338,27 @@
                     loadCandidateDraft(savedActive);
                 }
             }
+
+            // Ultimate backup: Sync saved completion states directly from server!
+            fetch('/api/my_judge_scores')
+            .then(res => res.json())
+            .then(data => {
+                if (data.prelim_done) {
+                    for (const step in data.prelim_done) {
+                        if (!candidateCompleted.prelim[step]) candidateCompleted.prelim[step] = {};
+                        Object.assign(candidateCompleted.prelim[step], data.prelim_done[step]);
+                    }
+                }
+                if (data.top5_done) {
+                    for (const step in data.top5_done) {
+                        if (!candidateCompleted.top5[step]) candidateCompleted.top5[step] = {};
+                        Object.assign(candidateCompleted.top5[step], data.top5_done[step]);
+                    }
+                }
+                persistDrafts();
+                updateCategoryProgress();
+            })
+            .catch(err => {});
         });
     </script>
 </body>

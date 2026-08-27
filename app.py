@@ -196,7 +196,78 @@ def save_score():
             prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, 
             grand_total, timestamp
         )
-        return "Preliminary score submitted successfully!"
+# --- ROUTE: FETCH CURRENT JUDGE'S SCORES FOR AUTOMATIC RESTORATION ON RELOAD ---
+@app.route('/api/my_judge_scores')
+def get_my_judge_scores():
+    judge_slot = session.get('judge_slot', request.args.get('judge_slot', 'Judge 1'))
+    init_csv()
+    
+    prelim_done = {}     # step -> { candNum: true }
+    top5_done = {}       # step -> { candNum: true }
+
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('Judge ID') == judge_slot:
+                    cand_str = row.get('Candidate', '')
+                    if cand_str:
+                        cand_num = str(int(cand_str.replace('Candidate ', '')))
+                        
+                        p_val = float(row.get('Production (Max 100)', 0))
+                        c_val = float(row.get('Casual Wear (Max 100)', 0))
+                        s_val = float(row.get('Swimwear (Max 100)', 0))
+                        a_val = float(row.get('Advocacy (Max 100)', 0))
+                        g_val = float(row.get('Evening Gown (Max 100)', 0))
+                        q_val = float(row.get('Q&A (Max 100)', 0))
+
+                        if p_val > 0:
+                            if '1' not in prelim_done: prelim_done['1'] = {}
+                            prelim_done['1'][cand_num] = True
+
+                        if c_val > 0:
+                            if '2' not in prelim_done: prelim_done['2'] = {}
+                            prelim_done['2'][cand_num] = True
+
+                        if s_val > 0:
+                            if '3' not in prelim_done: prelim_done['3'] = {}
+                            prelim_done['3'][cand_num] = True
+
+                        if a_val > 0:
+                            if '4' not in prelim_done: prelim_done['4'] = {}
+                            prelim_done['4'][cand_num] = True
+
+                        if g_val > 0:
+                            if '5' not in prelim_done: prelim_done['5'] = {}
+                            prelim_done['5'][cand_num] = True
+
+                        if q_val > 0:
+                            if '6' not in prelim_done: prelim_done['6'] = {}
+                            prelim_done['6'][cand_num] = True
+
+    if os.path.exists(TOP5_CSV_FILE):
+        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('Judge ID') == judge_slot:
+                    cand_str = row.get('Candidate', '')
+                    if cand_str:
+                        cand_num = str(int(cand_str.replace('Candidate ', '')))
+                        b_tot = float(row.get('BEAUTY TOTAL (30)', 0))
+                        br_tot = float(row.get('BRAIN TOTAL (40)', 0))
+
+                        if b_tot > 0:
+                            if '1' not in top5_done: top5_done['1'] = {}
+                            top5_done['1'][cand_num] = True
+
+                        if br_tot > 0:
+                            if '2' not in top5_done: top5_done['2'] = {}
+                            top5_done['2'][cand_num] = True
+
+    return jsonify({
+        'prelim_done': prelim_done,
+        'top5_done': top5_done
+    })
 
 # --- ROUTE 3: The Live Leaderboard ---
 @app.route('/rankings')
