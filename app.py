@@ -91,6 +91,58 @@ def to_float(val):
     except (ValueError, TypeError):
         return 0.0
 
+def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, grand_total, timestamp):
+    rows = []
+    updated = False
+    
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            headers = next(reader, None)
+            if headers:
+                rows.append(headers)
+                for row in reader:
+                    if len(row) >= 3 and row[0] == candidate_str and row[1] == judge_slot:
+                        old_p = float(row[3]) if len(row) > 3 and float(row[3]) > 0 else 0
+                        old_c = float(row[4]) if len(row) > 4 and float(row[4]) > 0 else 0
+                        old_s = float(row[5]) if len(row) > 5 and float(row[5]) > 0 else 0
+                        old_a = float(row[6]) if len(row) > 6 and float(row[6]) > 0 else 0
+                        old_g = float(row[7]) if len(row) > 7 and float(row[7]) > 0 else 0
+                        old_q = float(row[8]) if len(row) > 8 and float(row[8]) > 0 else 0
+
+                        new_p = prod_sum if prod_sum > 0 else old_p
+                        new_c = cas_sum if cas_sum > 0 else old_c
+                        new_s = swim_sum if swim_sum > 0 else old_s
+                        new_a = adv_sum if adv_sum > 0 else old_a
+                        new_g = gown_sum if gown_sum > 0 else old_g
+                        new_q = qa_sum if qa_sum > 0 else old_q
+
+                        g_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+
+                        rows.append([
+                            candidate_str, judge_slot, judge_name,
+                            round(new_p, 2), round(new_c, 2), round(new_s, 2), round(new_a, 2), round(new_g, 2), round(new_q, 2),
+                            round(g_total, 2), timestamp
+                        ])
+                        updated = True
+                    else:
+                        rows.append(row)
+
+    if not updated:
+        if not rows:
+            init_csv()
+            with open(CSV_FILE, mode='r', encoding='utf-8') as file:
+                rows = list(csv.reader(file))
+        rows.append([
+            candidate_str, judge_slot, judge_name,
+            round(prod_sum, 2), round(cas_sum, 2), round(swim_sum, 2), round(adv_sum, 2), round(gown_sum, 2), round(qa_sum, 2),
+            round(grand_total, 2), timestamp
+        ])
+
+    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerows(rows)
+
 # --- ROUTE 2: Saving Judge Scores (Prelim or Top 5) ---
 @app.route('/submit_score', methods=['POST'])
 def save_score():
@@ -102,7 +154,6 @@ def save_score():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if round_type == 'top5':
-        # TOP 5 FINALS SCORING BY JUDGES
         b_facial = to_float(request.form.get('b_facial'))
         b_poise  = to_float(request.form.get('b_poise'))
         b_conf   = to_float(request.form.get('b_conf'))
@@ -130,37 +181,21 @@ def save_score():
         return "Top 5 Score submitted successfully!"
 
     else:
-        # PRELIMINARY SCORING BY JUDGES
         prod_sum = to_float(request.form.get('p_presence')) + to_float(request.form.get('p_execution')) + to_float(request.form.get('p_energy')) + to_float(request.form.get('p_personality'))
-        prod_weighted = prod_sum * 0.15
-
         cas_sum = to_float(request.form.get('c_poise')) + to_float(request.form.get('c_carriage')) + to_float(request.form.get('c_presence')) + to_float(request.form.get('c_impact'))
-        cas_weighted = cas_sum * 0.15
-
         swim_sum = to_float(request.form.get('s_confidence')) + to_float(request.form.get('s_carriage')) + to_float(request.form.get('s_presence')) + to_float(request.form.get('s_impact'))
-        swim_weighted = swim_sum * 0.15
-
         adv_sum = to_float(request.form.get('a_relevance')) + to_float(request.form.get('a_content')) + to_float(request.form.get('a_feasibility')) + to_float(request.form.get('a_communication')) + to_float(request.form.get('a_sincerity'))
-        adv_weighted = adv_sum * 0.20
-
         gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_grace')) + to_float(request.form.get('e_styling')) + to_float(request.form.get('e_impact'))
-        gown_weighted = gown_sum * 0.15
-
         qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_communication')) + to_float(request.form.get('q_composure'))
-        qa_weighted = qa_sum * 0.20
 
-        grand_total = prod_weighted + cas_weighted + swim_weighted + adv_weighted + gown_weighted + qa_weighted
+        grand_total = (prod_sum * 0.15) + (cas_sum * 0.15) + (swim_sum * 0.15) + (adv_sum * 0.20) + (gown_sum * 0.15) + (qa_sum * 0.20)
         
-        with open(CSV_FILE, mode='a', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow([
-                "Candidate " + str(candidate), 
-                judge_slot,
-                judge_name,
-                round(prod_sum, 2), round(cas_sum, 2), round(swim_sum, 2), round(adv_sum, 2), round(gown_sum, 2), round(qa_sum, 2), 
-                round(grand_total, 2),
-                timestamp
-            ])
+        update_or_append_prelim_csv(
+            "Candidate " + str(candidate), 
+            judge_slot, judge_name,
+            prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, 
+            grand_total, timestamp
+        )
         return "Preliminary score submitted successfully!"
 
 # --- ROUTE 3: The Live Leaderboard ---
@@ -203,8 +238,8 @@ def admin_panel():
 
 # --- HELPER & API FOR REAL-TIME TABULATION ---
 def get_tabulation_data():
-    prelim_by_judge = {}  # cand_num -> { judge_slot: score }
-    category_results = {}
+    prelim_by_judge = {}     # cand_num -> { judge_slot: score }
+    category_by_judge = {}   # cand_num -> { judge_slot: { 'prod': p, 'casual': c, ... } }
     judge_progress = {}
     
     if os.path.exists(CSV_FILE):
@@ -215,16 +250,20 @@ def get_tabulation_data():
                 score_str = row.get('FINAL SCORE', '')
                 j_slot = row.get('Judge ID', 'Unknown')
                 
-                if cand_str and score_str:
+                if cand_str:
                     try:
                         cand_num = int(cand_str.replace('Candidate ', ''))
-                        score = float(score_str)
+                        score = float(score_str) if score_str else 0.0
+                        
                         if cand_num not in prelim_by_judge:
                             prelim_by_judge[cand_num] = {}
-                        prelim_by_judge[cand_num][j_slot] = score  # Latest score per judge
+                        if score > 0:
+                            prelim_by_judge[cand_num][j_slot] = score
                         
-                        if cand_num not in category_results:
-                            category_results[cand_num] = {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []}
+                        if cand_num not in category_by_judge:
+                            category_by_judge[cand_num] = {}
+                        if j_slot not in category_by_judge[cand_num]:
+                            category_by_judge[cand_num][j_slot] = {}
 
                         p_val = float(row.get('Production (Max 100)', 0))
                         c_val = float(row.get('Casual Wear (Max 100)', 0))
@@ -233,12 +272,12 @@ def get_tabulation_data():
                         g_val = float(row.get('Evening Gown (Max 100)', 0))
                         q_val = float(row.get('Q&A (Max 100)', 0))
 
-                        category_results[cand_num]['prod'].append(p_val)
-                        category_results[cand_num]['casual'].append(c_val)
-                        category_results[cand_num]['swim'].append(s_val)
-                        category_results[cand_num]['adv'].append(a_val)
-                        category_results[cand_num]['gown'].append(g_val)
-                        category_results[cand_num]['qa'].append(q_val)
+                        if p_val > 0: category_by_judge[cand_num][j_slot]['prod'] = p_val
+                        if c_val > 0: category_by_judge[cand_num][j_slot]['casual'] = c_val
+                        if s_val > 0: category_by_judge[cand_num][j_slot]['swim'] = s_val
+                        if a_val > 0: category_by_judge[cand_num][j_slot]['adv'] = a_val
+                        if g_val > 0: category_by_judge[cand_num][j_slot]['gown'] = g_val
+                        if q_val > 0: category_by_judge[cand_num][j_slot]['qa'] = q_val
                         
                         if j_slot not in judge_progress:
                             judge_progress[j_slot] = set()
@@ -285,25 +324,35 @@ def get_tabulation_data():
         p_dict = prelim_by_judge.get(cand_num, {})
         b_dict = top5_beauty_by_judge.get(cand_num, {})
         br_dict = top5_brain_by_judge.get(cand_num, {})
-        cats = category_results.get(cand_num, {'prod': [], 'casual': [], 'swim': [], 'adv': [], 'gown': [], 'qa': []})
+        cand_cats = category_by_judge.get(cand_num, {})
 
-        # 30% Prelim Avg based on judges who scored
+        # Compute accurate category averages per candidate across judges
+        prod_scores = [j['prod'] for j in cand_cats.values() if 'prod' in j]
+        casual_scores = [j['casual'] for j in cand_cats.values() if 'casual' in j]
+        swim_scores = [j['swim'] for j in cand_cats.values() if 'swim' in j]
+        adv_scores = [j['adv'] for j in cand_cats.values() if 'adv' in j]
+        gown_scores = [j['gown'] for j in cand_cats.values() if 'gown' in j]
+        qa_scores = [j['qa'] for j in cand_cats.values() if 'qa' in j]
+
+        prod_avg = sum(prod_scores) / len(prod_scores) if prod_scores else 0.0
+        casual_avg = sum(casual_scores) / len(casual_scores) if casual_scores else 0.0
+        swim_avg = sum(swim_scores) / len(swim_scores) if swim_scores else 0.0
+        adv_avg = sum(adv_scores) / len(adv_scores) if adv_scores else 0.0
+        gown_avg = sum(gown_scores) / len(gown_scores) if gown_scores else 0.0
+        qa_avg = sum(qa_scores) / len(qa_scores) if qa_scores else 0.0
+
         p_scores = list(p_dict.values())
-        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0
+        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0.0
         prelim_30 = prelim_avg * 0.30
 
-        # 30% Beauty Avg based on judges who scored
         b_scores = list(b_dict.values())
-        beauty_30 = sum(b_scores) / len(b_scores) if b_scores else 0
+        beauty_30 = sum(b_scores) / len(b_scores) if b_scores else 0.0
 
-        # 40% Brain Avg based on judges who scored
         br_scores = list(br_dict.values())
-        brain_40  = sum(br_scores) / len(br_scores) if br_scores else 0
+        brain_40  = sum(br_scores) / len(br_scores) if br_scores else 0.0
 
-        # Final Score (100%) = 30% Prelim + 30% Beauty + 40% Brain
         final_score = prelim_30 + beauty_30 + brain_40
 
-        # Build Per-Judge Top 5 Breakdown (Beauty + Brain total out of 70 pts per judge)
         j_breakdown = {}
         for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']:
             has_b = j_id in b_dict
@@ -332,12 +381,12 @@ def get_tabulation_data():
             'p_j3': p_dict.get('Judge 3', '-'),
             'p_j4': p_dict.get('Judge 4', '-'),
             'p_j5': p_dict.get('Judge 5', '-'),
-            'prod_avg': round(sum(cats['prod']) / len(cats['prod']), 2) if cats['prod'] else 0,
-            'casual_avg': round(sum(cats['casual']) / len(cats['casual']), 2) if cats['casual'] else 0,
-            'swim_avg': round(sum(cats['swim']) / len(cats['swim']), 2) if cats['swim'] else 0,
-            'adv_avg': round(sum(cats['adv']) / len(cats['adv']), 2) if cats['adv'] else 0,
-            'gown_avg': round(sum(cats['gown']) / len(cats['gown']), 2) if cats['gown'] else 0,
-            'qa_avg': round(sum(cats['qa']) / len(cats['qa']), 2) if cats['qa'] else 0,
+            'prod_avg': round(prod_avg, 2),
+            'casual_avg': round(casual_avg, 2),
+            'swim_avg': round(swim_avg, 2),
+            'adv_avg': round(adv_avg, 2),
+            'gown_avg': round(gown_avg, 2),
+            'qa_avg': round(qa_avg, 2),
             'has_top5_scores': len(b_scores) > 0 or len(br_scores) > 0,
             'submission_count': len(p_scores)
         })
