@@ -357,24 +357,27 @@ def get_tabulation_data():
                 if cand_str:
                     try:
                         cand_num = int(cand_str.replace('Candidate ', ''))
-                        score = float(score_str) if score_str else 0.0
+                        score = to_float(score_str)
                         
+                        p_val = to_float(row.get('Production (Max 100)', 0))
+                        c_val = to_float(row.get('Casual Wear (Max 100)', 0))
+                        s_val = to_float(row.get('Swimwear (Max 100)', 0))
+                        a_val = to_float(row.get('Advocacy (Max 100)', 0))
+                        g_val = to_float(row.get('Evening Gown (Max 100)', 0))
+                        q_val = to_float(row.get('Q&A (Max 100)', 0))
+
+                        calc_score = p_val + c_val + s_val + a_val + g_val + q_val
+                        final_prelim_val = score if score > 0 else calc_score
+
                         if cand_num not in prelim_by_judge:
                             prelim_by_judge[cand_num] = {}
-                        if score > 0:
-                            prelim_by_judge[cand_num][j_slot] = score
+                        if final_prelim_val > 0:
+                            prelim_by_judge[cand_num][j_slot] = final_prelim_val
                         
                         if cand_num not in category_by_judge:
                             category_by_judge[cand_num] = {}
                         if j_slot not in category_by_judge[cand_num]:
                             category_by_judge[cand_num][j_slot] = {}
-
-                        p_val = float(row.get('Production (Max 100)', 0))
-                        c_val = float(row.get('Casual Wear (Max 100)', 0))
-                        s_val = float(row.get('Swimwear (Max 100)', 0))
-                        a_val = float(row.get('Advocacy (Max 100)', 0))
-                        g_val = float(row.get('Evening Gown (Max 100)', 0))
-                        q_val = float(row.get('Q&A (Max 100)', 0))
 
                         if p_val > 0: category_by_judge[cand_num][j_slot]['prod'] = p_val
                         if c_val > 0: category_by_judge[cand_num][j_slot]['casual'] = c_val

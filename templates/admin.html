@@ -568,7 +568,8 @@
         });
 
         function calculateTabulation() {
-            const rows = document.querySelectorAll('#tabView-0 .candidate-row');
+            const grid = document.querySelector('#tabView-0 tbody');
+            const rows = Array.from(document.querySelectorAll('#tabView-0 .candidate-row'));
             let candidates = [];
 
             rows.forEach((row) => {
@@ -583,10 +584,14 @@
                 });
             });
 
+            // Sort candidates from highest score to lowest score (Rank 1 to 12)
             const sortedCandidates = [...candidates].sort((a, b) => b.score - a.score);
             const top5List = [];
 
             sortedCandidates.forEach((cand, sortedIndex) => {
+                // Re-append row in sorted order to re-order table from highest to lowest score
+                if (grid) grid.appendChild(cand.element);
+
                 const rank = sortedIndex + 1;
                 const rankCell = cand.element.querySelector('.rank-cell');
                 const top5Cell = cand.element.querySelector('.top5-cell');
@@ -666,6 +671,7 @@
                             if (row.querySelector('.adv-avg')) row.querySelector('.adv-avg').textContent = cand.adv_avg.toFixed(2);
                             if (row.querySelector('.gown-avg')) row.querySelector('.gown-avg').textContent = cand.gown_avg.toFixed(2);
                             if (row.querySelector('.qa-avg')) row.querySelector('.qa-avg').textContent = cand.qa_avg.toFixed(2);
+                            if (row.querySelector('.prelim-val')) row.querySelector('.prelim-val').textContent = cand.prelim_score.toFixed(2);
                             row.setAttribute('data-prelim-score', cand.prelim_score.toFixed(2));
                         }
                     });
