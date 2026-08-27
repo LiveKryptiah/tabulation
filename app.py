@@ -143,6 +143,41 @@ def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum,
         writer = csv.writer(file)
         writer.writerows(rows)
 
+def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poise, b_conf, beauty_total, br_substance, br_intelligence, br_clarity, br_delivery, brain_total, top5_total, timestamp):
+    rows = []
+    found = False
+    if os.path.exists(TOP5_CSV_FILE):
+        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            header = next(reader, None)
+            if header:
+                rows.append(header)
+            for row in reader:
+                if len(row) >= 3 and row[0] == candidate and row[1] == judge_slot:
+                    rows.append([
+                        candidate, judge_slot, judge_name,
+                        b_facial, b_poise, b_conf, round(beauty_total, 2),
+                        br_substance, br_intelligence, br_clarity, br_delivery, round(brain_total, 2),
+                        round(top5_total, 2), timestamp
+                    ])
+                    found = True
+                else:
+                    rows.append(row)
+
+    if not found:
+        if not rows:
+            rows.append(["Candidate", "Judge ID", "Judge Name", "Beauty Facial (Max 15)", "Beauty Poise (Max 10)", "Beauty Confidence (Max 5)", "BEAUTY TOTAL (30)", "Brain Substance (Max 15)", "Brain Intelligence (Max 10)", "Brain Clarity (Max 10)", "Brain Delivery (Max 5)", "BRAIN TOTAL (40)", "TOP5 TOTAL (70)", "Timestamp"])
+        rows.append([
+            candidate, judge_slot, judge_name,
+            b_facial, b_poise, b_conf, round(beauty_total, 2),
+            br_substance, br_intelligence, br_clarity, br_delivery, round(brain_total, 2),
+            round(top5_total, 2), timestamp
+        ])
+
+    with open(TOP5_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerows(rows)
+
 # --- ROUTE 2: Saving Judge Scores (Prelim or Top 5) ---
 @app.route('/submit_score', methods=['POST'])
 def save_score():
@@ -167,17 +202,13 @@ def save_score():
 
         top5_total = beauty_total + brain_total
 
-        with open(TOP5_CSV_FILE, mode='a', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow([
-                "Candidate " + str(candidate),
-                judge_slot,
-                judge_name,
-                b_facial, b_poise, b_conf, round(beauty_total, 2),
-                br_substance, br_intelligence, br_clarity, br_delivery, round(brain_total, 2),
-                round(top5_total, 2),
-                timestamp
-            ])
+        update_or_append_top5_csv(
+            "Candidate " + str(candidate),
+            judge_slot, judge_name,
+            b_facial, b_poise, b_conf, beauty_total,
+            br_substance, br_intelligence, br_clarity, br_delivery, brain_total,
+            top5_total, timestamp
+        )
         return "Top 5 Score submitted successfully!"
 
     else:
@@ -464,9 +495,19 @@ def get_tabulation_data():
             'submission_count': len(p_scores)
         })
 
-    # Compute Top 5 Finalists & Titles
-    prelim_sorted = sorted(candidates_data, key=lambda x: (x['final_score'], x['prelim_score']), reverse=True)
-    top5_candidates = prelim_sorted[:5]
+    # Compute Top 5 Finalists & Titles based on real judge submissions
+    scored_prelim = [c for c in candidates_data if c['submission_count'] > 0 or c['prelim_score'] > 0]
+    
+    # Sort by prelim_score to select the 5 official qualifiers
+    prelim_sorted = sorted(candidates_data, key=lambda x: (x['prelim_score'], -x['number']), reverse=True)
+    top5_qualifiers = prelim_sorted[:5]
+
+    has_any_top5_scores = any(c['has_top5_scores'] for c in top5_qualifiers)
+
+    if has_any_top5_scores:
+        top5_candidates = sorted(top5_qualifiers, key=lambda x: (x['final_score'], x['prelim_score']), reverse=True)
+    else:
+        top5_candidates = top5_qualifiers
 
     titles = [
         "👑 MISS SK YOUTH AMBASSADRESS 2026",
@@ -477,8 +518,13 @@ def get_tabulation_data():
     ]
 
     for idx, cand in enumerate(top5_candidates):
-        cand['title'] = titles[idx]
         cand['top5_rank'] = idx + 1
+        if len(scored_prelim) > 0 and has_any_top5_scores:
+            cand['title'] = titles[idx]
+        elif len(scored_prelim) > 0:
+            cand['title'] = "Pending Top 5 Finals"
+        else:
+            cand['title'] = "-"
 
     judge_summary = {j: len(cands) for j, cands in judge_progress.items()}
     return {'candidates': candidates_data, 'top5_candidates': top5_candidates, 'judge_summary': judge_summary}

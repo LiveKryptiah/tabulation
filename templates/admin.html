@@ -579,13 +579,15 @@
 
         function updateSpotlightCards(top5List) {
             const spotlightContainer = document.getElementById('top5Spotlight');
-            if (top5List.length === 0) {
-                spotlightContainer.innerHTML = `<div style="color: #8e8e93; font-size: 12px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
+            const validCandidates = top5List.filter(c => parseFloat(c.score) > 0);
+
+            if (validCandidates.length === 0) {
+                spotlightContainer.innerHTML = `<div style="color: #b3b3b3; font-size: 12px;">Waiting for judge scores to compute official Top 5 Finalists...</div>`;
                 return;
             }
 
             let html = '';
-            top5List.forEach(cand => {
+            validCandidates.forEach(cand => {
                 html += `
                     <div class="spotlight-card">
                         <span class="spotlight-rank">Rank #${cand.rank}</span>
