@@ -460,10 +460,10 @@
                 <div class="legend-header">SCORING DISTRIBUTION</div>
                 <table class="legend-table">
                     <tr><th>COMPONENT</th><th style="text-align: right;">WEIGHT</th></tr>
-                    <tr><td>Overall Preliminary Performance</td><td style="font-weight: 800; text-align: right;">30%</td></tr>
-                    <tr><td>Beauty</td><td style="font-weight: 800; text-align: right;">30%</td></tr>
-                    <tr><td>Brain</td><td style="font-weight: 800; text-align: right;">40%</td></tr>
-                    <tr style="font-weight: 800; background-color: rgba(16, 185, 129, 0.1);"><td>TOTAL</td><td style="font-weight: 800; text-align: right; color: #10b981;">100%</td></tr>
+                    <tr><td>Overall Preliminary Performance</td><td style="font-weight: 700; text-align: right;">30%</td></tr>
+                    <tr><td>Beauty</td><td style="font-weight: 700; text-align: right;">30%</td></tr>
+                    <tr><td>Brain</td><td style="font-weight: 700; text-align: right;">40%</td></tr>
+                    <tr style="font-weight: 700; background-color: rgba(30, 215, 96, 0.1);"><td>TOTAL</td><td style="font-weight: 700; text-align: right; color: #1ed760;">100%</td></tr>
                 </table>
             </div>
 
@@ -471,10 +471,10 @@
                 <div class="legend-header">BEAUTY CRITERIA BREAKDOWN (30%)</div>
                 <table class="legend-table">
                     <tr><th>CRITERION</th><th style="text-align: right;">WEIGHT</th></tr>
-                    <tr><td>Facial beauty and appeal</td><td style="text-align: right; font-weight: 800;">15%</td></tr>
-                    <tr><td>Poise, elegance, and stage presence</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
-                    <tr><td>Confidence and overall impression</td><td style="text-align: right; font-weight: 800;">5%</td></tr>
-                    <tr style="font-weight: 800; background-color: rgba(16, 185, 129, 0.1);"><td>BEAUTY TOTAL</td><td style="text-align: right; color: #10b981;">30%</td></tr>
+                    <tr><td>Facial beauty and appeal</td><td style="text-align: right; font-weight: 700;">15%</td></tr>
+                    <tr><td>Poise, elegance, and stage presence</td><td style="text-align: right; font-weight: 700;">10%</td></tr>
+                    <tr><td>Confidence and overall impression</td><td style="text-align: right; font-weight: 700;">5%</td></tr>
+                    <tr style="font-weight: 700; background-color: rgba(30, 215, 96, 0.1);"><td>BEAUTY TOTAL</td><td style="text-align: right; color: #1ed760;">30%</td></tr>
                 </table>
             </div>
 
@@ -482,11 +482,11 @@
                 <div class="legend-header">BRAIN CRITERIA BREAKDOWN (40%)</div>
                 <table class="legend-table">
                     <tr><th>CRITERION</th><th style="text-align: right;">WEIGHT</th></tr>
-                    <tr><td>Relevance and substance of answer</td><td style="text-align: right; font-weight: 800;">15%</td></tr>
-                    <tr><td>Intelligence and critical thinking</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
-                    <tr><td>Clarity and organization of thoughts</td><td style="text-align: right; font-weight: 800;">10%</td></tr>
-                    <tr><td>Confidence and delivery</td><td style="text-align: right; font-weight: 800;">5%</td></tr>
-                    <tr style="font-weight: 800; background-color: rgba(0, 123, 255, 0.1);"><td>BRAIN TOTAL</td><td style="text-align: right; color: #007bff;">40%</td></tr>
+                    <tr><td>Relevance and substance of answer</td><td style="text-align: right; font-weight: 700;">15%</td></tr>
+                    <tr><td>Intelligence and critical thinking</td><td style="text-align: right; font-weight: 700;">10%</td></tr>
+                    <tr><td>Clarity and organization of thoughts</td><td style="text-align: right; font-weight: 700;">10%</td></tr>
+                    <tr><td>Confidence and delivery</td><td style="text-align: right; font-weight: 700;">5%</td></tr>
+                    <tr style="font-weight: 700; background-color: rgba(83, 157, 245, 0.1);"><td>BRAIN TOTAL</td><td style="text-align: right; color: #539df5;">40%</td></tr>
                 </table>
             </div>
         </div>
@@ -625,33 +625,33 @@
                     catRows.forEach(catRow => {
                         const prodAvg = catRow.querySelector('.cat-prod-avg');
                         const prodW = catRow.querySelector('.cat-prod-weight');
-                        if (prodAvg) prodAvg.textContent = `${cand.prod_avg.toFixed(2)} pts`;
-                        if (prodW) prodW.textContent = `${(cand.prod_avg * 0.15).toFixed(2)}%`;
+                        if (prodAvg) prodAvg.textContent = `${cand.prod_avg.toFixed(2)} / 15 pts`;
+                        if (prodW) prodW.textContent = `${cand.prod_avg.toFixed(2)} / 15 pts`;
 
                         const casualAvg = catRow.querySelector('.cat-casual-avg');
                         const casualW = catRow.querySelector('.cat-casual-weight');
-                        if (casualAvg) casualAvg.textContent = `${cand.casual_avg.toFixed(2)} pts`;
-                        if (casualW) casualW.textContent = `${(cand.casual_avg * 0.15).toFixed(2)}%`;
+                        if (casualAvg) casualAvg.textContent = `${cand.casual_avg.toFixed(2)} / 15 pts`;
+                        if (casualW) casualW.textContent = `${cand.casual_avg.toFixed(2)} / 15 pts`;
 
                         const swimAvg = catRow.querySelector('.cat-swim-avg');
                         const swimW = catRow.querySelector('.cat-swim-weight');
-                        if (swimAvg) swimAvg.textContent = `${cand.swim_avg.toFixed(2)} pts`;
-                        if (swimW) swimW.textContent = `${(cand.swim_avg * 0.15).toFixed(2)}%`;
+                        if (swimAvg) swimAvg.textContent = `${cand.swim_avg.toFixed(2)} / 15 pts`;
+                        if (swimW) swimW.textContent = `${cand.swim_avg.toFixed(2)} / 15 pts`;
 
                         const advAvg = catRow.querySelector('.cat-adv-avg');
                         const advW = catRow.querySelector('.cat-adv-weight');
-                        if (advAvg) advAvg.textContent = `${cand.adv_avg.toFixed(2)} pts`;
-                        if (advW) advW.textContent = `${(cand.adv_avg * 0.20).toFixed(2)}%`;
+                        if (advAvg) advAvg.textContent = `${cand.adv_avg.toFixed(2)} / 20 pts`;
+                        if (advW) advW.textContent = `${cand.adv_avg.toFixed(2)} / 20 pts`;
 
                         const gownAvg = catRow.querySelector('.cat-gown-avg');
                         const gownW = catRow.querySelector('.cat-gown-weight');
-                        if (gownAvg) gownAvg.textContent = `${cand.gown_avg.toFixed(2)} pts`;
-                        if (gownW) gownW.textContent = `${(cand.gown_avg * 0.15).toFixed(2)}%`;
+                        if (gownAvg) gownAvg.textContent = `${cand.gown_avg.toFixed(2)} / 15 pts`;
+                        if (gownW) gownW.textContent = `${cand.gown_avg.toFixed(2)} / 15 pts`;
 
                         const qaAvg = catRow.querySelector('.cat-qa-avg');
                         const qaW = catRow.querySelector('.cat-qa-weight');
-                        if (qaAvg) qaAvg.textContent = `${cand.qa_avg.toFixed(2)} pts`;
-                        if (qaW) qaW.textContent = `${(cand.qa_avg * 0.20).toFixed(2)}%`;
+                        if (qaAvg) qaAvg.textContent = `${cand.qa_avg.toFixed(2)} / 20 pts`;
+                        if (qaW) qaW.textContent = `${cand.qa_avg.toFixed(2)} / 20 pts`;
                     });
                 });
 

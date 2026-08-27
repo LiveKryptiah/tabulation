@@ -212,14 +212,14 @@ def save_score():
         return "Top 5 Score submitted successfully!"
 
     else:
-        prod_sum = to_float(request.form.get('p_presence')) + to_float(request.form.get('p_execution')) + to_float(request.form.get('p_energy')) + to_float(request.form.get('p_personality'))
-        cas_sum = to_float(request.form.get('c_poise')) + to_float(request.form.get('c_carriage')) + to_float(request.form.get('c_presence')) + to_float(request.form.get('c_impact'))
-        swim_sum = to_float(request.form.get('s_confidence')) + to_float(request.form.get('s_carriage')) + to_float(request.form.get('s_presence')) + to_float(request.form.get('s_impact'))
-        adv_sum = to_float(request.form.get('a_relevance')) + to_float(request.form.get('a_content')) + to_float(request.form.get('a_feasibility')) + to_float(request.form.get('a_communication')) + to_float(request.form.get('a_sincerity'))
-        gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_grace')) + to_float(request.form.get('e_styling')) + to_float(request.form.get('e_impact'))
-        qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_communication')) + to_float(request.form.get('q_composure'))
+        prod_sum = to_float(request.form.get('p_presence')) + to_float(request.form.get('p_execution')) + to_float(request.form.get('p_personality'))
+        cas_sum = to_float(request.form.get('c_poise')) + to_float(request.form.get('c_carriage')) + to_float(request.form.get('c_impact'))
+        swim_sum = to_float(request.form.get('s_confidence')) + to_float(request.form.get('s_carriage')) + to_float(request.form.get('s_impact'))
+        adv_sum = to_float(request.form.get('a_relevance')) + to_float(request.form.get('a_content')) + to_float(request.form.get('a_feasibility')) + to_float(request.form.get('a_communication'))
+        gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_impact'))
+        qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_composure'))
 
-        grand_total = (prod_sum * 0.15) + (cas_sum * 0.15) + (swim_sum * 0.15) + (adv_sum * 0.20) + (gown_sum * 0.15) + (qa_sum * 0.20)
+        grand_total = prod_sum + cas_sum + swim_sum + adv_sum + gown_sum + qa_sum
         
         update_or_append_prelim_csv(
             "Candidate " + str(candidate), 
