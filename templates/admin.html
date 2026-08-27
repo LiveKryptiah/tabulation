@@ -219,6 +219,49 @@
 
         <!-- TAB 0: OVERALL & TOP 5 TABULATION -->
         <div class="tab-view active" id="tabView-0">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">CANDIDATE</th>
+                        <th colspan="6">PRELIMINARY CATEGORIES (MAX 100 PTS EACH)</th>
+                        <th rowspan="2" class="col-prelim">PRELIM TOTAL<br>(100 PTS)</th>
+                        <th rowspan="2" class="col-prelim">30% PRELIM<br>WEIGHT</th>
+                        <th rowspan="2" class="col-rank">RANK</th>
+                        <th rowspan="2">TOP 5 STATUS</th>
+                    </tr>
+                    <tr>
+                        <th>1. PROD (15%)</th>
+                        <th>2. CASUAL (15%)</th>
+                        <th>3. SWIM (15%)</th>
+                        <th>4. ADV (20%)</th>
+                        <th>5. GOWN (15%)</th>
+                        <th>6. Q&A (20%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cand in candidates %}
+                    <tr class="candidate-row" data-cand="{{ cand.number }}">
+                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
+                        <td class="prod-avg">{{ cand.prod_avg }}</td>
+                        <td class="casual-avg">{{ cand.casual_avg }}</td>
+                        <td class="swim-avg">{{ cand.swim_avg }}</td>
+                        <td class="adv-avg">{{ cand.adv_avg }}</td>
+                        <td class="gown-avg">{{ cand.gown_avg }}</td>
+                        <td class="qa-avg">{{ cand.qa_avg }}</td>
+                        <td class="prelim-val col-prelim" style="font-weight: 800;">{{ cand.prelim_score }}</td>
+                        <td class="prelim-30 col-prelim" style="font-weight: 800; color: #10b981;">{{ cand.prelim_30 }}</td>
+                        <td class="rank-cell col-rank">-</td>
+                        <td class="top5-cell">-</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="11" style="padding: 20px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 7: TOP 5 JUDGE BREAKDOWN & CORONATION SHEET -->
+        <div class="tab-view" id="tabView-7">
             <!-- Top 5 Finalist Spotlight Banner -->
             <div style="background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 80%), #000000; border-bottom: 1px solid #3a3a3f; padding: 14px 20px; text-align: center;">
                 <div style="font-weight: 800; font-size: 12px; color: #10b981; text-transform: uppercase; letter-spacing: 1.4px; margin-bottom: 10px;">
@@ -228,56 +271,7 @@
                     <div style="color: #8e8e93; font-size: 12px;">Waiting for judge scores to compute official Top 5 Finalists...</div>
                 </div>
             </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2">CANDIDATE</th>
-                        <th colspan="2" class="col-prelim">PRELIMINARY (30%)</th>
-                        <th colspan="5">JUDGE BREAKDOWN (TOP 5 FINALS - 70 PTS)</th>
-                        <th colspan="2">FINALS AVERAGES</th>
-                        <th rowspan="2" class="col-final">FINAL SCORE<br>(100%)</th>
-                        <th rowspan="2">RANK</th>
-                        <th rowspan="2">TOP 5 STATUS</th>
-                    </tr>
-                    <tr>
-                        <th class="col-prelim">PRELIM AVG</th>
-                        <th class="col-prelim">30% PRELIM</th>
-                        <th>JUDGE 1</th>
-                        <th>JUDGE 2</th>
-                        <th>JUDGE 3</th>
-                        <th>JUDGE 4</th>
-                        <th>JUDGE 5</th>
-                        <th class="col-beauty">30% BEAUTY</th>
-                        <th class="col-brain">40% BRAIN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cand in candidates %}
-                    <tr class="candidate-row" data-cand="{{ cand.number }}">
-                        <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
-                        <td class="prelim-val col-prelim">{{ cand.prelim_score }}</td>
-                        <td class="prelim-30 col-prelim" style="font-weight: 800;">{{ cand.prelim_30 }}</td>
-                        <td class="j1-val">{{ cand.judge_1 }}</td>
-                        <td class="j2-val">{{ cand.judge_2 }}</td>
-                        <td class="j3-val">{{ cand.judge_3 }}</td>
-                        <td class="j4-val">{{ cand.judge_4 }}</td>
-                        <td class="j5-val">{{ cand.judge_5 }}</td>
-                        <td class="beauty-30 col-beauty" style="font-weight: 800; color: #10b981;">{{ cand.beauty_30 }}</td>
-                        <td class="brain-40 col-brain" style="font-weight: 800; color: #007bff;">{{ cand.brain_40 }}</td>
-                        <td class="final-score col-final">{{ cand.final_score }}</td>
-                        <td class="rank-cell col-rank">-</td>
-                        <td class="top5-cell">-</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="13" style="padding: 20px; color: #8e8e93;">No scores recorded yet. Have judges submit scores first!</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
 
-        <!-- TAB 7: TOP 5 JUDGE BREAKDOWN & CORONATION SHEET -->
-        <div class="tab-view" id="tabView-7">
             <div style="background: #000000; border-bottom: 1px solid #3a3a3f; padding: 12px 20px; font-weight: 800; color: #10b981; text-align: center; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px;">
                 OFFICIAL TOP 5 FINALISTS JUDGE-BY-JUDGE BREAKDOWN & TITLE ASSIGNMENT
             </div>
@@ -611,16 +605,14 @@
                     rows.forEach(row => {
                         const nameTd = row.querySelector('td');
                         if (nameTd && nameTd.textContent.trim() === cand.name) {
-                            row.querySelector('.prelim-val').textContent = cand.prelim_score.toFixed(2);
-                            row.querySelector('.prelim-30').textContent = cand.prelim_30.toFixed(2);
-                            if (row.querySelector('.j1-val')) row.querySelector('.j1-val').textContent = cand.judge_1;
-                            if (row.querySelector('.j2-val')) row.querySelector('.j2-val').textContent = cand.judge_2;
-                            if (row.querySelector('.j3-val')) row.querySelector('.j3-val').textContent = cand.judge_3;
-                            if (row.querySelector('.j4-val')) row.querySelector('.j4-val').textContent = cand.judge_4;
-                            if (row.querySelector('.j5-val')) row.querySelector('.j5-val').textContent = cand.judge_5;
-                            row.querySelector('.beauty-30').textContent = cand.beauty_30.toFixed(2);
-                            row.querySelector('.brain-40').textContent = cand.brain_40.toFixed(2);
-                            row.querySelector('.final-score').textContent = cand.final_score.toFixed(2);
+                            if (row.querySelector('.prod-avg')) row.querySelector('.prod-avg').textContent = cand.prod_avg.toFixed(2);
+                            if (row.querySelector('.casual-avg')) row.querySelector('.casual-avg').textContent = cand.casual_avg.toFixed(2);
+                            if (row.querySelector('.swim-avg')) row.querySelector('.swim-avg').textContent = cand.swim_avg.toFixed(2);
+                            if (row.querySelector('.adv-avg')) row.querySelector('.adv-avg').textContent = cand.adv_avg.toFixed(2);
+                            if (row.querySelector('.gown-avg')) row.querySelector('.gown-avg').textContent = cand.gown_avg.toFixed(2);
+                            if (row.querySelector('.qa-avg')) row.querySelector('.qa-avg').textContent = cand.qa_avg.toFixed(2);
+                            if (row.querySelector('.prelim-val')) row.querySelector('.prelim-val').textContent = cand.prelim_score.toFixed(2);
+                            if (row.querySelector('.prelim-30')) row.querySelector('.prelim-30').textContent = cand.prelim_30.toFixed(2);
                         }
                     });
 
