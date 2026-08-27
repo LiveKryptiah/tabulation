@@ -118,12 +118,12 @@ def sync_stores_from_csv():
                         g_total = to_float(row[9])
 
                         existing = PRELIM_STORE.get(key, {})
-                        new_p = max(prod_val, existing.get('prod', 0))
-                        new_c = max(cas_val, existing.get('casual', 0))
-                        new_s = max(swim_val, existing.get('swim', 0))
-                        new_a = max(adv_val, existing.get('adv', 0))
-                        new_g = max(gown_val, existing.get('gown', 0))
-                        new_q = max(qa_val, existing.get('qa', 0))
+                        new_p = prod_val if prod_val > 0 else existing.get('prod', 0)
+                        new_c = cas_val if cas_val > 0 else existing.get('casual', 0)
+                        new_s = swim_val if swim_val > 0 else existing.get('swim', 0)
+                        new_a = adv_val if adv_val > 0 else existing.get('adv', 0)
+                        new_g = gown_val if gown_val > 0 else existing.get('gown', 0)
+                        new_q = qa_val if qa_val > 0 else existing.get('qa', 0)
                         calc_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
                         final_total = g_total if g_total > 0 else calc_total
 
@@ -167,9 +167,9 @@ def sync_stores_from_csv():
                         t5_tot = to_float(row[12])
 
                         existing = TOP5_STORE.get(key, {})
-                        new_b_tot = max(b_tot, existing.get('beauty_total', 0))
-                        new_br_tot = max(br_tot, existing.get('brain_total', 0))
-                        final_t5 = max(t5_tot, new_b_tot + new_br_tot)
+                        new_b_tot = b_tot if b_tot > 0 else existing.get('beauty_total', 0)
+                        new_br_tot = br_tot if br_tot > 0 else existing.get('brain_total', 0)
+                        final_t5 = t5_tot if t5_tot > 0 else (new_b_tot + new_br_tot)
 
                         TOP5_STORE[key] = {
                             'candidate': cand_str,
@@ -296,8 +296,12 @@ def save_score():
     init_csv()
     round_type = request.form.get('round_type', 'prelim')
     candidate = request.form.get('candidate_number', '')
-    judge_slot = session.get('judge_slot') or request.form.get('judge_slot') or 'Judge 1'
-    judge_name = session.get('judge_name') or request.form.get('judge_name') or judge_slot
+    # IMPORTANT: Use form judge_slot as PRIMARY source.
+    # The JS page bakes the correct judge_slot at render time into currentJudgeSlot.
+    # Session can change if user logs in as a different judge in another tab,
+    # so session must NOT override the form value from the original page.
+    judge_slot = request.form.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
+    judge_name = request.form.get('judge_name') or session.get('judge_name') or judge_slot
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if round_type == 'top5':
@@ -344,7 +348,7 @@ def save_score():
 # --- ROUTE: FETCH CURRENT JUDGE'S SCORES FOR AUTOMATIC RESTORATION ON RELOAD ---
 @app.route('/api/my_judge_scores')
 def get_my_judge_scores():
-    judge_slot = session.get('judge_slot') or request.args.get('judge_slot') or 'Judge 1'
+    judge_slot = request.args.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
     sync_stores_from_csv()
     
     prelim_done = {}     # step -> { candNum: true }
