@@ -881,6 +881,148 @@
             document.getElementById('preview-name').textContent = "No Candidate Selected";
         }
 
+        // --- CANDIDATE DRAFT TRACKING & NEXT CATEGORY VALIDATION ---
+        let candidateDrafts = { prelim: {}, top5: {} };
+        let currentStep = 1;
+        let currentTop5Step = 1;
+
+        function saveCurrentCandidateDraft() {
+            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
+            if (!selectedRadio) {
+                updateCategoryProgress();
+                return;
+            }
+            const candNum = selectedRadio.value;
+            const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
+            
+            if (!candidateDrafts[currentMode][step]) {
+                candidateDrafts[currentMode][step] = {};
+            }
+
+            const currentStepEl = currentMode === 'prelim' 
+                ? document.getElementById(`step-${step}`) 
+                : document.getElementById(`top5-step-${step}`);
+                
+            if (!currentStepEl) return;
+
+            const inputs = currentStepEl.querySelectorAll('input[type="number"]');
+            let isComplete = true;
+            let scores = {};
+            
+            inputs.forEach(input => {
+                const val = parseFloat(input.value);
+                if (isNaN(val) || val === null || val === undefined || input.value === '') {
+                    isComplete = false;
+                } else {
+                    scores[input.name] = val;
+                }
+            });
+
+            if (isComplete) {
+                candidateDrafts[currentMode][step][candNum] = scores;
+            } else {
+                delete candidateDrafts[currentMode][step][candNum];
+            }
+
+            updateCategoryProgress();
+        }
+
+        function loadCandidateDraft(candNum) {
+            const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
+            const draft = candidateDrafts[currentMode]?.[step]?.[candNum];
+            
+            const currentStepEl = currentMode === 'prelim' 
+                ? document.getElementById(`step-${step}`) 
+                : document.getElementById(`top5-step-${step}`);
+                
+            if (!currentStepEl) return;
+
+            const inputs = currentStepEl.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                if (draft && draft[input.name] !== undefined) {
+                    input.value = draft[input.name];
+                } else {
+                    input.value = '';
+                }
+            });
+            updateLiveTotal();
+        }
+
+        function updateCategoryProgress() {
+            const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
+            const completedSet = candidateDrafts[currentMode]?.[step] || {};
+            
+            let totalRequired = 0;
+            let completedCount = 0;
+
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                const num = card.getAttribute('data-cand-num');
+                const isVisible = card.style.display !== 'none';
+                
+                if (isVisible) {
+                    totalRequired++;
+                    let statusBadge = card.querySelector('.scored-check-badge');
+                    if (!statusBadge) {
+                        statusBadge = document.createElement('span');
+                        statusBadge.className = 'top5-star-badge';
+                        statusBadge.style.backgroundColor = '#10b981';
+                        statusBadge.style.color = '#000000';
+                        statusBadge.style.left = '-4px';
+                        statusBadge.style.right = 'auto';
+                        statusBadge.style.top = '-4px';
+                        card.querySelector('.candidate-box').appendChild(statusBadge);
+                    }
+                    
+                    if (completedSet[num]) {
+                        statusBadge.style.display = 'block';
+                        statusBadge.textContent = '✓ DONE';
+                        completedCount++;
+                    } else {
+                        statusBadge.style.display = 'none';
+                    }
+                }
+            });
+
+            if (totalRequired === 0) totalRequired = currentMode === 'prelim' ? 12 : 5;
+
+            const currentStepEl = currentMode === 'prelim' 
+                ? document.getElementById(`step-${step}`) 
+                : document.getElementById(`top5-step-${step}`);
+                
+            if (currentStepEl) {
+                const nextBtn = currentStepEl.querySelector('.btn-next');
+                const submitBtn = currentStepEl.querySelector('.btn-submit');
+                const isFullyDone = completedCount >= totalRequired;
+
+                if (nextBtn) {
+                    if (isFullyDone) {
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.cursor = 'pointer';
+                        nextBtn.style.backgroundColor = '#10b981';
+                        nextBtn.style.color = '#000000';
+                        nextBtn.innerHTML = `NEXT CATEGORY (${completedCount}/${totalRequired} COMPLETE) &rarr;`;
+                    } else {
+                        nextBtn.disabled = false; // allow click to show friendly alert if incomplete
+                        nextBtn.style.opacity = '0.7';
+                        nextBtn.style.backgroundColor = 'transparent';
+                        nextBtn.style.color = '#10b981';
+                        nextBtn.innerHTML = `NEXT CATEGORY (${completedCount}/${totalRequired} SCORED)`;
+                    }
+                }
+
+                if (submitBtn) {
+                    if (isFullyDone) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '0.7';
+                    }
+                }
+            }
+        }
+
         // --- 1. CANDIDATE SELECTION ---
         const radioButtons = document.querySelectorAll('input[name="candidate_number"]');
         const previewImg = document.getElementById('preview-img');
@@ -889,24 +1031,27 @@
 
         radioButtons.forEach(radio => {
             radio.addEventListener('change', function() {
+                saveCurrentCandidateDraft();
                 placeholderCircle.style.display = 'none';
                 previewImg.style.display = 'block';
                 previewImg.src = this.getAttribute('data-img');
                 previewName.textContent = this.getAttribute('data-name');
-                updateLiveTotal();
+                loadCandidateDraft(this.value);
             });
         });
 
         // --- 2. LIVE GRAND TOTAL CALCULATOR ---
         document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.addEventListener('input', updateLiveTotal);
+            input.addEventListener('input', function() {
+                saveCurrentCandidateDraft();
+                updateLiveTotal();
+            });
         });
 
         function updateLiveTotal() {
             const getVal = name => parseFloat(document.querySelector(`input[name="${name}"]`)?.value || 0);
 
             if (currentMode === 'prelim') {
-                // Production (15%)
                 const pSum = getVal('p_presence') + getVal('p_execution') + getVal('p_energy') + getVal('p_personality');
                 const pW = pSum * 0.15;
                 const cSum = getVal('c_poise') + getVal('c_carriage') + getVal('c_presence') + getVal('c_impact');
@@ -923,7 +1068,6 @@
                 const total = pW + cW + sW + aW + eW + qW;
                 document.getElementById('grandTotalPreview').textContent = total.toFixed(2) + ' / 100';
             } else {
-                // Top 5 Round (Beauty 30% + Brain 40% = 70%)
                 const beauty = getVal('b_facial') + getVal('b_poise') + getVal('b_conf');
                 const brain  = getVal('br_substance') + getVal('br_intelligence') + getVal('br_clarity') + getVal('br_delivery');
                 const total = beauty + brain;
@@ -932,8 +1076,8 @@
         }
 
         // --- 3. STEPPER NAVIGATION & WIZARD ---
-        let currentStep = 1;
         function jumpToStep(stepNumber) {
+            saveCurrentCandidateDraft();
             currentStep = stepNumber;
             document.querySelectorAll('#prelimWizard .step-content').forEach(step => step.classList.remove('active'));
             document.getElementById(`step-${stepNumber}`).classList.add('active');
@@ -942,21 +1086,36 @@
                 if (index + 1 === stepNumber) tab.classList.add('active');
                 else tab.classList.remove('active');
             });
+            
+            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
+            if (selectedRadio) loadCandidateDraft(selectedRadio.value);
+            updateCategoryProgress();
         }
 
         function jumpToTop5Step(stepNumber) {
+            saveCurrentCandidateDraft();
+            currentTop5Step = stepNumber;
             document.querySelectorAll('#top5Wizard .step-content').forEach(step => step.classList.remove('active'));
             document.getElementById(`top5-step-${stepNumber}`).classList.add('active');
 
             document.getElementById('top5Tab1').classList.toggle('active', stepNumber === 1);
             document.getElementById('top5Tab2').classList.toggle('active', stepNumber === 2);
+            
+            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
+            if (selectedRadio) loadCandidateDraft(selectedRadio.value);
+            updateCategoryProgress();
         }
 
         document.querySelectorAll('#prelimWizard .btn-next').forEach(button => {
             button.addEventListener('click', () => {
-                if (currentStep === 1 && !document.querySelector('input[name="candidate_number"]:checked')) {
-                    alert("Please select a candidate first!");
-                    return; 
+                saveCurrentCandidateDraft();
+                const step = currentStep;
+                const completedSet = candidateDrafts['prelim']?.[step] || {};
+                const completedCount = Object.keys(completedSet).length;
+
+                if (completedCount < 12) {
+                    alert(`⚠️ Please finish scoring all 12 candidates in this category before proceeding to the next category!\n\nProgress: ${completedCount}/12 Candidates Scored`);
+                    return;
                 }
                 jumpToStep(currentStep + 1); 
             });
@@ -968,10 +1127,37 @@
             });
         });
 
+        document.querySelectorAll('#top5Wizard .btn-next').forEach(button => {
+            button.addEventListener('click', () => {
+                saveCurrentCandidateDraft();
+                const step = currentTop5Step;
+                const completedSet = candidateDrafts['top5']?.[step] || {};
+                const completedCount = Object.keys(completedSet).length;
+
+                if (completedCount < 5) {
+                    alert(`⚠️ Please finish scoring all 5 qualified finalists in this category before proceeding!\n\nProgress: ${completedCount}/5 Scored`);
+                    return;
+                }
+                jumpToTop5Step(2);
+            });
+        });
+
         // --- 4. SUBMIT FORM ---
         document.getElementById('scoringForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
+            saveCurrentCandidateDraft();
+
             const statusMessage = document.getElementById('status-message');
+            const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
+            const completedSet = candidateDrafts[currentMode]?.[step] || {};
+            const completedCount = Object.keys(completedSet).length;
+            const required = currentMode === 'prelim' ? 12 : 5;
+
+            if (completedCount < required) {
+                alert(`⚠️ Please finish scoring all ${required} candidates before submitting final scores!\n\nProgress: ${completedCount}/${required} Scored`);
+                return;
+            }
+
             statusMessage.textContent = "Submitting scores..."; 
             statusMessage.className = ""; 
             
