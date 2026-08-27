@@ -881,12 +881,28 @@
             document.getElementById('preview-name').textContent = "No Candidate Selected";
         }
 
-        // --- CANDIDATE DRAFT TRACKING & NEXT CATEGORY VALIDATION ---
+        // --- CANDIDATE DRAFT TRACKING & LOCALSTORAGE PERSISTENCE ---
         let candidateDrafts = { prelim: {}, top5: {} };
+        let candidateCompleted = { prelim: {}, top5: {} };
         let currentStep = 1;
         let currentTop5Step = 1;
         let activeCandidateNum = null;
         let syncDebounceTimer = null;
+
+        try {
+            const savedDrafts = localStorage.getItem('pageant_candidate_drafts');
+            if (savedDrafts) candidateDrafts = JSON.parse(savedDrafts);
+            
+            const savedCompleted = localStorage.getItem('pageant_candidate_completed');
+            if (savedCompleted) candidateCompleted = JSON.parse(savedCompleted);
+        } catch (e) {}
+
+        function persistDrafts() {
+            try {
+                localStorage.setItem('pageant_candidate_drafts', JSON.stringify(candidateDrafts));
+                localStorage.setItem('pageant_candidate_completed', JSON.stringify(candidateCompleted));
+            } catch (e) {}
+        }
 
         function autoSyncDraftToBackend(candNum) {
             if (!candNum) return;
@@ -928,9 +944,8 @@
             if (!candNum) return;
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
             
-            if (!candidateDrafts[currentMode][step]) {
-                candidateDrafts[currentMode][step] = {};
-            }
+            if (!candidateDrafts[currentMode][step]) candidateDrafts[currentMode][step] = {};
+            if (!candidateCompleted[currentMode][step]) candidateCompleted[currentMode][step] = {};
 
             const currentStepEl = currentMode === 'prelim' 
                 ? document.getElementById(`step-${step}`) 
@@ -953,16 +968,19 @@
                 }
             });
 
-            if (isComplete) {
+            if (hasAnyValue) {
                 candidateDrafts[currentMode][step][candNum] = scores;
             } else {
-                if (hasAnyValue) {
-                    candidateDrafts[currentMode][step][candNum] = scores;
-                } else {
-                    delete candidateDrafts[currentMode][step][candNum];
-                }
+                delete candidateDrafts[currentMode][step][candNum];
             }
 
+            if (isComplete) {
+                candidateCompleted[currentMode][step][candNum] = true;
+            } else {
+                delete candidateCompleted[currentMode][step][candNum];
+            }
+
+            persistDrafts();
             updateCategoryProgress();
             autoSyncDraftToBackend(candNum);
         }
@@ -995,7 +1013,7 @@
 
         function updateCategoryProgress() {
             const step = currentMode === 'prelim' ? currentStep : currentTop5Step;
-            const completedSet = candidateDrafts[currentMode]?.[step] || {};
+            const completedSet = candidateCompleted[currentMode]?.[step] || {};
             
             let totalRequired = 0;
             let completedCount = 0;
@@ -1009,7 +1027,7 @@
                     let statusBadge = card.querySelector('.scored-check-badge');
                     if (!statusBadge) {
                         statusBadge = document.createElement('span');
-                        statusBadge.className = 'top5-star-badge';
+                        statusBadge.className = 'top5-star-badge scored-check-badge';
                         statusBadge.style.backgroundColor = '#10b981';
                         statusBadge.style.color = '#000000';
                         statusBadge.style.left = '-4px';
@@ -1271,6 +1289,11 @@
 
                 document.getElementById('scoringForm').reset();
                 candidateDrafts[currentMode] = {};
+                candidateCompleted[currentMode] = {};
+                try {
+                    localStorage.removeItem('pageant_candidate_drafts');
+                    localStorage.removeItem('pageant_candidate_completed');
+                } catch(e) {}
                 activeCandidateNum = null;
 
                 if (currentMode === 'prelim') jumpToStep(1);
@@ -1287,6 +1310,10 @@
                 statusMessage.textContent = "Error submitting scores. Please check server connection."; 
                 statusMessage.className = "error";
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCategoryProgress();
         });
     </script>
 </body>
