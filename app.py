@@ -296,8 +296,8 @@ def save_score():
     init_csv()
     round_type = request.form.get('round_type', 'prelim')
     candidate = request.form.get('candidate_number', '')
-    judge_slot = request.form.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
-    judge_name = request.form.get('judge_name') or session.get('judge_name') or judge_slot
+    judge_slot = session.get('judge_slot') or request.form.get('judge_slot') or 'Judge 1'
+    judge_name = session.get('judge_name') or request.form.get('judge_name') or judge_slot
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if round_type == 'top5':
@@ -345,69 +345,48 @@ def save_score():
 @app.route('/api/my_judge_scores')
 def get_my_judge_scores():
     judge_slot = request.args.get('judge_slot') or session.get('judge_slot') or 'Judge 1'
-    init_csv()
+    sync_stores_from_csv()
     
     prelim_done = {}     # step -> { candNum: true }
     top5_done = {}       # step -> { candNum: true }
 
-    if os.path.exists(CSV_FILE):
-        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row.get('Judge ID') == judge_slot:
-                    cand_str = row.get('Candidate', '')
-                    if cand_str:
-                        cand_num = str(int(cand_str.replace('Candidate ', '')))
-                        
-                        p_val = float(row.get('Production (Max 100)', 0))
-                        c_val = float(row.get('Casual Wear (Max 100)', 0))
-                        s_val = float(row.get('Swimwear (Max 100)', 0))
-                        a_val = float(row.get('Advocacy (Max 100)', 0))
-                        g_val = float(row.get('Evening Gown (Max 100)', 0))
-                        q_val = float(row.get('Q&A (Max 100)', 0))
+    for (cand_str, j_slot), item in PRELIM_STORE.items():
+        if j_slot.strip() == judge_slot.strip():
+            try:
+                cand_num = str(int(cand_str.replace('Candidate ', '')))
+                if item.get('prod', 0) > 0:
+                    if '1' not in prelim_done: prelim_done['1'] = {}
+                    prelim_done['1'][cand_num] = True
+                if item.get('casual', 0) > 0:
+                    if '2' not in prelim_done: prelim_done['2'] = {}
+                    prelim_done['2'][cand_num] = True
+                if item.get('swim', 0) > 0:
+                    if '3' not in prelim_done: prelim_done['3'] = {}
+                    prelim_done['3'][cand_num] = True
+                if item.get('adv', 0) > 0:
+                    if '4' not in prelim_done: prelim_done['4'] = {}
+                    prelim_done['4'][cand_num] = True
+                if item.get('gown', 0) > 0:
+                    if '5' not in prelim_done: prelim_done['5'] = {}
+                    prelim_done['5'][cand_num] = True
+                if item.get('qa', 0) > 0:
+                    if '6' not in prelim_done: prelim_done['6'] = {}
+                    prelim_done['6'][cand_num] = True
+            except ValueError:
+                pass
 
-                        if p_val > 0:
-                            if '1' not in prelim_done: prelim_done['1'] = {}
-                            prelim_done['1'][cand_num] = True
-
-                        if c_val > 0:
-                            if '2' not in prelim_done: prelim_done['2'] = {}
-                            prelim_done['2'][cand_num] = True
-
-                        if s_val > 0:
-                            if '3' not in prelim_done: prelim_done['3'] = {}
-                            prelim_done['3'][cand_num] = True
-
-                        if a_val > 0:
-                            if '4' not in prelim_done: prelim_done['4'] = {}
-                            prelim_done['4'][cand_num] = True
-
-                        if g_val > 0:
-                            if '5' not in prelim_done: prelim_done['5'] = {}
-                            prelim_done['5'][cand_num] = True
-
-                        if q_val > 0:
-                            if '6' not in prelim_done: prelim_done['6'] = {}
-                            prelim_done['6'][cand_num] = True
-
-    if os.path.exists(TOP5_CSV_FILE):
-        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row.get('Judge ID') == judge_slot:
-                    cand_str = row.get('Candidate', '')
-                    if cand_str:
-                        cand_num = str(int(cand_str.replace('Candidate ', '')))
-                        b_tot = float(row.get('BEAUTY TOTAL (30)', 0))
-                        br_tot = float(row.get('BRAIN TOTAL (40)', 0))
-
-                        if b_tot > 0:
-                            if '1' not in top5_done: top5_done['1'] = {}
-                            top5_done['1'][cand_num] = True
-
-                        if br_tot > 0:
-                            if '2' not in top5_done: top5_done['2'] = {}
-                            top5_done['2'][cand_num] = True
+    for (cand_str, j_slot), item in TOP5_STORE.items():
+        if j_slot.strip() == judge_slot.strip():
+            try:
+                cand_num = str(int(cand_str.replace('Candidate ', '')))
+                if item.get('beauty_total', 0) > 0:
+                    if '1' not in top5_done: top5_done['1'] = {}
+                    top5_done['1'][cand_num] = True
+                if item.get('brain_total', 0) > 0:
+                    if '2' not in top5_done: top5_done['2'] = {}
+                    top5_done['2'][cand_num] = True
+            except ValueError:
+                pass
 
     return jsonify({
         'prelim_done': prelim_done,
