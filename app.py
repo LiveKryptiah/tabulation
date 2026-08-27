@@ -448,8 +448,16 @@ def get_tabulation_data():
         gown_avg = sum(gown_scores) / len(gown_scores) if gown_scores else 0.0
         qa_avg = sum(qa_scores) / len(qa_scores) if qa_scores else 0.0
 
+        prod_w = prod_avg * 0.15
+        casual_w = casual_avg * 0.15
+        swim_w = swim_avg * 0.15
+        adv_w = adv_avg * 0.20
+        gown_w = gown_avg * 0.15
+        qa_w = qa_avg * 0.20
+
+        calc_prelim_total = prod_w + casual_w + swim_w + adv_w + gown_w + qa_w
         p_scores = list(p_dict.values())
-        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else 0.0
+        prelim_avg = sum(p_scores) / len(p_scores) if p_scores else calc_prelim_total
         prelim_30 = prelim_avg * 0.30
 
         b_scores = list(b_dict.values())
@@ -496,6 +504,12 @@ def get_tabulation_data():
             'adv_avg': round(adv_avg, 2),
             'gown_avg': round(gown_avg, 2),
             'qa_avg': round(qa_avg, 2),
+            'prod_w': round(prod_w, 2),
+            'casual_w': round(casual_w, 2),
+            'swim_w': round(swim_w, 2),
+            'adv_w': round(adv_w, 2),
+            'gown_w': round(gown_w, 2),
+            'qa_w': round(qa_w, 2),
             'prod_j': prod_j,
             'casual_j': casual_j,
             'swim_j': swim_j,
