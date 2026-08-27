@@ -811,6 +811,10 @@
                 document.getElementById('scorePreviewLabel').textContent = "PRELIMINARY GRAND TOTAL:";
                 banner.style.display = 'none';
                 
+                // Hide no-prelim-basis banner if switching back to prelim
+                const noBasisBanner = document.getElementById('no-prelim-basis-banner');
+                if (noBasisBanner) noBasisBanner.style.display = 'none';
+
                 // Show all candidates in prelim mode in numerical order (1 to 12)
                 const grid = document.querySelector('.candidate-grid');
                 const cards = Array.from(document.querySelectorAll('.candidate-card'));
@@ -840,6 +844,48 @@
             .then(res => res.json())
             .then(data => {
                 if (data.candidates && data.candidates.length > 0) {
+                    const scoredCandidates = data.candidates.filter(c => c.prelim_score > 0 || c.submission_count > 0);
+                    let noBasisBanner = document.getElementById('no-prelim-basis-banner');
+
+                    if (scoredCandidates.length === 0) {
+                        // Hide all candidate cards if no preliminary score basis exists yet
+                        document.querySelectorAll('.candidate-card').forEach(card => {
+                            card.style.display = 'none';
+                            const radio = card.querySelector('input[type="radio"]');
+                            if (radio && radio.checked) {
+                                radio.checked = false;
+                                resetCandidatePreview();
+                            }
+                        });
+
+                        if (!noBasisBanner) {
+                            noBasisBanner = document.createElement('div');
+                            noBasisBanner.id = 'no-prelim-basis-banner';
+                            noBasisBanner.style.cssText = `
+                                background-color: #1f1f1f;
+                                border: 1px solid #333333;
+                                color: #b3b3b3;
+                                padding: 20px;
+                                border-radius: 12px;
+                                text-align: center;
+                                font-size: 11px;
+                                font-weight: 700;
+                                letter-spacing: 1.2px;
+                                text-transform: uppercase;
+                                margin-top: 15px;
+                                box-shadow: rgba(0,0,0,0.5) 0px 8px 24px;
+                            `;
+                            noBasisBanner.innerHTML = `<span style="color: #1ed760; font-size: 14px; display: block; margin-bottom: 8px;">⚠️ TOP 5 FINALS LOCKED</span> PRELIMINARY ROUND SCORING IS STILL IN PROGRESS.<br>TOP 5 CANDIDATES WILL AUTOMATICALLY UNLOCK HERE ONCE PRELIMINARY SCORES ARE SUBMITTED BY JUDGES.`;
+                            const leftPanel = document.querySelector('.left-panel');
+                            if (leftPanel) leftPanel.appendChild(noBasisBanner);
+                        } else {
+                            noBasisBanner.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    if (noBasisBanner) noBasisBanner.style.display = 'none';
+
                     // Sort candidates by prelim score descending
                     const sorted = [...data.candidates].sort((a, b) => b.prelim_score - a.prelim_score);
                     const top5List = sorted.slice(0, 5);
