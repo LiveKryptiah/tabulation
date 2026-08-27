@@ -1154,8 +1154,8 @@
             });
         });
 
-        // --- 4. SUBMIT FORM ---
-        document.getElementById('scoringForm').addEventListener('submit', function(event) {
+        // --- 4. SUBMIT FORM (BATCH ALL CANDIDATE SCORES TO BACKEND) ---
+        document.getElementById('scoringForm').addEventListener('submit', async function(event) {
             event.preventDefault(); 
             if (activeCandidateNum) saveCandidateDraft(activeCandidateNum);
 
@@ -1170,39 +1170,62 @@
                 return;
             }
 
-            statusMessage.textContent = "Submitting scores..."; 
+            statusMessage.textContent = "Submitting all candidate scores to Admin tabulation..."; 
             statusMessage.className = ""; 
-            
-            const selectedRadio = document.querySelector('input[name="candidate_number"]:checked');
-            if (!selectedRadio) {
-                alert("Please select a candidate before submitting!");
-                return;
+
+            const modeDrafts = candidateDrafts[currentMode] || {};
+            const candNums = currentMode === 'prelim' 
+                ? Array.from({length: 12}, (_, i) => (i + 1).toString())
+                : Array.from(document.querySelectorAll('.candidate-card'))
+                    .filter(c => c.style.display !== 'none')
+                    .map(c => c.getAttribute('data-cand-num'));
+
+            let successCount = 0;
+
+            for (const candNum of candNums) {
+                const formData = new FormData();
+                formData.append('round_type', currentMode);
+                formData.append('candidate_number', candNum);
+
+                for (const s in modeDrafts) {
+                    const cScores = modeDrafts[s]?.[candNum];
+                    if (cScores) {
+                        for (const [key, val] of Object.entries(cScores)) {
+                            formData.append(key, val);
+                        }
+                    }
+                }
+
+                try {
+                    const res = await fetch('/submit_score', { method: 'POST', body: formData });
+                    if (res.ok) successCount++;
+                } catch (err) {
+                    console.error("Error submitting candidate", candNum, err);
+                }
             }
 
-            fetch('/submit_score', { 
-                method: 'POST', 
-                body: new FormData(this) 
-            })
-            .then(response => response.text())
-            .then(data => {
-                statusMessage.textContent = "SCORES SUBMITTED SUCCESSFULLY"; 
+            if (successCount > 0) {
+                statusMessage.textContent = `SUCCESS: ALL ${successCount} CANDIDATE SCORES SUBMITTED!`; 
                 statusMessage.className = "success";
 
                 document.getElementById('scoringForm').reset();
+                candidateDrafts[currentMode] = {};
+                activeCandidateNum = null;
+
                 if (currentMode === 'prelim') jumpToStep(1);
                 else jumpToTop5Step(1);
                 
                 resetCandidatePreview();
                 updateLiveTotal();
+                updateCategoryProgress();
                 
                 setTimeout(() => { 
                     statusMessage.textContent = ""; 
-                }, 3000);
-            })
-            .catch(error => {
+                }, 4000);
+            } else {
                 statusMessage.textContent = "Error submitting scores. Please check server connection."; 
                 statusMessage.className = "error";
-            });
+            }
         });
     </script>
 </body>

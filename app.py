@@ -85,6 +85,12 @@ def scoring():
                            judge_slot=session.get('judge_slot', 'Judge 1'), 
                            judge_name=session.get('judge_name', 'Judge'))
 
+def to_float(val):
+    try:
+        return float(val) if val is not None and str(val).strip() != '' else 0.0
+    except (ValueError, TypeError):
+        return 0.0
+
 # --- ROUTE 2: Saving Judge Scores (Prelim or Top 5) ---
 @app.route('/submit_score', methods=['POST'])
 def save_score():
@@ -97,15 +103,15 @@ def save_score():
 
     if round_type == 'top5':
         # TOP 5 FINALS SCORING BY JUDGES
-        b_facial = float(request.form.get('b_facial', 0))
-        b_poise  = float(request.form.get('b_poise', 0))
-        b_conf   = float(request.form.get('b_conf', 0))
+        b_facial = to_float(request.form.get('b_facial'))
+        b_poise  = to_float(request.form.get('b_poise'))
+        b_conf   = to_float(request.form.get('b_conf'))
         beauty_total = b_facial + b_poise + b_conf
 
-        br_substance    = float(request.form.get('br_substance', 0))
-        br_intelligence = float(request.form.get('br_intelligence', 0))
-        br_clarity      = float(request.form.get('br_clarity', 0))
-        br_delivery     = float(request.form.get('br_delivery', 0))
+        br_substance    = to_float(request.form.get('br_substance'))
+        br_intelligence = to_float(request.form.get('br_intelligence'))
+        br_clarity      = to_float(request.form.get('br_clarity'))
+        br_delivery     = to_float(request.form.get('br_delivery'))
         brain_total = br_substance + br_intelligence + br_clarity + br_delivery
 
         top5_total = beauty_total + brain_total
@@ -125,22 +131,22 @@ def save_score():
 
     else:
         # PRELIMINARY SCORING BY JUDGES
-        prod_sum = int(request.form.get('p_presence', 0)) + int(request.form.get('p_execution', 0)) + int(request.form.get('p_energy', 0)) + int(request.form.get('p_personality', 0))
+        prod_sum = to_float(request.form.get('p_presence')) + to_float(request.form.get('p_execution')) + to_float(request.form.get('p_energy')) + to_float(request.form.get('p_personality'))
         prod_weighted = prod_sum * 0.15
 
-        cas_sum = int(request.form.get('c_poise', 0)) + int(request.form.get('c_carriage', 0)) + int(request.form.get('c_presence', 0)) + int(request.form.get('c_impact', 0))
+        cas_sum = to_float(request.form.get('c_poise')) + to_float(request.form.get('c_carriage')) + to_float(request.form.get('c_presence')) + to_float(request.form.get('c_impact'))
         cas_weighted = cas_sum * 0.15
 
-        swim_sum = int(request.form.get('s_confidence', 0)) + int(request.form.get('s_carriage', 0)) + int(request.form.get('s_presence', 0)) + int(request.form.get('s_impact', 0))
+        swim_sum = to_float(request.form.get('s_confidence')) + to_float(request.form.get('s_carriage')) + to_float(request.form.get('s_presence')) + to_float(request.form.get('s_impact'))
         swim_weighted = swim_sum * 0.15
 
-        adv_sum = int(request.form.get('a_relevance', 0)) + int(request.form.get('a_content', 0)) + int(request.form.get('a_feasibility', 0)) + int(request.form.get('a_communication', 0)) + int(request.form.get('a_sincerity', 0))
+        adv_sum = to_float(request.form.get('a_relevance')) + to_float(request.form.get('a_content')) + to_float(request.form.get('a_feasibility')) + to_float(request.form.get('a_communication')) + to_float(request.form.get('a_sincerity'))
         adv_weighted = adv_sum * 0.20
 
-        gown_sum = int(request.form.get('e_elegance', 0)) + int(request.form.get('e_carriage', 0)) + int(request.form.get('e_grace', 0)) + int(request.form.get('e_styling', 0)) + int(request.form.get('e_impact', 0))
+        gown_sum = to_float(request.form.get('e_elegance')) + to_float(request.form.get('e_carriage')) + to_float(request.form.get('e_grace')) + to_float(request.form.get('e_styling')) + to_float(request.form.get('e_impact'))
         gown_weighted = gown_sum * 0.15
 
-        qa_sum = int(request.form.get('q_relevance', 0)) + int(request.form.get('q_clarity', 0)) + int(request.form.get('q_insight', 0)) + int(request.form.get('q_communication', 0)) + int(request.form.get('q_composure', 0))
+        qa_sum = to_float(request.form.get('q_relevance')) + to_float(request.form.get('q_clarity')) + to_float(request.form.get('q_insight')) + to_float(request.form.get('q_communication')) + to_float(request.form.get('q_composure'))
         qa_weighted = qa_sum * 0.20
 
         grand_total = prod_weighted + cas_weighted + swim_weighted + adv_weighted + gown_weighted + qa_weighted
@@ -151,7 +157,7 @@ def save_score():
                 "Candidate " + str(candidate), 
                 judge_slot,
                 judge_name,
-                prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, 
+                round(prod_sum, 2), round(cas_sum, 2), round(swim_sum, 2), round(adv_sum, 2), round(gown_sum, 2), round(qa_sum, 2), 
                 round(grand_total, 2),
                 timestamp
             ])
