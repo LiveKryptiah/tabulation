@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import csv
 import os
+import threading
 from datetime import datetime
 
 app = Flask(__name__)
@@ -94,138 +95,168 @@ def to_float(val):
 # Global In-Memory Score Stores (Preserves all judges data seamlessly)
 PRELIM_STORE = {}  # (cand_str, judge_slot) -> dict
 TOP5_STORE = {}    # (cand_str, judge_slot) -> dict
+STORE_LOCK = threading.Lock()  # Protect concurrent read/write to stores and CSV
+_STORES_INITIALIZED = False  # Track whether initial CSV load has happened
+
+def _load_prelim_from_csv():
+    """Internal: Read prelim CSV rows into PRELIM_STORE (additive merge)."""
+    if not os.path.exists(CSV_FILE):
+        return
+    try:
+        with open(CSV_FILE, mode='r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            headers = next(reader, None)
+            for row in reader:
+                if len(row) >= 10:
+                    cand_str = row[0].strip()
+                    j_slot = row[1].strip()
+                    j_name = row[2].strip()
+                    key = (cand_str, j_slot)
+
+                    prod_val = to_float(row[3])
+                    cas_val = to_float(row[4])
+                    swim_val = to_float(row[5])
+                    adv_val = to_float(row[6])
+                    gown_val = to_float(row[7])
+                    qa_val = to_float(row[8])
+                    g_total = to_float(row[9])
+
+                    existing = PRELIM_STORE.get(key, {})
+                    new_p = prod_val if prod_val > 0 else existing.get('prod', 0)
+                    new_c = cas_val if cas_val > 0 else existing.get('casual', 0)
+                    new_s = swim_val if swim_val > 0 else existing.get('swim', 0)
+                    new_a = adv_val if adv_val > 0 else existing.get('adv', 0)
+                    new_g = gown_val if gown_val > 0 else existing.get('gown', 0)
+                    new_q = qa_val if qa_val > 0 else existing.get('qa', 0)
+                    calc_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+                    final_total = g_total if g_total > 0 else calc_total
+
+                    PRELIM_STORE[key] = {
+                        'candidate_str': cand_str,
+                        'judge_slot': j_slot,
+                        'judge_name': j_name,
+                        'prod': round(new_p, 2),
+                        'casual': round(new_c, 2),
+                        'swim': round(new_s, 2),
+                        'adv': round(new_a, 2),
+                        'gown': round(new_g, 2),
+                        'qa': round(new_q, 2),
+                        'grand_total': round(final_total, 2),
+                        'timestamp': row[10] if len(row) > 10 else ''
+                    }
+    except Exception as e:
+        print("Error reading prelim CSV to store:", e)
+
+
+def _load_top5_from_csv():
+    """Internal: Read top5 CSV rows into TOP5_STORE (additive merge)."""
+    if not os.path.exists(TOP5_CSV_FILE):
+        return
+    try:
+        with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            headers = next(reader, None)
+            for row in reader:
+                if len(row) >= 13:
+                    cand_str = row[0].strip()
+                    j_slot = row[1].strip()
+                    j_name = row[2].strip()
+                    key = (cand_str, j_slot)
+
+                    b_fac = to_float(row[3])
+                    b_poi = to_float(row[4])
+                    b_cnf = to_float(row[5])
+                    b_tot = to_float(row[6])
+                    br_sub = to_float(row[7])
+                    br_int = to_float(row[8])
+                    br_cla = to_float(row[9])
+                    br_del = to_float(row[10])
+                    br_tot = to_float(row[11])
+                    t5_tot = to_float(row[12])
+
+                    existing = TOP5_STORE.get(key, {})
+                    new_b_tot = b_tot if b_tot > 0 else existing.get('beauty_total', 0)
+                    new_br_tot = br_tot if br_tot > 0 else existing.get('brain_total', 0)
+                    final_t5 = t5_tot if t5_tot > 0 else (new_b_tot + new_br_tot)
+
+                    TOP5_STORE[key] = {
+                        'candidate': cand_str,
+                        'judge_slot': j_slot,
+                        'judge_name': j_name,
+                        'b_facial': b_fac,
+                        'b_poise': b_poi,
+                        'b_conf': b_cnf,
+                        'beauty_total': round(new_b_tot, 2),
+                        'br_substance': br_sub,
+                        'br_intelligence': br_int,
+                        'br_clarity': br_cla,
+                        'br_delivery': br_del,
+                        'brain_total': round(new_br_tot, 2),
+                        'top5_total': round(final_t5, 2),
+                        'timestamp': row[13] if len(row) > 13 else ''
+                    }
+    except Exception as e:
+        print("Error reading top5 CSV to store:", e)
+
+
+def ensure_stores_loaded():
+    """Ensure in-memory stores are loaded from CSV (runs once on first access)."""
+    global _STORES_INITIALIZED
+    if _STORES_INITIALIZED:
+        return
+    with STORE_LOCK:
+        if _STORES_INITIALIZED:
+            return
+        _load_prelim_from_csv()
+        _load_top5_from_csv()
+        _STORES_INITIALIZED = True
+        print(f"Stores loaded: {len(PRELIM_STORE)} prelim entries, {len(TOP5_STORE)} top5 entries")
+
 
 def sync_stores_from_csv():
-    """Load existing CSV files into memory store."""
-    if os.path.exists(CSV_FILE):
-        try:
-            with open(CSV_FILE, mode='r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                headers = next(reader, None)
-                for row in reader:
-                    if len(row) >= 10:
-                        cand_str = row[0].strip()
-                        j_slot = row[1].strip()
-                        j_name = row[2].strip()
-                        key = (cand_str, j_slot)
-
-                        prod_val = to_float(row[3])
-                        cas_val = to_float(row[4])
-                        swim_val = to_float(row[5])
-                        adv_val = to_float(row[6])
-                        gown_val = to_float(row[7])
-                        qa_val = to_float(row[8])
-                        g_total = to_float(row[9])
-
-                        existing = PRELIM_STORE.get(key, {})
-                        new_p = prod_val if prod_val > 0 else existing.get('prod', 0)
-                        new_c = cas_val if cas_val > 0 else existing.get('casual', 0)
-                        new_s = swim_val if swim_val > 0 else existing.get('swim', 0)
-                        new_a = adv_val if adv_val > 0 else existing.get('adv', 0)
-                        new_g = gown_val if gown_val > 0 else existing.get('gown', 0)
-                        new_q = qa_val if qa_val > 0 else existing.get('qa', 0)
-                        calc_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
-                        final_total = g_total if g_total > 0 else calc_total
-
-                        PRELIM_STORE[key] = {
-                            'candidate_str': cand_str,
-                            'judge_slot': j_slot,
-                            'judge_name': j_name,
-                            'prod': round(new_p, 2),
-                            'casual': round(new_c, 2),
-                            'swim': round(new_s, 2),
-                            'adv': round(new_a, 2),
-                            'gown': round(new_g, 2),
-                            'qa': round(new_q, 2),
-                            'grand_total': round(final_total, 2),
-                            'timestamp': row[10] if len(row) > 10 else ''
-                        }
-        except Exception as e:
-            print("Error reading prelim CSV to store:", e)
-
-    if os.path.exists(TOP5_CSV_FILE):
-        try:
-            with open(TOP5_CSV_FILE, mode='r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                headers = next(reader, None)
-                for row in reader:
-                    if len(row) >= 13:
-                        cand_str = row[0].strip()
-                        j_slot = row[1].strip()
-                        j_name = row[2].strip()
-                        key = (cand_str, j_slot)
-
-                        b_fac = to_float(row[3])
-                        b_poi = to_float(row[4])
-                        b_cnf = to_float(row[5])
-                        b_tot = to_float(row[6])
-                        br_sub = to_float(row[7])
-                        br_int = to_float(row[8])
-                        br_cla = to_float(row[9])
-                        br_del = to_float(row[10])
-                        br_tot = to_float(row[11])
-                        t5_tot = to_float(row[12])
-
-                        existing = TOP5_STORE.get(key, {})
-                        new_b_tot = b_tot if b_tot > 0 else existing.get('beauty_total', 0)
-                        new_br_tot = br_tot if br_tot > 0 else existing.get('brain_total', 0)
-                        final_t5 = t5_tot if t5_tot > 0 else (new_b_tot + new_br_tot)
-
-                        TOP5_STORE[key] = {
-                            'candidate': cand_str,
-                            'judge_slot': j_slot,
-                            'judge_name': j_name,
-                            'b_facial': b_fac,
-                            'b_poise': b_poi,
-                            'b_conf': b_cnf,
-                            'beauty_total': round(new_b_tot, 2),
-                            'br_substance': br_sub,
-                            'br_intelligence': br_int,
-                            'br_clarity': br_cla,
-                            'br_delivery': br_del,
-                            'brain_total': round(new_br_tot, 2),
-                            'top5_total': round(final_t5, 2),
-                            'timestamp': row[13] if len(row) > 13 else ''
-                        }
-        except Exception as e:
-            print("Error reading top5 CSV to store:", e)
+    """Ensure stores are populated. Safe to call from read-only paths."""
+    ensure_stores_loaded()
 
 def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, grand_total, timestamp):
-    sync_stores_from_csv()
-    key = (candidate_str.strip(), judge_slot.strip())
-    existing = PRELIM_STORE.get(key, {})
+    ensure_stores_loaded()
+    with STORE_LOCK:
+        key = (candidate_str.strip(), judge_slot.strip())
+        existing = PRELIM_STORE.get(key, {})
 
-    old_p = existing.get('prod', 0)
-    old_c = existing.get('casual', 0)
-    old_s = existing.get('swim', 0)
-    old_a = existing.get('adv', 0)
-    old_g = existing.get('gown', 0)
-    old_q = existing.get('qa', 0)
+        old_p = existing.get('prod', 0)
+        old_c = existing.get('casual', 0)
+        old_s = existing.get('swim', 0)
+        old_a = existing.get('adv', 0)
+        old_g = existing.get('gown', 0)
+        old_q = existing.get('qa', 0)
 
-    new_p = prod_sum if prod_sum > 0 else old_p
-    new_c = cas_sum if cas_sum > 0 else old_c
-    new_s = swim_sum if swim_sum > 0 else old_s
-    new_a = adv_sum if adv_sum > 0 else old_a
-    new_g = gown_sum if gown_sum > 0 else old_g
-    new_q = qa_sum if qa_sum > 0 else old_q
+        new_p = prod_sum if prod_sum > 0 else old_p
+        new_c = cas_sum if cas_sum > 0 else old_c
+        new_s = swim_sum if swim_sum > 0 else old_s
+        new_a = adv_sum if adv_sum > 0 else old_a
+        new_g = gown_sum if gown_sum > 0 else old_g
+        new_q = qa_sum if qa_sum > 0 else old_q
 
-    g_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
+        g_total = (new_p * 0.15) + (new_c * 0.15) + (new_s * 0.15) + (new_a * 0.20) + (new_g * 0.15) + (new_q * 0.20)
 
-    PRELIM_STORE[key] = {
-        'candidate_str': candidate_str,
-        'judge_slot': judge_slot,
-        'judge_name': judge_name,
-        'prod': round(new_p, 2),
-        'casual': round(new_c, 2),
-        'swim': round(new_s, 2),
-        'adv': round(new_a, 2),
-        'gown': round(new_g, 2),
-        'qa': round(new_q, 2),
-        'grand_total': round(g_total, 2),
-        'timestamp': timestamp
-    }
+        PRELIM_STORE[key] = {
+            'candidate_str': candidate_str,
+            'judge_slot': judge_slot,
+            'judge_name': judge_name,
+            'prod': round(new_p, 2),
+            'casual': round(new_c, 2),
+            'swim': round(new_s, 2),
+            'adv': round(new_a, 2),
+            'gown': round(new_g, 2),
+            'qa': round(new_q, 2),
+            'grand_total': round(g_total, 2),
+            'timestamp': timestamp
+        }
 
-    # Write out full combined store
+        _flush_prelim_csv()
+
+def _flush_prelim_csv():
+    """Write the entire PRELIM_STORE to CSV. Must be called while holding STORE_LOCK."""
     rows = [[
         'Candidate', 'Judge ID', 'Judge Name',
         'Production (Max 100)', 'Casual Wear (Max 100)', 'Swimwear (Max 100)',
@@ -239,7 +270,6 @@ def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum,
             item['adv'], item['gown'], item['qa'],
             item['grand_total'], item['timestamp']
         ])
-
     try:
         with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
@@ -247,28 +277,9 @@ def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum,
     except Exception as e:
         print("Error writing prelim CSV:", e)
 
-def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poise, b_conf, beauty_total, br_substance, br_intelligence, br_clarity, br_delivery, brain_total, top5_total, timestamp):
-    sync_stores_from_csv()
-    key = (candidate.strip(), judge_slot.strip())
 
-    TOP5_STORE[key] = {
-        'candidate': candidate,
-        'judge_slot': judge_slot,
-        'judge_name': judge_name,
-        'b_facial': b_facial,
-        'b_poise': b_poise,
-        'b_conf': b_conf,
-        'beauty_total': round(beauty_total, 2),
-        'br_substance': br_substance,
-        'br_intelligence': br_intelligence,
-        'br_clarity': br_clarity,
-        'br_delivery': br_delivery,
-        'brain_total': round(brain_total, 2),
-        'top5_total': round(top5_total, 2),
-        'timestamp': timestamp
-    }
-
-    # Write out full combined store
+def _flush_top5_csv():
+    """Write the entire TOP5_STORE to CSV. Must be called while holding STORE_LOCK."""
     rows = [[
         'Candidate', 'Judge ID', 'Judge Name',
         'Beauty Facial (Max 15)', 'Beauty Poise (Max 10)', 'Beauty Confidence (Max 5)', 'BEAUTY TOTAL (30)',
@@ -282,13 +293,37 @@ def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poi
             item['br_substance'], item['br_intelligence'], item['br_clarity'], item['br_delivery'], item['brain_total'],
             item['top5_total'], item['timestamp']
         ])
-
     try:
         with open(TOP5_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
     except Exception as e:
         print("Error writing top5 CSV:", e)
+
+
+def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poise, b_conf, beauty_total, br_substance, br_intelligence, br_clarity, br_delivery, brain_total, top5_total, timestamp):
+    ensure_stores_loaded()
+    with STORE_LOCK:
+        key = (candidate.strip(), judge_slot.strip())
+
+        TOP5_STORE[key] = {
+            'candidate': candidate,
+            'judge_slot': judge_slot,
+            'judge_name': judge_name,
+            'b_facial': b_facial,
+            'b_poise': b_poise,
+            'b_conf': b_conf,
+            'beauty_total': round(beauty_total, 2),
+            'br_substance': br_substance,
+            'br_intelligence': br_intelligence,
+            'br_clarity': br_clarity,
+            'br_delivery': br_delivery,
+            'brain_total': round(brain_total, 2),
+            'top5_total': round(top5_total, 2),
+            'timestamp': timestamp
+        }
+
+        _flush_top5_csv()
 
 # --- ROUTE 2: Saving Judge Scores (Prelim or Top 5) ---
 @app.route('/submit_score', methods=['POST'])
@@ -631,7 +666,9 @@ def admin_data():
 
 if __name__ == '__main__':
     init_csv()
+    ensure_stores_loaded()
     print("Starting Tabulation Server...")
+    print(f"  Prelim entries: {len(PRELIM_STORE)}, Top5 entries: {len(TOP5_STORE)}")
     app.run(host='0.0.0.0', port=5000, debug=True)
 
 
