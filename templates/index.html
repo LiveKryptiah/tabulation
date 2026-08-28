@@ -964,43 +964,60 @@
             } catch (e) {}
         }
 
+        let _syncDirty = false;  // Track if there are unsent changes
+
         function autoSyncDraftToBackend(candNum) {
             if (!candNum) return;
+            _syncDirty = true;
             clearTimeout(syncDebounceTimer);
             
             syncDebounceTimer = setTimeout(() => {
-                const modeDrafts = candidateDrafts[currentMode] || {};
-                const formData = new FormData();
-                formData.append('round_type', currentMode);
-                formData.append('candidate_number', candNum);
-                formData.append('judge_slot', currentJudgeSlot);
-                formData.append('judge_name', currentJudgeName);
-
-                let hasData = false;
-                for (const s in modeDrafts) {
-                    const cScores = modeDrafts[s]?.[candNum];
-                    if (cScores) {
-                        for (const [key, val] of Object.entries(cScores)) {
-                            formData.append(key, val);
-                            hasData = true;
-                        }
-                    }
-                }
-
-                if (hasData) {
-                    fetch('/submit_score', { method: 'POST', body: formData })
-                    .then(() => {
-                        const statusMessage = document.getElementById('status-message');
-                        if (statusMessage) {
-                            statusMessage.textContent = "AUTO-SAVED TO ADMIN TABULATION";
-                            statusMessage.className = "success";
-                            setTimeout(() => { statusMessage.textContent = ""; }, 2000);
-                        }
-                    })
-                    .catch(err => console.log("Auto-sync background save", err));
-                }
+                _flushSyncToBackend(candNum);
             }, 500);
         }
+
+        function _flushSyncToBackend(candNum) {
+            if (!candNum) return;
+            const modeDrafts = candidateDrafts[currentMode] || {};
+            const formData = new FormData();
+            formData.append('round_type', currentMode);
+            formData.append('candidate_number', candNum);
+            formData.append('judge_slot', currentJudgeSlot);
+            formData.append('judge_name', currentJudgeName);
+
+            let hasData = false;
+            for (const s in modeDrafts) {
+                const cScores = modeDrafts[s]?.[candNum];
+                if (cScores) {
+                    for (const [key, val] of Object.entries(cScores)) {
+                        formData.append(key, val);
+                        hasData = true;
+                    }
+                }
+            }
+
+            if (hasData) {
+                _syncDirty = false;
+                fetch('/submit_score', { method: 'POST', body: formData })
+                .then(() => {
+                    const statusMessage = document.getElementById('status-message');
+                    if (statusMessage) {
+                        statusMessage.textContent = "AUTO-SAVED TO ADMIN TABULATION";
+                        statusMessage.className = "success";
+                        setTimeout(() => { statusMessage.textContent = ""; }, 2000);
+                    }
+                })
+                .catch(err => { _syncDirty = true; console.log("Auto-sync background save", err); });
+            }
+        }
+
+        // Periodic auto-sync every 3 seconds to guarantee admin sees updates
+        setInterval(() => {
+            if (_syncDirty && activeCandidateNum) {
+                saveCandidateDraft(activeCandidateNum);
+                _flushSyncToBackend(activeCandidateNum);
+            }
+        }, 3000);
 
         function saveCandidateDraft(candNum) {
             if (!candNum) return;
@@ -1193,6 +1210,14 @@
                     saveCandidateDraft(activeCandidateNum);
                 }
                 updateLiveTotal();
+            });
+            // Immediate sync when field loses focus (tab out / click away)
+            input.addEventListener('change', function() {
+                if (activeCandidateNum) {
+                    saveCandidateDraft(activeCandidateNum);
+                    clearTimeout(syncDebounceTimer);
+                    _flushSyncToBackend(activeCandidateNum);
+                }
             });
         });
 
