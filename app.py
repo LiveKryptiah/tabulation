@@ -305,21 +305,48 @@ def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poi
     ensure_stores_loaded()
     with STORE_LOCK:
         key = (candidate.strip(), judge_slot.strip())
+        existing = TOP5_STORE.get(key, {})
+
+        old_b_fac = existing.get('b_facial', 0)
+        old_b_poi = existing.get('b_poise', 0)
+        old_b_cnf = existing.get('b_conf', 0)
+        old_b_tot = existing.get('beauty_total', 0)
+
+        old_br_sub = existing.get('br_substance', 0)
+        old_br_int = existing.get('br_intelligence', 0)
+        old_br_cla = existing.get('br_clarity', 0)
+        old_br_del = existing.get('br_delivery', 0)
+        old_br_tot = existing.get('brain_total', 0)
+
+        new_b_fac = b_facial if b_facial > 0 else old_b_fac
+        new_b_poi = b_poise if b_poise > 0 else old_b_poi
+        new_b_cnf = b_conf if b_conf > 0 else old_b_cnf
+        calc_b_tot = new_b_fac + new_b_poi + new_b_cnf
+        new_b_tot = calc_b_tot if calc_b_tot > 0 else (beauty_total if beauty_total > 0 else old_b_tot)
+
+        new_br_sub = br_substance if br_substance > 0 else old_br_sub
+        new_br_int = br_intelligence if br_intelligence > 0 else old_br_int
+        new_br_cla = br_clarity if br_clarity > 0 else old_br_cla
+        new_br_del = br_delivery if br_delivery > 0 else old_br_del
+        calc_br_tot = new_br_sub + new_br_int + new_br_cla + new_br_del
+        new_br_tot = calc_br_tot if calc_br_tot > 0 else (brain_total if brain_total > 0 else old_br_tot)
+
+        final_t5 = new_b_tot + new_br_tot
 
         TOP5_STORE[key] = {
             'candidate': candidate,
             'judge_slot': judge_slot,
             'judge_name': judge_name,
-            'b_facial': b_facial,
-            'b_poise': b_poise,
-            'b_conf': b_conf,
-            'beauty_total': round(beauty_total, 2),
-            'br_substance': br_substance,
-            'br_intelligence': br_intelligence,
-            'br_clarity': br_clarity,
-            'br_delivery': br_delivery,
-            'brain_total': round(brain_total, 2),
-            'top5_total': round(top5_total, 2),
+            'b_facial': round(new_b_fac, 2),
+            'b_poise': round(new_b_poi, 2),
+            'b_conf': round(new_b_cnf, 2),
+            'beauty_total': round(new_b_tot, 2),
+            'br_substance': round(new_br_sub, 2),
+            'br_intelligence': round(new_br_int, 2),
+            'br_clarity': round(new_br_cla, 2),
+            'br_delivery': round(new_br_del, 2),
+            'brain_total': round(new_br_tot, 2),
+            'top5_total': round(final_t5, 2),
             'timestamp': timestamp
         }
 
