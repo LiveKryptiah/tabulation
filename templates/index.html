@@ -551,7 +551,7 @@
                 <div class="candidate-grid">
                     <!-- Candidates 1 to 12 -->
                     <label class="candidate-card" data-cand-num="1">
-                        <input type="radio" name="candidate_number" value="1" data-img="/static/candidate1.jpg" data-name="Candidate 1" required>
+                        <input type="radio" name="candidate_number" value="1" data-img="/static/candidate1.jpg" data-name="Candidate 1">
                         <div class="candidate-box">
                             <span class="top5-star-badge">TOP 5</span>
                             <img src="/static/candidate1.jpg" alt="Cand 1"><span>CAND. 1</span>
@@ -795,6 +795,12 @@
             currentMode = mode;
             document.getElementById('round_type_input').value = mode;
             
+            // Clear candidate selection when changing modes!
+            document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+            setActiveCandidate(null);
+            resetCandidatePreview();
+            document.querySelectorAll('.right-panel input[type="number"]').forEach(input => input.value = '');
+
             const btnP = document.getElementById('btnPrelimRound');
             const btnT = document.getElementById('btnTop5Round');
             const headerT = document.getElementById('formHeaderTitle');
@@ -920,6 +926,7 @@
                             const radio = card.querySelector('input[type="radio"]');
                             if (radio && radio.checked) {
                                 radio.checked = false;
+                                setActiveCandidate(null);
                                 resetCandidatePreview();
                             }
                         }
@@ -1200,11 +1207,9 @@
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
                 if (!activeCandidateNum) {
-                    const firstRadio = document.querySelector('input[name="candidate_number"]:checked') || document.querySelector('input[name="candidate_number"]');
-                    if (firstRadio) {
-                        firstRadio.checked = true;
-                        setActiveCandidate(firstRadio.value);
-                    }
+                    this.value = '';
+                    alert("⚠️ Please select a candidate from the left panel first before entering scores!");
+                    return;
                 }
                 if (activeCandidateNum) {
                     saveCandidateDraft(activeCandidateNum);
@@ -1414,7 +1419,8 @@
             const savedActive = localStorage.getItem(activeStorageKey);
             if (savedActive) {
                 const radio = document.querySelector(`input[name="candidate_number"][value="${savedActive}"]`);
-                if (radio) {
+                const card = radio ? radio.closest('.candidate-card') : null;
+                if (radio && card && card.style.display !== 'none') {
                     radio.checked = true;
                     setActiveCandidate(savedActive);
                     placeholderCircle.style.display = 'none';
@@ -1422,7 +1428,15 @@
                     previewImg.src = radio.getAttribute('data-img');
                     previewName.textContent = radio.getAttribute('data-name');
                     loadCandidateDraft(savedActive);
+                } else {
+                    document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+                    setActiveCandidate(null);
+                    resetCandidatePreview();
                 }
+            } else {
+                document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+                setActiveCandidate(null);
+                resetCandidatePreview();
             }
 
             // Ultimate backup: Sync saved completion states directly from server for THIS judge!
