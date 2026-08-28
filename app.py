@@ -175,22 +175,33 @@ def _load_top5_from_csv():
                     t5_tot = to_float(row[12])
 
                     existing = TOP5_STORE.get(key, {})
-                    new_b_tot = b_tot if b_tot > 0 else existing.get('beauty_total', 0)
-                    new_br_tot = br_tot if br_tot > 0 else existing.get('brain_total', 0)
-                    final_t5 = t5_tot if t5_tot > 0 else (new_b_tot + new_br_tot)
+                    new_b_fac = b_fac if b_fac > 0 else existing.get('b_facial', 0)
+                    new_b_poi = b_poi if b_poi > 0 else existing.get('b_poise', 0)
+                    new_b_cnf = b_cnf if b_cnf > 0 else existing.get('b_conf', 0)
+                    calc_b = new_b_fac + new_b_poi + new_b_cnf
+                    new_b_tot = calc_b if calc_b > 0 else (b_tot if b_tot > 0 else existing.get('beauty_total', 0))
+
+                    new_br_sub = br_sub if br_sub > 0 else existing.get('br_substance', 0)
+                    new_br_int = br_int if br_int > 0 else existing.get('br_intelligence', 0)
+                    new_br_cla = br_cla if br_cla > 0 else existing.get('br_clarity', 0)
+                    new_br_del = br_del if br_del > 0 else existing.get('br_delivery', 0)
+                    calc_br = new_br_sub + new_br_int + new_br_cla + new_br_del
+                    new_br_tot = calc_br if calc_br > 0 else (br_tot if br_tot > 0 else existing.get('brain_total', 0))
+
+                    final_t5 = new_b_tot + new_br_tot
 
                     TOP5_STORE[key] = {
                         'candidate': cand_str,
                         'judge_slot': j_slot,
                         'judge_name': j_name,
-                        'b_facial': b_fac,
-                        'b_poise': b_poi,
-                        'b_conf': b_cnf,
+                        'b_facial': round(new_b_fac, 2),
+                        'b_poise': round(new_b_poi, 2),
+                        'b_conf': round(new_b_cnf, 2),
                         'beauty_total': round(new_b_tot, 2),
-                        'br_substance': br_sub,
-                        'br_intelligence': br_int,
-                        'br_clarity': br_cla,
-                        'br_delivery': br_del,
+                        'br_substance': round(new_br_sub, 2),
+                        'br_intelligence': round(new_br_int, 2),
+                        'br_clarity': round(new_br_cla, 2),
+                        'br_delivery': round(new_br_del, 2),
                         'brain_total': round(new_br_tot, 2),
                         'top5_total': round(final_t5, 2),
                         'timestamp': row[13] if len(row) > 13 else ''
@@ -200,22 +211,15 @@ def _load_top5_from_csv():
 
 
 def ensure_stores_loaded():
-    """Ensure in-memory stores are loaded from CSV (runs once on first access)."""
-    global _STORES_INITIALIZED
-    if _STORES_INITIALIZED:
-        return
-    with STORE_LOCK:
-        if _STORES_INITIALIZED:
-            return
-        _load_prelim_from_csv()
-        _load_top5_from_csv()
-        _STORES_INITIALIZED = True
-        print(f"Stores loaded: {len(PRELIM_STORE)} prelim entries, {len(TOP5_STORE)} top5 entries")
+    """Ensure in-memory stores are loaded from CSV."""
+    sync_stores_from_csv()
 
 
 def sync_stores_from_csv():
-    """Ensure stores are populated. Safe to call from read-only paths."""
-    ensure_stores_loaded()
+    """Ensure stores are populated and fully merged from CSV files on disk."""
+    with STORE_LOCK:
+        _load_prelim_from_csv()
+        _load_top5_from_csv()
 
 def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum, cas_sum, swim_sum, adv_sum, gown_sum, qa_sum, grand_total, timestamp):
     ensure_stores_loaded()
