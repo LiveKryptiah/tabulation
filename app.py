@@ -597,39 +597,39 @@ def get_tabulation_data():
         gown_j = {j_id: round(cand_cats[j_id]['gown'], 2) if (j_id in cand_cats and 'gown' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
         qa_j = {j_id: round(cand_cats[j_id]['qa'], 2) if (j_id in cand_cats and 'qa' in cand_cats[j_id]) else '-' for j_id in ['Judge 1', 'Judge 2', 'Judge 3', 'Judge 4', 'Judge 5']}
 
-        candidates_data.append({\r
-            'number': cand_num,\r
-            'name': f"Candidate {cand_num}",\r
-            'prelim_score': round(prelim_avg, 2),\r
-            'prelim_30': round(prelim_30, 2),\r
-            'beauty_30': round(beauty_30, 2),\r
-            'brain_40': round(brain_40, 2),\r
-            'final_score': round(final_score, 2),\r
-            'judge_1': j_breakdown.get('Judge 1', '-'),\r
-            'judge_2': j_breakdown.get('Judge 2', '-'),\r
-            'judge_3': j_breakdown.get('Judge 3', '-'),\r
-            'judge_4': j_breakdown.get('Judge 4', '-'),\r
-            'judge_5': j_breakdown.get('Judge 5', '-'),\r
-            'prod_avg': round(prod_avg, 2),\r
-            'casual_avg': round(casual_avg, 2),\r
-            'swim_avg': round(swim_avg, 2),\r
-            'adv_avg': round(adv_avg, 2),\r
-            'gown_avg': round(gown_avg, 2),\r
-            'qa_avg': round(qa_avg, 2),\r
-            'prod_weighted': round(prod_avg * 0.15, 2),\r
-            'casual_weighted': round(casual_avg * 0.15, 2),\r
-            'swim_weighted': round(swim_avg * 0.15, 2),\r
-            'adv_weighted': round(adv_avg * 0.20, 2),\r
-            'gown_weighted': round(gown_avg * 0.15, 2),\r
-            'qa_weighted': round(qa_avg * 0.20, 2),\r
-            'prod_j': prod_j,\r
-            'casual_j': casual_j,\r
-            'swim_j': swim_j,\r
-            'adv_j': adv_j,\r
-            'gown_j': gown_j,\r
-            'qa_j': qa_j,\r
-            'has_top5_scores': len(b_scores) > 0 or len(br_scores) > 0,\r
-            'submission_count': len(p_scores)\r
+        candidates_data.append({
+            'number': cand_num,
+            'name': f"Candidate {cand_num}",
+            'prelim_score': round(prelim_avg, 2),
+            'prelim_30': round(prelim_30, 2),
+            'beauty_30': round(beauty_30, 2),
+            'brain_40': round(brain_40, 2),
+            'final_score': round(final_score, 2),
+            'judge_1': j_breakdown.get('Judge 1', '-'),
+            'judge_2': j_breakdown.get('Judge 2', '-'),
+            'judge_3': j_breakdown.get('Judge 3', '-'),
+            'judge_4': j_breakdown.get('Judge 4', '-'),
+            'judge_5': j_breakdown.get('Judge 5', '-'),
+            'prod_avg': round(prod_avg, 2),
+            'casual_avg': round(casual_avg, 2),
+            'swim_avg': round(swim_avg, 2),
+            'adv_avg': round(adv_avg, 2),
+            'gown_avg': round(gown_avg, 2),
+            'qa_avg': round(qa_avg, 2),
+            'prod_weighted': round(prod_avg * 0.15, 2),
+            'casual_weighted': round(casual_avg * 0.15, 2),
+            'swim_weighted': round(swim_avg * 0.15, 2),
+            'adv_weighted': round(adv_avg * 0.20, 2),
+            'gown_weighted': round(gown_avg * 0.15, 2),
+            'qa_weighted': round(qa_avg * 0.20, 2),
+            'prod_j': prod_j,
+            'casual_j': casual_j,
+            'swim_j': swim_j,
+            'adv_j': adv_j,
+            'gown_j': gown_j,
+            'qa_j': qa_j,
+            'has_top5_scores': len(b_scores) > 0 or len(br_scores) > 0,
+            'submission_count': len(p_scores)
         })
 
     # Compute Top 5 Finalists & Titles based on real judge submissions
