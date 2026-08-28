@@ -304,7 +304,7 @@
                 <tbody id="top5BreakdownBody">
                     {% for cand in top5_candidates %}
                     <tr>
-                        <td style="font-weight: 800; font-size: 14px;">Rank #{{ cand.top5_rank }}</td>
+                        <td style="font-weight: 800; font-size: 13px;"><span style="background-color: #1ed760; color: #000000; padding: 4px 10px; border-radius: 9999px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;">Rank #{{ cand.top5_rank }}</span></td>
                         <td style="text-align: left; padding-left: 16px; font-weight: 800;">{{ cand.name }}</td>
                         <td class="col-prelim" style="font-weight: 800; color: #10b981;">{{ cand.prelim_30 }}</td>
                         <td class="col-beauty" style="font-weight: 800; color: #10b981;">{{ cand.beauty_30 }}</td>
@@ -757,7 +757,7 @@
                         data.top5_candidates.forEach(cand => {
                             html += `
                                 <tr>
-                                    <td style="font-weight: 700; font-size: 13px; color: #ffffff;">Rank #${cand.top5_rank}</td>
+                                    <td style="font-weight: 800; font-size: 13px;"><span style="background-color: #1ed760; color: #000000; padding: 4px 10px; border-radius: 9999px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;">Rank #${cand.top5_rank}</span></td>
                                     <td style="text-align: left; padding-left: 16px; font-weight: 700; color: #ffffff;">${cand.name}</td>
                                     <td style="font-weight: 700; color: #ffffff;">${cand.prelim_30.toFixed(2)}</td>
                                     <td style="font-weight: 700; color: #ffffff;">${cand.beauty_30.toFixed(2)}</td>
