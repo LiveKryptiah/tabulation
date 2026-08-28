@@ -924,13 +924,15 @@
                         } else {
                             card.style.display = 'none';
                             const radio = card.querySelector('input[type="radio"]');
-                            if (radio && radio.checked) {
-                                radio.checked = false;
-                                setActiveCandidate(null);
-                                resetCandidatePreview();
-                            }
+                            if (radio) radio.checked = false;
                         }
                     });
+
+                    // Ensure no candidate pops up automatically in Top 5 round until judge clicks
+                    if (!activeCandidateNum) {
+                        document.querySelectorAll('input[name="candidate_number"]').forEach(r => r.checked = false);
+                        resetCandidatePreview();
+                    }
                 }
             })
             .catch(err => console.error("Error filtering top 5 candidates", err));
