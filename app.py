@@ -259,8 +259,20 @@ def update_or_append_prelim_csv(candidate_str, judge_slot, judge_name, prod_sum,
 
         _flush_prelim_csv()
 
+def _atomic_write_csv(filepath, rows):
+    """Write rows to a temp file first, then atomically replace target filepath."""
+    temp_filepath = filepath + '.tmp'
+    try:
+        with open(temp_filepath, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
+        os.replace(temp_filepath, filepath)
+    except Exception as e:
+        print(f"Error atomic writing CSV {filepath}:", e)
+
+
 def _flush_prelim_csv():
-    """Write the entire PRELIM_STORE to CSV. Must be called while holding STORE_LOCK."""
+    """Write the entire PRELIM_STORE to CSV atomically. Must be called while holding STORE_LOCK."""
     rows = [[
         'Candidate', 'Judge ID', 'Judge Name',
         'Production (Max 100)', 'Casual Wear (Max 100)', 'Swimwear (Max 100)',
@@ -274,16 +286,11 @@ def _flush_prelim_csv():
             item['adv'], item['gown'], item['qa'],
             item['grand_total'], item['timestamp']
         ])
-    try:
-        with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerows(rows)
-    except Exception as e:
-        print("Error writing prelim CSV:", e)
+    _atomic_write_csv(CSV_FILE, rows)
 
 
 def _flush_top5_csv():
-    """Write the entire TOP5_STORE to CSV. Must be called while holding STORE_LOCK."""
+    """Write the entire TOP5_STORE to CSV atomically. Must be called while holding STORE_LOCK."""
     rows = [[
         'Candidate', 'Judge ID', 'Judge Name',
         'Beauty Facial (Max 15)', 'Beauty Poise (Max 10)', 'Beauty Confidence (Max 5)', 'BEAUTY TOTAL (30)',
@@ -297,12 +304,7 @@ def _flush_top5_csv():
             item['br_substance'], item['br_intelligence'], item['br_clarity'], item['br_delivery'], item['brain_total'],
             item['top5_total'], item['timestamp']
         ])
-    try:
-        with open(TOP5_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerows(rows)
-    except Exception as e:
-        print("Error writing top5 CSV:", e)
+    _atomic_write_csv(TOP5_CSV_FILE, rows)
 
 
 def update_or_append_top5_csv(candidate, judge_slot, judge_name, b_facial, b_poise, b_conf, beauty_total, br_substance, br_intelligence, br_clarity, br_delivery, brain_total, top5_total, timestamp):
