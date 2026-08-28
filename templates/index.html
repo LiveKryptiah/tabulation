@@ -976,11 +976,7 @@
         function autoSyncDraftToBackend(candNum) {
             if (!candNum) return;
             _syncDirty = true;
-            clearTimeout(syncDebounceTimer);
-            
-            syncDebounceTimer = setTimeout(() => {
-                _flushSyncToBackend(candNum);
-            }, 500);
+            _flushSyncToBackend(candNum);
         }
 
         function _flushSyncToBackend(candNum) {
@@ -1004,9 +1000,9 @@
             }
 
             if (hasData) {
-                _syncDirty = false;
                 fetch('/submit_score', { method: 'POST', body: formData })
                 .then(() => {
+                    _syncDirty = false;
                     const statusMessage = document.getElementById('status-message');
                     if (statusMessage) {
                         statusMessage.textContent = "AUTO-SAVED TO ADMIN TABULATION";
@@ -1018,13 +1014,13 @@
             }
         }
 
-        // Periodic auto-sync every 3 seconds to guarantee admin sees updates
+        // Periodic auto-sync fallback every 2 seconds
         setInterval(() => {
             if (_syncDirty && activeCandidateNum) {
                 saveCandidateDraft(activeCandidateNum);
                 _flushSyncToBackend(activeCandidateNum);
             }
-        }, 3000);
+        }, 2000);
 
         function saveCandidateDraft(candNum) {
             if (!candNum) return;
